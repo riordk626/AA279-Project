@@ -1,0 +1,399 @@
+\section{\Large PROBLEM SET 1}
+\subsection{PROBLEM 1}
+
+\subsubsection{Select the characteristics of your mission.} \label{sec:char}
+
+For this mission, we have decided to create an attitude determination and control system (ADCS) for a Low Earth Orbit (LEO) satellite that is Earth pointing. We are currently planning to use Euler Angles for our attitude state representation as we do not currently believe that the attitude adjustments needed for this mission will be large enough to lead to gimbal lock, the most typical problem that is faced when working with Euler angles. For the satellite's sensors, we are planning to use a magnetometer due to its reliability and a star tracker due to its high precision. The actuators that we are planning to use are reaction wheels and magnetorquers in order to have both large adjustment and fine tuning attitude maneuver capabilities.
+
+\subsubsection{Conduct survey of satellites which have characteristics similar to selected project.}
+
+Outside of communications satellites, Earth observing satellites are the most common type of satellites orbiting Earth today. Additionally, earth observing satellite missions generally have clear ADCS requirements due to the instrument payloads having resolution requirements that are publicly available. Due to these factors, analysis was done on several Earth observing satellites including the Landsat series of satellites \cite{landsat} and satellites carrying a MODIS (Moderate Resolution Imaging Spectrometer). \cite{mril} In this process, satellite missions that had released a sufficient amount of public information to make accurate conclusions about their ADCS systems, geometry, and mission requirements were favored over those that were withholding large amounts of information from the public.
+
+\subsubsection{Select preferred existing satellite and payload for project.}
+
+Out of the Earth observing satellites that were considered, the Aqua satellite from NASA seemed to closely match the characteristics that we had chosen in Section \ref{sec:char} and had a wealth of public information that we could use for the research and development of this mission.
+
+\subsubsection{Collect basic information on mission, requirements, ADCS sensors and actuators, mechanical layout, mass, mass distribution, and inertia properties.} \label{sec:mission_info}
+
+At the time of its launch in 2004, Aqua's primary mission objective was to collect data on the Earth's water cycle. This included observations related to oceans, atmosphere, land surfaces, and ice. Aqua eventually became a part of NASA's Earth Observing System (EOS) program, which aims to provide long-term data records for studying Earth's climate system and environmental changes over time. For its orbit, Aqua was in a Sun-Synchronous Orbit (SSO). The orbit was almost circular and had an altitude of 705 kilometers and an inclination of 98.2 degrees. \cite{aqua_orbit_info} The primary requirements of Aqua's mission were:
+
+\begin{enumerate}
+    \item Provide global coverage of Earth's surface to get the full picture of the Earth's water cycle and related phenomena. \\
+    \item Obtain high spacial and temporal resolution to accurately capture changes in Earth's surface. \\
+    \item Utilize multisensor and multispectral observations to ensure accurate data. \\
+    \item Have a minimum mission lifetime of 6 years to ensure that changes in Earth's water cycle could be recorded over a lengthy amount of time. \\
+    \item Have readily accessible data for analysis by the scientific community. 
+\end{enumerate}
+
+\cite{aqua}For its ADCS sensors, Aqua used two charged-couple-device (CCD) star trackers, an inertial reference unit package (IRU) that included a set of gyros, and a magnetometer. For its actuators, Aqua used four reaction wheels, a magnetic torquer assembly, and a set of four primary thrusters and four redundant backups. \cite{aqua_acds}
+
+Like most satellites, the primary components of the Aqua satellite were the satellite structure that provided protection and support for all of the onboard instruments, the payload compartment that contained the suite of sensors for the mission, the power and thermal control subsystems, the ADCS, the communications subsystem, the on board computer (OBC), and the solar array. \cite{aqua_health_summary}
+
+From combining some reference schematics and the known deployed dimensions of the satellite that were 4.81 meters (15.8 ft) x 16.70 meters (54.8 ft) x 8.04 meters (26.4 ft), a rough design of the outer mechanical layout was created and is shown in the following sections. \cite{aqua_mass_sumaries} Additionally, this schematic showing the sensor distribution that was obtained.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 10cm]{Images/Schematic-of-the-Aqua-spacecraft-its-six-Earth-observing-instruments-12-panel-solar.png}
+    \caption{Schematic of Aqua Instruments}
+    \label{fig:squa-schematic}
+\end{figure}
+
+Additionally, the total mass of the satellite was 2,934 kg at launch. The mass distribution was 1,750 kg for the spacecraft structure, 1,082 kg for the instruments, and 102 kg for the propellant. Going into more detail, the individual mass of each of the instuments shown in Figure \ref{fig:squa-schematic} was also obtained. The MODIS had a mass of 229 kg. The AIRS had a mass of 177 kg. The AMSU-A had a mass of 91 kg. The HSB had a mass of 51 kg. The AMSR-E had a mass of 314 kg. Finally, the CERES had a mass of 50 kg per sensor of which there are two. It can be seen that with these instrument masses, their sum is 962 kg. Therefore, the mass of the overall system after both launch and deployment would have been 2814 kg. \cite{aqua_mass_sumaries} Even though the mass distribution and inertia properties of Aqua are not public information, by combining this information with Figure \ref{fig:squa-schematic}, a rough mass distribution and inertia properties such as the center of mass and moment of inertia can be obtained.
+
+\subsubsection{Simplify spacecraft geometry, make assumptions on mass distribution, e.g. splitting it in its core parts, define body axes (typically related to geometry and payload), compute moments of inertia and full inertia tensor w.r.t. body axes. Show your calculations.}
+
+A model of the satellite was generated with the geometry greatly simplified as shown in Figure \ref{fig:aquacad}. Each instrument listed in the previous section was approximated as a rectangular prism with a uniform mass distrubution corresopnding to the aforementioned instrument masses in Section \ref{sec:mission_info}. 
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 10cm]{Images/AquaSat-1.png}
+    \caption{Simplified Aqua Model}
+    \label{fig:aquacad}
+\end{figure}
+
+The location of the center of mass was calculated using Equation \ref{eq:center_mass} with distances measured from the lower-most corner oriented with the body coordinate system, whose orientation is  depicted in Figure \ref{fig:aquacad}. 
+
+\begin{equation} \label{eq:center_mass}
+    \vec{r} = \begin{bmatrix}
+        \bar{x} & \bar{y} & \bar{z}
+    \end{bmatrix}^T = \begin{bmatrix}
+        \frac{\sum_{i=1}^N{m_i x_i}}{\sum_{i = 1}^N{m_i}} & \frac{\sum_{i=1}^N{m_i y_i}}{\sum_{i = 1}^N{m_i}} & \frac{\sum_{i=1}^N{m_i z_i}}{\sum_{i = 1}^N{m_i}}
+    \end{bmatrix}^T
+\end{equation}
+
+The vector in this equation represents a position vector of the satellite's center of mass. The mass of each component in the satellite is denoted by $m_i$ where the position vector of each components center of mass has coordinates described as $\vec{r_i} = \begin{bmatrix}
+    x_i & y_i & z_i
+\end{bmatrix}^T$. The calculations were done using the component masses and locations tabulated below, which were pulled from the CAD model. The total mass along with the location of the satellite's center of mass is presented in the bottom row of Table \ref{tab:mass_props}. The mass of the chassis and solar panel were approximated by summing the non-instrument mass and propellant mass and uniformly distributing it between the two components.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|cccc}
+    Component & $m_i$ [kg] & $x_i$ [m] & $y_i$ [m] & $z_i$ [m] \\ \hline
+    MODIS     &    229   &    7.29   &   1.25    &   0.75    \\
+    AMSU-A1   &     49  &    5.79   &    1.25   &   0.75    \\
+    AMSU-A2    &    42   &    4.665   &   1.875    &  0.75   \\
+    AIRS        &    177   &    4.29   &   0.625    &   0.75    \\
+    HSB         &    51   &     3.915  &    1.875   &    0.75   \\
+    CERES       &   100    &    1.77   &   1.25    &   0.25    \\
+    AMSR-E      &    314   &    7.44   &    1.25   &   3.15    \\
+    Chassis     &     1607  &    2.997   &   1.25    &    1.929   \\
+    Solar Panel     &   245    &   4.02    &   9.6    &    2.25   \\ \hline
+    Total       & 2184      & 4.059     & 1.958     & 1.804
+    \end{tabular}
+    \caption{Mass Properties and Distribution for Satellite Components}
+    \label{tab:mass_props}
+\end{table}
+
+Following this, the moment of inertia for the satellite was computed. To compute this, first the moments of inertia of each component were taken about their own centers of mass. In general, the moment of inertia of a body is calculated using Equation \ref{eq:general_inertia}. Approximating each of the components as a rectangular prism, the moment of inertia about the centers of mass is found through using Equation \ref{eq:rect_inertia}, where $\rho$ is the mass density and $l_x$, $l_y$, and $l_z$ represent the lengths of each prism along the coordinate directions.
+
+\begin{equation} \label{eq:general_inertia}
+    \boldsymbol{I_{CM}} = \left[ \begin{array}{ccc}
+     \int{(y^2 + z^2)}dm & \int{-  xy}dm & \int{-  xz}dm \\
+\int{-  xy}dm &   \int{(x^2 + z^2)}dm & \int{-  yz}dm \\
+\int{-  xz}dm & \int{-  yz}dm &  \int{(x^2 + y^2)}dm \\
+    \end{array} \right]
+\end{equation}
+
+\begin{equation} \label{eq:rect_inertia}
+    \boldsymbol{I_{CM}} = \left[ \begin{array}{ccc}
+       \frac{1}{12}\rho l_x \left( l_y^3 l_z + l_z^3 l_y \right)  & 0 & 0 \\
+         0  & \frac{1}{12}\rho l_y \left( l_x^3 l_z + l_z^3 l_x \right) & 0 \\
+         0  & 0 &  \frac{1}{12}\rho l_z \left( l_x^3 l_y + l_y^3 l_x \right)
+         \end{array} \right]
+\end{equation}
+
+Table \ref{tab:mass_props} shows the properties that were used to calculate the moment of inertias as well as the component-wise results. 
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|ccccccc}
+    Component & $\rho$ [kg/m\textsuperscript{3}] & $l_x$ [m] & $l_y$ [m] & $l_z$ [m] & $I_{xx}$ [kg m\textsuperscript{2}] & $I_{yy}$ [kg m\textsuperscript{2}] & $I_{zz}$ [kg m\textsuperscript{2}] \\ \hline
+    MODIS       &    40.711    &   1.50    &   2.50     &  1.50     &  612.21      &  85.875      &   162.21     \\
+    AMSU-A1     &    8.7111    &   1.50    &   2.50     &  1.50     &  34.708     &   18.375     &    34.708    \\
+    AMSU-A2     &    29.867    &   0.75    &   1.25     &  1.50     &  13.344     &   9.814     &   7.438     \\
+    AIRS        &    62.933    &   1.50    &   1.25     &  1.50     &  56.234     &   66.375     &  56.234      \\
+    HSB         &    36.267    &   0.75    &   1.25     &  1.50     &  16.203     &   11.953     &  9.0310      \\
+    CERES       &    22.599    &   3.54    &   2.50     &  0.50     &  54.167     &   106.51     &  156.51      \\
+    AMSR-E      &    31.717    &   1.20    &   2.50     &  3.30     &  448.50     &   322.64     &  201.222      \\
+    Solar Panel &    45.404    &   3.80    &   14.2    &   0.1    &    4117.0    &    295.00    &   4411.6     \\
+    \end{tabular}
+    \caption{Mass Properties and Distribution for Satellite Components}
+    \label{tab:mass_props}
+\end{table}
+
+The chassis inertia had to be computed in a different manner using a composition of rectangles. The approach taken in this paper was to first take the inertia about a geometrically convenient point, then use the parallel axis theorem to determine the inertia about the center of mass of the chassis. The composition chosen was one where a larger rectangle of uniform density has from it a component of equivalent density subtracted. This composition is described in Table \ref{tab:composite_chassis}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|ccccccc}
+    Member  & $\rho$ & $l_x$ & $l_y$ & $l_z$ & $I_{xx}$ & $I_{yy}$ & $I_{zz}$ \\ \hline
+    Prism 1 &   46.580     &   6.84    &   2.5    &   2.5    &  2074.3      &   8800.7     &   8800.7     \\
+    Prism 2 &   -46.580     &  3.3     &   2.5    &   1.0    &  232.17      &   380.76     &   548.88     \\  
+    \end{tabular}
+    \caption{Mass Properties for Composite Chassis}
+    \label{tab:composite_chassis}
+\end{table}
+
+Using the parallel axis theorem, seen in Equation \ref{eq:par_axis}, the moment of inertia of the composite shape about the center of mass of prism 1 along with the inertia about the center of mass of the object is shown in Table \ref{tab:chass_inertia}. In Equation \ref{eq:par_axis}, $\boldsymbol{I_P}$ is the inertia tensor about an arbitrary point P whose position relative to the center of mass is $\vec{r} = \begin{bmatrix} x & y & z \end{bmatrix}^T$.
+
+\begin{equation} \label{eq:par_axis}
+    \boldsymbol{I_{P}} = \boldsymbol{I_{CM}} + m \left[ \begin{array}{ccc}  (y^2 + z^2) & -  xy & -  xz \\ 
+    -  xy &   (x^2 + z^2) & -  yz \\
+-  xz & -  yz &  (x^2 + y^2) \\ \end{array} \right]
+\end{equation}
+
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|cccccc}
+    Reference Point   & $I_{xx}$ & $I_{yy}$ & $I_{zz}$ & $I_{xy}$ & $I_{xz}$ & $I_{yz}$ \\ \hline
+    Center of Prism 1 & 1625.9   & 7000     & 7047.9   & 0        & -510.10  & 0        \\
+    Center of Mass    & 1574.2   & 6660.3   & 6760.0   & 0        & -632.12  & 0       
+    \end{tabular}
+    \caption{Inertia Tensors of Chassis about Intermediate Reference and Center of Mass}
+    \label{tab:chass_inertia}
+\end{table}
+
+Now applying parallel axis theorem to each component, Aqua's inertia tensor about its own center of mass is shown in Table \ref{tab:total_ineretia}.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{c|cccccc}
+                     & $I_{xx}$ & $I_{yy}$ & $I_{zz}$ & $I_{xy}$ & $I_{xz}$ & $I_{yz}$ \\ \hline
+Total Inertia Tensor & 23745    & 17560    & 36065    & 93.907   & -1267.1  & -967.50 
+\end{tabular}
+\caption{Total Inertial Tensor about Satellite Center of Mass Directed along Body Axes}
+\label{tab:total_ineretia}
+\end{table}
+
+Below is the script written to perform all of the above calculations.
+
+\begin{lstlisting}
+clc, clear 
+close all
+
+%% Instrument Moments of Inertia
+
+instruments = {'MODIS', 'AMSU-A1', 'AMSU-A2', 'AIRS', 'HSB', 'CERES', 'AMSR-E'};
+lxs = [1.5, 1.5, 0.75, 1.5, 0.75, 3.54, 1.2];
+lys = [2.5, 2.5, 1.25, 1.25,1.25, 2.5, 2.5];
+lzs = [1.5, 1.5, 1.5, 1.5, 1.5, 0.5, 3.3];
+ms = [229, 49, 42, 177, 51, 100, 314];
+Vs = lxs.*lys.*lzs;
+rhos = ms./Vs;
+Icms = zeros([3 3 7]);
+
+for i = 1:7
+    Icms(:,:,i) = rectInertia(lxs(i),lys(i),lzs(i),rhos(i));
+end
+%% Chassis
+
+V = 34.5;
+Vsub = 3.3*2.5*1;
+Vt = V + Vsub;
+m = 1607;
+rho = m/V;
+
+It = rectInertia(6.84, 2.5, 2.5, rho);
+
+Is = rectInertia(3.3,2.5,1,rho);
+
+xbar = 1.77;
+ybar = 0;
+zbar = -0.75;
+
+Is = parallelAxis(Is,xbar,ybar,zbar,rho,Vsub);
+
+Ichassis = It - Is;
+
+xbart = 3.42;
+ybart = 1.25;
+zbart = 1.75;
+
+xbars = xbart + xbar;
+ybars = ybart + ybar;
+zbars = zbart + zbar;
+
+xbarc = (Vt*xbart - Vsub*xbars)/V
+ybarc = (Vt*ybart - Vsub*ybars)/V
+zbarc = (Vt*zbart - Vsub*zbars)/V
+
+xtild = xbart - xbarc;
+ytild = ybart - ybarc;
+ztild = zbart - zbarc;
+
+Ichassis = parallelAxis(Ichassis, xtild, ytild, ztild, -rho, V)
+
+%% Solar Panel
+
+lx = 3.8;
+ly = 14.2;
+lz = 0.1;
+V = lx*ly*lz;
+m = 245;
+rho = m/V;
+
+Isolar = rectInertia(lx,ly,lz,rho);
+
+%% COM
+
+ms = [ms, 1607, 245];
+Vs = [Vs, 34.5, 5.396];
+rhos = ms./Vs;
+Icms = cat(3, Icms, Ichassis, Isolar);
+
+xis = [7.29, 5.79, 4.665, 4.29, 3.915, 1.77, 7.44, xbarc, 8.04/2];
+yis = [1.25, 1.25, 1.875, 0.625, 1.875, 1.25, 1.25, ybarc, 9.6];
+zis = [0.75, 0.75, 0.75, 0.75, 0.75, 0.25, 3.15, zbarc, 2.25];
+
+xyzBar = centerMass(ms, xis, yis, zis);
+
+%% Total Moment of Inertia
+
+% xis(8) = 6.84/2;
+% zis(8) = 1.75;
+
+x0s = xis - xyzBar(1);
+y0s = yis - xyzBar(2);
+z0s = zis - xyzBar(3);
+
+Itotal = zeros([3 3]);
+
+for i=1:9
+    Itotal = Itotal + parallelAxis(Icms(:,:,i), x0s(i), y0s(i), z0s(i), rhos(i), Vs(i));
+end
+
+%% Functions
+
+function I = rectInertia(lx, ly, lz, rho)
+
+% rho = m/V;
+
+I = zeros([3 3]);
+
+% Ixy = 0, Iyz = 0, Ixz = 0;
+
+Ixx = (1/12).*rho.*lx.*(ly.^3.*lz + lz.^3.*ly);
+Iyy = (1/12).*rho.*ly.*(lx.^3.*lz + lz.^3.*lx);
+Izz = (1/12).*rho.*lz.*(lx.^3.*ly + ly.^3.*lx);
+
+I(1,1) = Ixx;
+I(2,2) = Iyy;
+I(3,3) = Izz;
+
+end
+
+function I = parallelAxis(Icm, x, y, z, rho, V)
+
+Iplus = rho*V*[y^2 + z^2, -x*y, -x*z;
+            -x*y, x^2 + z^2, -y*z;
+            -x*z, -y*z, x^2 + y^2];
+
+I = Icm + Iplus;
+
+end
+
+function xyzBar = centerMass(ms, xs, ys, zs)
+
+xbar = sum(xs.*ms)/sum(ms);
+ybar = sum(ys.*ms)/sum(ms);
+zbar = sum(zs.*ms)/sum(ms);
+
+xyzBar = [xbar, ybar, zbar];
+
+end
+\end{lstlisting}
+
+\subsubsection{Discretize your spacecraft through its outer surfaces (geometry). Develop a Matlab/Simulink function to handle barycenter (geometry, no mass distribution) coordinates, size, and unit vectors normal to each outer surface of the spacecraft in body frame. You can list all this information in a Matrix. }
+
+Descriptions of all surfaces through barycenter coordinates, surfaces normal vectors, and surface areas are recorded below in Table \ref{tab:surface_data} with the corresponding surfaces labeled in Figure \ref{fig:surface_labels}. 
+
+% Please add the following required packages to your document preamble:
+% \usepackage{multirow}
+\begin{table}[H]
+\centering
+\begin{tabular}{c|ccc|ccc|c}
+        & \multicolumn{3}{c|}{Surface Normal Vector} & \multicolumn{3}{c|}{Centroid Coordinates} & \multirow{2}{*}{Area [m\textsuperscript{2}]} \\ \cline{2-7}
+Surface & $n_x$        & $n_y$        & $n_z$        & $x$ [m]  & $y$ [m]  & $z$ [m] &                                                                   \\ \hline
+1       & 0            & -1           & 0            & 4.30         & 0            & 1.70        & 26.28                                                             \\
+2       & 1            & 0            & 0            & 8.04         & 1.25         & 2.40        & 12.00                                                             \\
+3       & 0            & 0            & 1            & 7.44         & 1.25         & 4.80        & 3.000                                                             \\
+4       & -1           & 0            & 0            & 0            & 1.25         & 1.5         & 7.500                                                             \\
+5       & 0            & 0            & 1            & 3.42         & 1.25         & 3.00        & 17.10                                                             \\
+6       & 0            & 0            & 1            & 4.02         & 9.60         & 2.30        & 53.96                                                             \\
+7       & 0            & 0            & -1           & 4.02         & 9.60         & 2.30        & 53.96                                                             \\
+8       & -1           & 0            & 0            & 6.84         & 1.25         & 3.90        & 4.500                                                             \\
+9       & 0            & 1            & 0            & 4.30         & 0            & 1.70        & 26.28                                                             \\
+10      & 0            & 0            & -1           & 4.02         & 1.25         & 0           & 20.10                                                            
+\end{tabular}
+\caption{Normal Vectors, Barycenter Coordinates, and Surface Area for All Outer Surfaces}
+\label{tab:surface_data}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 14cm]{Images/AquaSurfaces.png}
+    \caption{Schematic of Aqua's Outer Surfaces Discretized and Labeled}
+    \label{fig:surface_labels}
+\end{figure}
+
+The script that was used to store this data is seen below:
+
+
+\begin{lstlisting}
+clc, clear
+close all
+
+A1s = [6.84*3, 1.2*4.8].';
+P1s = [6.84/2, 0, 3/2;
+        6.84 + 1.2/2, 0, 4.8/2];
+[A1, P1] = cent(A1s, P1s);
+A9 = A1; P9 = P1;
+N1 = [0 -1 0]; N9 = -N1;
+
+A2 = 4.8*2.5;
+P2 = [8.04, 2.5/2, 4.8/2];
+N2 = [1 0 0];
+
+A3 = 1.2*2.5;
+P3 = [6.84 + 1.2/2, 2.5/2, 4.8];
+N3 = [0 0 1];
+
+A4 = 2.5*3;
+P4 = [0 2.5/2, 3/2];
+N4 = [-1 0 0];
+
+A5 = 2.5*6.84;
+P5 = [6.84/2, 2.5/2, 3];
+N5 = [0 0 1];
+
+A6 = 14.2*3.8; A7 = A6;
+P6 = [4.02, 9.6, 2.3]; P7 = P6;
+N6 = [0 0 1]; N7 = -N6;
+
+A8 = 2.5*1.8;
+P8 = [6.84, 2.5/2, 3 + 1.8/2];
+N8 = [-1 0 0];
+
+A10 = 8.04*2.5;
+P10 = [8.04/2, 2.5/2, 0];
+N10 = [0 0 -1];
+
+N = [N1;N2;N3;N4;N5;N6;N7;N8;N9;N10];
+A = [A1;A2;A3;A4;A5;A6;A7;A8;A9;A10];
+P = [P1;P2;P3;P4;P5;P6;P7;P8;P9;P10];
+
+%% Centroid Function
+function [Ai, Pi] = cent(As, Ps)
+
+Ai = sum(As);
+
+x = sum(Ps(:,1).*As)./Ai;
+y = sum(Ps(:,2).*As)./Ai;
+z = sum(Ps(:,3).*As)./Ai;
+
+Pi = [x, y, z];
+
+end
+\end{lstlisting}
