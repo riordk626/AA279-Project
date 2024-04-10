@@ -1,0 +1,93 @@
+\documentclass[12pt,a4paper,notitlepage]{article}
+\usepackage[framed,numbered,autolinebreaks]{mcode}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{float}
+\usepackage[toc,page]{appendix}
+\usepackage{parskip}
+\usepackage{sectsty}
+\usepackage{gensymb}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage{titling}
+\setlength{\droptitle}{-1cm}
+\usepackage{enumitem}
+\setlist[enumerate]{topsep=0pt,itemsep=-3.5ex,partopsep=1ex,parsep=1ex}
+\renewcommand{\rmdefault}{ptm}
+\sectionfont{\fontsize{12}{0}\selectfont}
+\subsectionfont{\fontsize{12}{0}\selectfont}
+
+% Header and Footer
+\setlength{\headheight}{15pt} 
+\usepackage{fancyhdr}
+\fancypagestyle{plain}{
+ \fancyhf{}
+ \fancyhead[L]{AA 279C: Spacecraft Attitude Determination and Control}
+ \fancyhead[R]{Stanford University}
+ \fancyfoot[C]{\thepage}
+}
+
+% Table of contents
+\setcounter{tocdepth}{5}
+
+\begin{document}
+\title{\Huge \textbf{SATELLITE DYNAMICS AND ATTITUDE CONTROL}}
+\author{Harsh Patel}
+\date{14 June 2017}
+
+\begin{minipage}[h]{\textwidth}
+	\vspace{4 cm}
+	\advance\leftskip-1in
+    \maketitle
+\end{minipage}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.15]{Images/WMAP2.jpg}
+\end{figure}
+
+\pagebreak
+
+\section*{\Large REVISION HISTORY}
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular} [0.9 \textwidth]{cl}
+\hline \hline
+\multicolumn{1}{c}{VERSION} & \multicolumn{1}{l}{REVISION NOTES} \\
+\hline
+PS1 & - Created document \\
+    & - Added PS1 material \\
+ \hline
+ PS2 & - Added PS2 material \\
+ & - Updated title page \\
+ & - Added table of contents \\
+ & - Updated orbit around L2 point \\
+ & - Discretized cylindrical parts of geometry \\
+\hline \hline
+\end{tabular}
+	\caption{Summary of project revisions.}
+\end{center}
+\end{table}
+ 
+\newpage
+\section*{\Large TABLE OF CONTENTS}
+\makeatletter
+\@starttoc{toc}
+\makeatother
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{\Large INTRODUCTION}
+
+\include{pset1.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+\section{\Large CONCLUSION}
+
+
+\end{document}
