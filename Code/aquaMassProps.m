@@ -1,9 +1,9 @@
-clc, clear 
-close all
+function [rcm, Itotal] = aquaMassProps()
 
-%% Instrument Moments of Inertia
 
-instruments = {'MODIS', 'AMSU-A1', 'AMSU-A2', 'AIRS', 'HSB', 'CERES', 'AMSR-E'};
+% Instrument Moments of Inertia
+
+% instruments = {'MODIS', 'AMSU-A1', 'AMSU-A2', 'AIRS', 'HSB', 'CERES', 'AMSR-E'};
 lxs = [1.5, 1.5, 0.75, 1.5, 0.75, 3.54, 1.2];
 lys = [2.5, 2.5, 1.25, 1.25,1.25, 2.5, 2.5];
 lzs = [1.5, 1.5, 1.5, 1.5, 1.5, 0.5, 3.3];
@@ -15,7 +15,8 @@ Icms = zeros([3 3 7]);
 for i = 1:7
     Icms(:,:,i) = rectInertia(lxs(i),lys(i),lzs(i),rhos(i));
 end
-%% Chassis
+
+% Chassis
 
 V = 34.5;
 Vsub = 3.3*2.5*1;
@@ -43,17 +44,17 @@ xbars = xbart + xbar;
 ybars = ybart + ybar;
 zbars = zbart + zbar;
 
-xbarc = (Vt*xbart - Vsub*xbars)/V
-ybarc = (Vt*ybart - Vsub*ybars)/V
-zbarc = (Vt*zbart - Vsub*zbars)/V
+xbarc = (Vt*xbart - Vsub*xbars)/V;
+ybarc = (Vt*ybart - Vsub*ybars)/V;
+zbarc = (Vt*zbart - Vsub*zbars)/V;
 
 xtild = xbart - xbarc;
 ytild = ybart - ybarc;
 ztild = zbart - zbarc;
 
-Ichassis = parallelAxis(Ichassis, xtild, ytild, ztild, -rho, V)
+Ichassis = parallelAxis(Ichassis, xtild, ytild, ztild, -rho, V);
 
-%% Solar Panel
+% Solar Panel
 
 lx = 3.8;
 ly = 14.2;
@@ -64,7 +65,7 @@ rho = m/V;
 
 Isolar = rectInertia(lx,ly,lz,rho);
 
-%% COM
+% COM
 
 ms = [ms, 1607, 245];
 Vs = [Vs, 34.5, 5.396];
@@ -75,16 +76,16 @@ xis = [7.29, 5.79, 4.665, 4.29, 3.915, 1.77, 7.44, xbarc, 8.04/2];
 yis = [1.25, 1.25, 1.875, 0.625, 1.875, 1.25, 1.25, ybarc, 9.6];
 zis = [0.75, 0.75, 0.75, 0.75, 0.75, 0.25, 3.15, zbarc, 2.25];
 
-xyzBar = centerMass(ms, xis, yis, zis);
+rcm = centerMass(ms, xis, yis, zis);
 
-%% Total Moment of Inertia
+% Total Moment of Inertia
 
 % xis(8) = 6.84/2;
 % zis(8) = 1.75;
 
-x0s = xis - xyzBar(1);
-y0s = yis - xyzBar(2);
-z0s = zis - xyzBar(3);
+x0s = xis - rcm(1);
+y0s = yis - rcm(2);
+z0s = zis - rcm(3);
 
 Itotal = zeros([3 3]);
 
@@ -92,7 +93,7 @@ for i=1:9
     Itotal = Itotal + parallelAxis(Icms(:,:,i), x0s(i), y0s(i), z0s(i), rhos(i), Vs(i));
 end
 
-%% Functions
+% Sub-Functions
 
 function I = rectInertia(lx, ly, lz, rho)
 
@@ -129,5 +130,7 @@ ybar = sum(ys.*ms)/sum(ms);
 zbar = sum(zs.*ms)/sum(ms);
 
 xyzBar = [xbar, ybar, zbar];
+
+end
 
 end

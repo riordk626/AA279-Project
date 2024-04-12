@@ -1,5 +1,4 @@
-clc, clear
-close all
+function [A,P,N] = aquaSurfaceProps()
 
 A1s = [6.84*3, 1.2*4.8].';
 P1s = [6.84/2, 0, 3/2;
@@ -40,7 +39,8 @@ N = [N1;N2;N3;N4;N5;N6;N7;N8;N9;N10];
 A = [A1;A2;A3;A4;A5;A6;A7;A8;A9;A10];
 P = [P1;P2;P3;P4;P5;P6;P7;P8;P9;P10];
 
-%% Centroid Function
+% Centroid Sub-Function
+
 function [Ai, Pi] = cent(As, Ps)
 
 Ai = sum(As);
@@ -50,5 +50,7 @@ y = sum(Ps(:,2).*As)./Ai;
 z = sum(Ps(:,3).*As)./Ai;
 
 Pi = [x, y, z];
+
+end
 
 end
