@@ -42,6 +42,11 @@ The body axes of the spacecraft are seen plotted in Figure \ref{fig:aquacad}. Th
 
 \subsubsection{Program Euler equations in principal axes (e.g. in Matlab/Simulink). No external torques.}
 
+The following Simulink model utilizing the MATLAB function (also described below) takes in an initial rotational velocity vector and simulates the physics of the current AQUA model about the principal axes of inertia.
+
+\includegraphics{Images/}
+\lstinputlisting{Code/eulerPropagate.slx}
+
 \subsubsection{Numerically integrate Euler equations from arbitrary initial conditions ($\boldsymbol{\omega < 10^{\circ}/s}$, $\boldsymbol{\omega_i \neq 0}$). Multiple attitude revolutions.}
 
 \subsubsection{Plot rotational kinetic energy and momentum ellipsoids in 3D (axis equal) corresponding to chosen initial conditions. Verify that semi-axis of ellipsoids corresponds to theoretical values}
