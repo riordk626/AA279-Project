@@ -1,3 +1,19 @@
+
+% This LaTeX was auto-generated from MATLAB code.
+% To make changes, update the MATLAB code and republish this document.
+
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{color}
+
+\sloppy
+\definecolor{lightgray}{gray}{0.5}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+    
+    \begin{verbatim}
 clc, clear
 close all
 
@@ -29,35 +45,34 @@ genPlots(Icm_prime, 'principal')
 function genPlots(Icm_prime, name)
 
     load_system("eulerPropagate")
-    open_system("eulerPropagate")
-    
+
     sim("eulerPropagate")
-    
+
     om = om_p;
-    
+
     n = size(t,1);
-    
+
     Tvec = zeros([n 1]);
     Lvec = zeros([n 3]);
     for i=1:n
         Lvec(i,:) = Icm_prime*om(i,:).';
         Tvec(i) = 0.5*dot(om(i,:).', Lvec(i,:).');
     end
-    
+
     L = vecnorm(Lvec,2,2);
-    
+
     T = Tvec(1);
     L = L(1);
-    
-    
+
+
     % Integration
-    figure 
+    figure
     hold on
     plot(t, om(:,1))
     plot(t, om(:,2))
     plot(t, om(:,3))
     hold off
-    
+
     % Energy and Momentum Ellipsoids
     Ix = Icm_prime(1,1);
     Iy = Icm_prime(2,2);
@@ -67,7 +82,7 @@ function genPlots(Icm_prime, name)
     b_energy = sqrt(2*T/Iy);
     c_energy = sqrt(2*T/Iz);
     n = 100;
-    
+
     x = linspace(-a_energy, a_energy, n);
     X = meshgrid(x);
     Y = zeros(size(X));
@@ -81,17 +96,17 @@ function genPlots(Icm_prime, name)
         zi = real(sqrt((1/Iz).*(2*T - Ix.*xi.^2 - Iy.*yi.^2)));
         Z(:,i) = zi;
     end
-    
-    
+
+
     figure
     surface(X,Y,Z,'FaceColor', 'g', 'HandleVisibility', 'off')
     surface(X,Y,-Z, 'FaceColor', 'g', 'DisplayName', 'Energy Ellispoid')
     hold on
-    
+
     a_mom = L/Ix;
     b_mom = L/Iy;
     c_mom = L/Iz;
-    
+
     x = linspace(-a_mom, a_mom, n);
     X = meshgrid(x);
     Y = zeros(size(X));
@@ -105,12 +120,12 @@ function genPlots(Icm_prime, name)
         zi = real(sqrt((1/Iz^2).*(L^2 - Ix^2.*xi.^2 - Iy^2.*yi.^2)));
         Z(:,i) = zi;
     end
-    
-    
+
+
     surface(X,Y,Z,'FaceColor','b', 'HandleVisibility', 'off')
     surface(X,Y,-Z,'FaceColor', 'b', 'DisplayName', 'Momentum Ellipsoid')
-    
-    
+
+
     % Polhode plots
     plot3(om(:,1), om(:,2), om(:,3), 'r', 'LineWidth', 5, 'DisplayName', 'Polhode')
     axis equal
@@ -122,16 +137,16 @@ function genPlots(Icm_prime, name)
     zlabel('z')
     legend
     exportgraphics(gcf, ['../Images/ellipsoid_polhode_', name, '.png'])
-    
+
     xmin = min(om(:,1));
     xmax = max(om(:,1));
     ymin = min(om(:,2));
     ymax = max(om(:,2));
     zmin = min(om(:,3));
     zmax = max(om(:,3));
-    
+
     x = linspace(xmin, xmax, n);
-    
+
     figure
     subplot(3,1,1)
     ax = gca();
@@ -172,3 +187,25 @@ function genPlots(Icm_prime, name)
 
     exportgraphics(gcf, ['../Images/planar_polhode_', name, '.png'])
 end
+\end{verbatim}
+
+        \color{lightgray} \begin{verbatim}Warning: Exported image displays axes toolbar. To remove axes toolbar from
+image, export again. 
+\end{verbatim} \color{black}
+    
+\includegraphics [width=4in]{HW2main_01.eps}
+
+\includegraphics [width=4in]{HW2main_02.eps}
+
+\includegraphics [width=4in]{HW2main_03.eps}
+
+\includegraphics [width=4in]{HW2main_04.eps}
+
+\includegraphics [width=4in]{HW2main_05.eps}
+
+\includegraphics [width=4in]{HW2main_06.eps}
+
+
+
+\end{document}
+
