@@ -18,6 +18,15 @@ load_system("eulerPropagate")
 
 sim("eulerPropagate")
 
+n = size(t,1);
+
+T = zeros([n 1]);
+L = zeros([n 3]);
+for i=1:n
+    L(i,:) = Icm_prime*om(i,:).';
+    T = 0.5*dot(om(i,:).', L(i,:).');
+end
+
 figure 
 hold on
 plot(t, om(:,1))

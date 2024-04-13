@@ -18,6 +18,10 @@ load_system("eulerPropagate")
 
 sim("eulerPropagate")
 
+n = 
+
+figure 
+hold on
 plot(t, om(:,1))
 plot(t, om(:,2))
 plot(t, om(:,3))
