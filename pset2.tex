@@ -42,12 +42,56 @@ The body axes of the spacecraft are seen plotted in Figure \ref{fig:aquacad}. Th
 
 \subsubsection{Program Euler equations in principal axes (e.g. in Matlab/Simulink). No external torques.}
 
-The following Simulink model utilizing the MATLAB function (also described below) takes in an initial rotational velocity vector and simulates the physics of the current AQUA model about the principal axes of inertia.
+The following Simulink model utilizing a MATLAB function (both in Figure \ref{fig:euler_prop_model}) takes in an initial rotational velocity vector and simulates the physics of the current AQUA model about the principal axes of inertia.
 
-\includegraphics{Images/}
-\lstinputlisting{Code/eulerPropagate.slx}
+\begin{figure} [H]
+    \centering
+    \includegraphics[trim={5cm 5cm 5cm 5cm},clip,width = 15cm]{Images/eulerPropagate.pdf}
+    \begin{lstlisting}
+function xdot = fcn(u,x,Ip)
+
+xdot = zeros(size(x));
+
+
+Mx = u(1);
+My = u(2);
+Mz = u(3);
+
+omx = x(1);
+omy = x(2);
+omz = x(3);
+
+Ix = Ip(1,1);
+Iy = Ip(2,2);
+Iz = Ip(3,3);
+
+wxdot = (1/Ix)*(Mx - (Iz - Iy)*omy*omz);
+wydot = (1/Iy)*(My - (Ix - Iz)*omz*omx);
+wzdot = (1/Iz)*(Mz - (Iy - Ix)*omx*omy);
+
+xdot(1) = wxdot;
+xdot(2) = wydot;
+xdot(3) = wzdot;
+
+end
+    \end{lstlisting}
+    \caption{Euler Propagation Simulink Model}
+    \label{fig:euler_prop_model}
+\end{figure}
+
 
 \subsubsection{Numerically integrate Euler equations from arbitrary initial conditions ($\boldsymbol{\omega < 10^{\circ}/s}$, $\boldsymbol{\omega_i \neq 0}$). Multiple attitude revolutions.}
+
+Given an initial condition of $\vec{\omega}_0 = \begin{bmatrix}
+    -7 & 2 & 5
+\end{bmatrix}^T {}^{\circ}/s$, gyroscopic coupling causes a periodic oscillation in the angular velocity vector represented in a body fixed axis frame. In this instance in particular, the simulation results shown in \ref{fig:sim_omegas} follows this evolution in the principal frame.
+
+\begin{figure}
+    \centering
+    \includegraphics{Images/}
+    \caption{Angular Velocity Vector Components Evolving in the Body Fixed Principally Oriented Frame}
+    \label{fig:sim_omegas}
+\end{figure}
 
 \subsubsection{Plot rotational kinetic energy and momentum ellipsoids in 3D (axis equal) corresponding to chosen initial conditions. Verify that semi-axis of ellipsoids corresponds to theoretical values}
 
