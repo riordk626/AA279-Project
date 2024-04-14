@@ -44,9 +44,13 @@ The body axes of the spacecraft are seen plotted in Figure \ref{fig:aquacad}. Th
 
 The following Simulink model utilizing a MATLAB function (both in Figure \ref{fig:euler_prop_model}) takes in an initial rotational velocity vector and simulates the physics of the current AQUA model about the principal axes of inertia.
 
-\begin{figure} [H]
+\begin{figure}[H]
     \centering
     \includegraphics[trim={5cm 5cm 5cm 5cm},clip,width = 15cm]{Images/eulerPropagate.pdf}
+\end{figure}
+
+\begin{figure} [H]
+    \centering
     \begin{lstlisting}
 function xdot = fcn(u,x,Ip)
 
@@ -86,17 +90,71 @@ Given an initial condition of $\vec{\omega}_0 = \begin{bmatrix}
     -7 & 2 & 5
 \end{bmatrix}^T {}^{\circ}/s$, gyroscopic coupling causes a periodic oscillation in the angular velocity vector represented in a body fixed axis frame. In this instance in particular, the simulation results shown in \ref{fig:sim_omegas} follows this evolution in the principal frame.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
-    \includegraphics{Images/}
+    \includegraphics[width = 10cm] {Images/omega_prop_random.png}
     \caption{Angular Velocity Vector Components Evolving in the Body Fixed Principally Oriented Frame}
     \label{fig:sim_omegas}
 \end{figure}
 
 \subsubsection{Plot rotational kinetic energy and momentum ellipsoids in 3D (axis equal) corresponding to chosen initial conditions. Verify that semi-axis of ellipsoids corresponds to theoretical values}
 
+The angular momentum and rotational kinetic energy of a rigid body is computed using Equations \ref{eq:ang_mom} and \ref{eq:rot_KE} respectively, where $\vec{L}$ and $T$ are the momentum vector and energy, and the angular velocity vector in the principally oriented frame is described as $\vec{\omega} = \begin{bmatrix} \omega_x & \omega_y & \omega_z \end{bmatrix}^T$. 
+
+\begin{equation} \label{eq:ang_mom}
+    \vec{L} = \boldsymbol{I_{CM}'}\vec{\omega} = I_x \omega_x + I_y \omega_y + I_z \omega_z
+\end{equation}
+
+\begin{equation} \label{eq:rot_KE}
+    T = \vec{\omega} \cdot \vec{L} = I_x \omega_x^2 + I_y \omega_y + I_z \omega_z^2
+\end{equation}
+
+These quantities are both conserved, so the satellite's angular velocity must always take on a vector value that yields the same momentum magnitude and kinetic energy as the initial conditions. With not much manipulation, these relations can be shown to be equivalent to Equations \ref{eq:mom_ellipse} and \ref{eq:energy_ellipse} respectively, where L is the magnitude of the angular momentum vector. 
+
+\begin{equation} \label{eq:mom_ellipse}
+    \frac{\omega_x^2}{(L/I_x)^2} + \frac{\omega_y^2}{(L/I_y)^2} + \frac{\omega_z^2}{(L/I_z)^2} = 1
+\end{equation}
+
+\begin{equation} \label{eq:energy_ellipse}
+    \frac{\omega_x^2}{2T/I_x} + \frac{\omega_y^2}{2T/I_y} + \frac{\omega_z^2}{2T/I_z} = 1
+\end{equation}
+
+By inspection, the form of these equations is that of an ellipsoid. Therefore, if the Cartesian coordinates are chosen such that the x,y, and z components of the angular velocity lie along the x,y, and z axes, the tip of the angular velocity vector plotted on these axes will lie on the surface of these ellipsoids, both of which are plotted in Figure \ref{fig:ellipsoid_super_plot}. 
+
 \subsubsection{Plot polhode in same 3D plot. Verify that it is the intersection between the ellipsoid}
 
+Following that the angular velocity in a Cartesian plot must lie along the surface of both ellipsoids described in the above section, it follows that the vector would be restricted to the intersection of the two ellipsoids. This curve is called the polhode. The angular velocity vector obtained from the aforementioned simulation results can also be seen in Figure \ref{fig:ellipsoid_super_plot}. This matches the expected behavior for the polhode in that it clearly traces the intersection between the momentum and energy ellipsoids. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 12cm] {Images/ellipsoid_polhode_random.png}
+    \caption{Momentum and Energy Ellipsoids and Polhode Curve Plotted in 3D on Principally Aligned Coordinate Axes}
+    \label{fig:ellipsoid_super_plot}
+\end{figure}
+
 \subsubsection{Plot polhode in three 2D planes identified by principal axes (axis equal). Verify that shapes of resulting conic sections correspond to theory.}
+
+Figure \ref{fig:2d_polhode} shows the planar projections of the polhode curve along the labeled axes. In theory, these curves should be described by Equations \ref{eq:polhode1}, \ref{eq:polhode2}, and \ref{eq:polhode3}. 
+
+\begin{equation} \label{eq:polhode1}
+    (I_y - I_x)I_y \omega_y^2 + (I_z - I_x)I_z \omega_z^2 = L^2 - 2TI_x
+\end{equation}
+
+\begin{equation} \label{eq:polhode2}
+    (I_x - I_y)I_x \omega_x^2 + (I_z - I_y)I_z \omega_z^2 = L^2 - 2TI_y
+\end{equation}
+
+\begin{equation} \label{eq:polhode3}
+    (I_x - I_z)I_x \omega_x^2 + (I_y - I_z)I_y \omega_y^2 = L^2 - 2TI_z
+\end{equation}
+
+Due to the fact that $I_x < I_y < I_z$, Equation \ref{eq:polhode1} describes an ellipse in the yz plane, Equation \ref{eq:polhode2} a hyperbola in the xz plane, and Equation \ref{eq:polhode3} another ellipse in the xy plane. The theoretical values obtained from these equations were plotted over the polhode that resulted from simulations in Figure \ref{fig:2d_polhode}, establishing that the simulated dynamics followed the expected behavior. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 10cm]{Images/planar_polhode_random.png}
+    \caption{Polhode Curve Projected onto Principally Aligned Cartesian Coordinate Planes}
+    \label{fig:2d_polhode}
+\end{figure}
 
 \subsubsection{Repeat above steps changing initial conditions, e.g. setting angular velocity vector parallel to principal axis. Is the behavior according to expectations?}
