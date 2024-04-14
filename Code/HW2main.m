@@ -53,10 +53,15 @@ function genPlots(Icm_prime, name)
     % Integration
     figure 
     hold on
-    plot(t, om(:,1))
-    plot(t, om(:,2))
-    plot(t, om(:,3))
+    plot(t, om(:,1), 'LineWidth',2)
+    plot(t, om(:,2), 'LineWidth',2)
+    plot(t, om(:,3), 'LineWidth',2)
     hold off
+    ax = gca();
+    ax.FontSize = 14;
+    xlabel('t [sec]')
+    ylabel('\omega [rad/s]')
+    exportgraphics(gcf, ['../Images/omega_prop_', name, '.png'])
     
     % Energy and Momentum Ellipsoids
     Ix = Icm_prime(1,1);
