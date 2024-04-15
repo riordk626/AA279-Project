@@ -20,6 +20,8 @@ function genPlots(Icm_prime, name, flag)
     
     T = Tvec(1)
     L = L(1)
+
+    L^2/(2*T)
     
     
     % Integration
