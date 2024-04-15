@@ -98,8 +98,8 @@ function genPlots(Icm_prime, name, flag)
     end
     
     figure
-    surface(X_mom,Y_mom,Z_mom,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
-    surface(X_mom,Y_mom,-Z_mom,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
+    surface(X_mom,Y_mom,Z_mom,'FaceAlpha', 0.3, 'FaceColor', 'b', 'HandleVisibility', 'off')
+    surface(X_mom,Y_mom,-Z_mom,'FaceAlpha', 0.3, 'FaceColor', 'b', 'HandleVisibility', 'off')
     hold on
 
     quiver3(0,0,0, a_mom, 0,0, 'LineWidth', 5, 'DisplayName', 'a')
