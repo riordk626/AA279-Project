@@ -97,7 +97,7 @@ Given an initial condition of $\vec{\omega}_0 = \begin{bmatrix}
     \label{fig:sim_omegas}
 \end{figure}
 
-\subsubsection{Plot rotational kinetic energy and momentum ellipsoids in 3D (axis equal) corresponding to chosen initial conditions. Verify that semi-axis of ellipsoids corresponds to theoretical values}
+\subsubsection{Plot rotational kinetic energy and momentum ellipsoids in 3D (axis equal) corresponding to chosen initial conditions. Verify that semi-axis of ellipsoids corresponds to theoretical values} \label{sec:ellipsoid_definitions}
 
 The angular momentum and rotational kinetic energy of a rigid body is computed using Equations \ref{eq:ang_mom} and \ref{eq:rot_KE} respectively, where $\vec{L}$ and $T$ are the momentum vector and energy, and the angular velocity vector in the principally oriented frame is described as $\vec{\omega} = \begin{bmatrix} \omega_x & \omega_y & \omega_z \end{bmatrix}^T$. 
 
@@ -123,7 +123,7 @@ By inspection, the form of these equations is that of an ellipsoid. Therefore, i
 
 \subsubsection{Plot polhode in same 3D plot. Verify that it is the intersection between the ellipsoid}
 
-Following that the angular velocity in a Cartesian plot must lie along the surface of both ellipsoids described in the above section, it follows that the vector would be restricted to the intersection of the two ellipsoids. This curve is called the polhode. The angular velocity vector obtained from the aforementioned simulation results can also be seen in Figure \ref{fig:ellipsoid_super_plot}. This matches the expected behavior for the polhode in that it clearly traces the intersection between the momentum and energy ellipsoids. 
+Following that the angular velocity in a Cartesian plot must lie along the surface of both ellipsoids described in Section \ref{sec:ellipsoid_definitions}, it follows that the vector would be restricted to the intersection of the two ellipsoids. This curve is called the polhode. The angular velocity vector obtained from the aforementioned simulation results can also be seen in Figure \ref{fig:ellipsoid_super_plot}. This matches the expected behavior for the polhode in that it clearly traces the intersection between the momentum and energy ellipsoids. 
 
 \begin{figure}[H]
     \centering
@@ -165,7 +165,7 @@ Now with an initial condition of $\vec{\omega}_0 = \begin{bmatrix}
 
 \begin{figure}[H]
     \centering
-    \includegraphics{}
+    \includegraphics[width = 10cm]{Images/omega_prop_principal.png}
     \caption{Angular Velocity Vector Components for Principally Aligned Initical Conditions}
     \label{fig:sim_omegas_principal}
 \end{figure}
@@ -174,9 +174,16 @@ This manifests in the polhode graph being a single point. Figure \ref{fig:ellips
 
 \begin{figure}[H]
     \centering
-    \includegraphics{}
+    \includegraphics[width = 12cm] {Images/ellipsoid_polhode_principal.png}
     \caption{Momentum and Energy Ellipsoids and Polhode for Angular Velocity Aligned with a Principal Axis}
     \label{fig:ellipsoid_super_plot_principal}
 \end{figure}
 
-The polhode projected onto 2D axes is a single point that should lie along the theoretical curve described in Equations \ref{eq:polhode1}, \ref{eq:polhode2}, and \ref{eq:polhode3}.
+The polhode projected onto 2D axes is a single point that should lie along the theoretical curve described in Equations \ref{eq:polhode1}, \ref{eq:polhode2}, and \ref{eq:polhode3}. This is shown to hold true in Figure \ref{fig:2d_polhode_principal}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 10cm]{}
+    \caption{Projected Polhode Curve for Principally Aligned Angular Velocity Vector}
+    \label{fig:2d_polhode_principal}
+\end{figure}
