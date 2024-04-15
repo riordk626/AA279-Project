@@ -109,7 +109,7 @@ The angular momentum and rotational kinetic energy of a rigid body is computed u
     T = \vec{\omega} \cdot \vec{L} = I_x \omega_x^2 + I_y \omega_y + I_z \omega_z^2
 \end{equation}
 
-These quantities are both conserved, so the satellite's angular velocity must always take on a vector value that yields the same momentum magnitude and kinetic energy as the initial conditions. With not much manipulation, these relations can be shown to be equivalent to Equations \ref{eq:mom_ellipse} and \ref{eq:energy_ellipse} respectively, where L is the magnitude of the angular momentum vector. 
+These quantities are both conserved, so the satellite's angular velocity must always take on a vector value that yields the same momentum magnitude and kinetic energy as the initial conditions. With the initial conditions given above, the magnitude of angular momentum is 3906.4 kg m/s and the kinetic energy is 283.08 J. With not much manipulation, these relations can be shown to be equivalent to Equations \ref{eq:mom_ellipse} and \ref{eq:energy_ellipse} respectively, where L is the magnitude of the angular momentum vector.  
 
 \begin{equation} \label{eq:mom_ellipse}
     \frac{\omega_x^2}{(L/I_x)^2} + \frac{\omega_y^2}{(L/I_y)^2} + \frac{\omega_z^2}{(L/I_z)^2} = 1
@@ -158,3 +158,25 @@ Due to the fact that $I_x < I_y < I_z$, Equation \ref{eq:polhode1} describes an 
 \end{figure}
 
 \subsubsection{Repeat above steps changing initial conditions, e.g. setting angular velocity vector parallel to principal axis. Is the behavior according to expectations?}
+
+Now with an initial condition of $\vec{\omega}_0 = \begin{bmatrix}
+    10 & 0 & 0
+\end{bmatrix}^T {}^{\circ}/s$ the magnitude of momentum and kinetic energy are 3056.1 kg m/s and 266.69 J respectively. With the angular velocity vector strictly aligned with one of the principal axes, the vector does not evolve in the principally oriented frame. That is, there is no gyroscopic coupling that causes the zero components of the angular velocity to increase or decrease. The vector components plotted over time are seen in Figure \ref{fig:sim_omegas_principal} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{}
+    \caption{Angular Velocity Vector Components for Principally Aligned Initical Conditions}
+    \label{fig:sim_omegas_principal}
+\end{figure}
+
+This manifests in the polhode graph being a single point. Figure \ref{fig:ellipsoid_super_plot_principal} shows this point plotted at the intersection of the energy and momentum ellipsoids. The intersection in this case is strictly a point as the momentum ellipsoid is fully contained within the energy ellipsoid with two tangent points at  $10^{\circ}/s$ and $-10{}^{\circ}/s$ along the x-axis. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{}
+    \caption{Momentum and Energy Ellipsoids and Polhode for Angular Velocity Aligned with a Principal Axis}
+    \label{fig:ellipsoid_super_plot_principal}
+\end{figure}
+
+The polhode projected onto 2D axes is a single point that should lie along the theoretical curve described in Equations \ref{eq:polhode1}, \ref{eq:polhode2}, and \ref{eq:polhode3}.
