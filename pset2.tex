@@ -3,7 +3,7 @@
 
 \subsubsection{Define orbit initial conditions and make sure you can propagate the orbit of the satellite over multiple orbits using either a Keplerian propagator or a numerical integration scheme.}
 
-\subsubsection{In general the body axes are not the principal axes. Identify principal axes through the eigenvector/eigenvalue problem discussed in class and compute the rotation matrix from body to principal axes.}
+\subsubsection{In general the body axes are not the principal axes. Identify principal axes through the eigenvector/eigenvalue problem discussed in class and compute the rotation matrix from body to principal axes.} \label{sec:principal_inertia_def_and_calc}
 
 To resolve an inertia tensor $\boldsymbol{I_{CM}}$ to a diagonal matrix of principal moments of inertia, there must exist a matrix, $\boldsymbol{A}$ such that the Equation \ref{eq:principal_moments} holds, where $\boldsymbol{I_{CM}'}$ is the principal moment of inertia tensor about the center of mass.
 
@@ -157,7 +157,7 @@ Due to the fact that $I_x < I_y < I_z$, Equation \ref{eq:polhode1} describes an 
     \label{fig:2d_polhode}
 \end{figure}
 
-\subsubsection{Repeat above steps changing initial conditions, e.g. setting angular velocity vector parallel to principal axis. Is the behavior according to expectations?}
+\subsubsection{Repeat above steps changing initial conditions, e.g. setting angular velocity vector parallel to principal axis. Is the behavior according to expectations?} \label{sec:principally_aligned_omega}
 
 Now with an initial condition of $\vec{\omega}_0 = \begin{bmatrix}
     10 & 0 & 0
@@ -187,3 +187,7 @@ The polhode projected onto 2D axes is a single point that should lie along the t
     \caption{Projected Polhode Curve for Principally Aligned Angular Velocity Vector}
     \label{fig:2d_polhode_principal}
 \end{figure}
+
+The code used to perform all calculations and plots for Sections \ref{sec:principal_inertia_def_and_calc} -- \ref{sec:principally_aligned_omega} is listed below.
+
+\lstinputlisting{Code/HW2main.m}
