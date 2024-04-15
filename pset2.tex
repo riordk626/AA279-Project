@@ -119,7 +119,7 @@ These quantities are both conserved, so the satellite's angular velocity must al
     \frac{\omega_x^2}{2T/I_x} + \frac{\omega_y^2}{2T/I_y} + \frac{\omega_z^2}{2T/I_z} = 1
 \end{equation}
 
-By inspection, the form of these equations is that of an ellipsoid. Therefore, if the Cartesian coordinates are chosen such that the x,y, and z components of the angular velocity lie along the x,y, and z axes, the tip of the angular velocity vector plotted on these axes will lie on the surface of these ellipsoids. The momentum ellipsoid is plotted along with its semi-axis lengths is plotted in \ref{fig:momentum_axis_verification}. The same is done for the energy ellipsoid in \ref{fig:energy_axis_verification}
+By inspection, the form of these equations is that of an ellipsoid. Therefore, if the Cartesian coordinates are chosen such that the x,y, and z components of the angular velocity lie along the x,y, and z axes, the tip of the angular velocity vector plotted on these axes will lie on the surface of these ellipsoids. The momentum ellipsoid is plotted along with its semi-axis lengths is plotted in Figure \ref{fig:momentum_axis_verification}. The same is done for the energy ellipsoid in Figure \ref{fig:energy_axis_verification}
 
 \begin{figure}[H]
     \centering
@@ -137,7 +137,7 @@ By inspection, the form of these equations is that of an ellipsoid. Therefore, i
 
 \subsubsection{Plot polhode in same 3D plot. Verify that it is the intersection between the ellipsoid}
 
-Following that the angular velocity in a Cartesian plot must lie along the surface of both ellipsoids described in Section \ref{sec:ellipsoid_definitions}, it follows that the vector would be restricted to the intersection of the two ellipsoids. This curve is called the polhode. The angular velocity vector obtained from the aforementioned simulation results can also be seen in Figure \ref{fig:ellipsoid_super_plot}. This matches the expected behavior for the polhode in that it clearly traces the intersection between the momentum and energy ellipsoids. 
+Following that the angular velocity in a Cartesian plot must lie along the surface of both ellipsoids described in Section \ref{sec:ellipsoid_definitions}, it follows that the vector would be restricted to the intersection of the two ellipsoids. The curve that this vector traces is called the polhode, and the simulated results of this curve can be seen in Figure \ref{fig:ellipsoid_super_plot}, over-plotted with the momentum and energy ellipsoids. This curve matches the expected behavior in that it clearly traces the intersection between the momentum and energy ellipsoids. 
 
 \begin{figure}[H]
     \centering
@@ -182,6 +182,22 @@ Now with an initial condition of $\vec{\omega}_0 = \begin{bmatrix}
     \includegraphics[width = 10cm]{Images/omega_prop_principal.png}
     \caption{Angular Velocity Vector Components for Principally Aligned Initical Conditions}
     \label{fig:sim_omegas_principal}
+\end{figure}
+
+The momentum and energy ellipsoids along with their semi-axis lengths can be seen plotted in Figures \ref{fig:momentum_axis_verification_princ} and \ref{fig:energy_axis_verification_princ} respectively.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 10cm]{Images/momentum_axes_principal.png}
+    \caption{Momentum Ellipsoid and Semi-Axis Lengths for Principally Aligned Velocity Vector}
+    \label{fig:momentum_axis_verification_princ}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 10cm]{Images/energy_axes_principal.png}
+    \caption{Energy Ellipsoid and Semi-Axis Lengths for Principally Aligned Velocity Vector}
+    \label{fig:energy_axis_verification_princ}
 \end{figure}
 
 This manifests in the polhode graph being a single point. Figure \ref{fig:ellipsoid_super_plot_principal} shows this point plotted at the intersection of the energy and momentum ellipsoids. The intersection in this case is strictly a point as the momentum ellipsoid is fully contained within the energy ellipsoid with two tangent points at  $10^{\circ}/s$ and $-10{}^{\circ}/s$ along the x-axis. 
