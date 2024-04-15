@@ -48,23 +48,23 @@ function genPlots(Icm_prime, name, flag)
     c_energy = sqrt(2*T/Iz);
     n = 50;
     
-    x = linspace(-a_energy, a_energy, n);
+    x_energy = linspace(-a_energy, a_energy, n);
     X_energy = meshgrid(x);
-    Y_energy = zeros(size(X_energy));
-    Z_energy = zeros(size(X_energy));
+    Y_energy = zeros(size(X));
+    Z_energy = zeros(size(X));
     yu = real( sqrt((1/Iy).*(2*T - Ix.*x.^2)) );
     yl = -yu;
     for i=1:length(x)
-        xi = X_energy(:,i).';
+        xi = X(:,i).';
         yi = linspace(yl(i), yu(i), n);
-        Y_energy(:,i) = yi;
+        Y(:,i) = yi;
         zi = real(sqrt((1/Iz).*(2*T - Ix.*xi.^2 - Iy.*yi.^2)));
-        Z_energy(:,i) = zi;
+        Z(:,i) = zi;
     end
     
     figure
-    surface(X_energy,Y_energy,Z_energy,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
-    surface(X_energy,Y_energy,-Z_energy,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
+    surface(X,Y,Z,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
+    surface(X,Y,-Z,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
     hold on
 
     quiver3(0,0,0, a_energy, 0,0, 'LineWidth', 5, 'DisplayName', 'a')
@@ -79,22 +79,22 @@ function genPlots(Icm_prime, name, flag)
     c_mom = L/Iz;
     
     x = linspace(-a_mom, a_mom, n);
-    X_mom = meshgrid(x);
-    Y_mom = zeros(size(X_mom));
-    Z_mom = zeros(size(X_mom));
+    X = meshgrid(x);
+    Y = zeros(size(X));
+    Z = zeros(size(X));
     yu = sqrt((1/Iy^2).*(L^2 - Ix^2.*x.^2));
     yl = -yu;
     for i=1:length(x)
-        xi = X_mom(:,i).';
+        xi = X(:,i).';
         yi = linspace(yl(i), yu(i), n);
-        Y_mom(:,i) = yi;
+        Y(:,i) = yi;
         zi = real(sqrt((1/Iz^2).*(L^2 - Ix^2.*xi.^2 - Iy^2.*yi.^2)));
-        Z_mom(:,i) = zi;
+        Z(:,i) = zi;
     end
     
     figure
-    surface(X_mom,Y_mom,Z_mom,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
-    surface(X_mom,Y_mom,-Z_mom,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
+    surface(X,Y,Z,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
+    surface(X,Y,-Z,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
     hold on
 
     quiver3(0,0,0, a_mom, 0,0, 'LineWidth', 5, 'DisplayName', 'a')
@@ -105,10 +105,10 @@ function genPlots(Icm_prime, name, flag)
     exportgraphics(gcf, ['../Images/momentum_axes_', name, '.png'])
 
     figure
-    surface(X_energy,Y_energy,Z_energy,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
-    surface(X_energy,Y_energy,-Z_energy,'FaceAlpha', 0.3, 'FaceColor', 'g', 'DisplayName', 'Energy Ellispoid')
-    surface(X_mom,Y_mom,Z_mom,'FaceAlpha', 0.3,'FaceColor','b','HandleVisibility', 'off')
-    surface(X_mom,Y_mom,-Z_mom,'FaceAlpha', 0.3,'FaceColor', 'b', 'DisplayName', 'Momentum Ellipsoid')
+    surface(X,Y,Z,'FaceAlpha', 0.3, 'FaceColor', 'g', 'HandleVisibility', 'off')
+    surface(X,Y,-Z,'FaceAlpha', 0.3, 'FaceColor', 'g', 'DisplayName', 'Energy Ellispoid')
+    surface(X,Y,Z,'FaceAlpha', 0.3,'FaceColor','b','HandleVisibility', 'off')
+    surface(X,Y,-Z,'FaceAlpha', 0.3,'FaceColor', 'b', 'DisplayName', 'Momentum Ellipsoid')
     hold on
     
     
