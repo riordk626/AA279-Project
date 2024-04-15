@@ -23,9 +23,6 @@ x0_deg = [10, 0, 0].';
 x0 = x0_deg*pi/180;
 Tfinal = 120;
 
-
-genPlots(Icm_prime, 'principal')
-
 genPlots(Icm_prime, 'principal', 1)
 
 
