@@ -64,8 +64,8 @@ function genPlots(Icm_prime, name, flag)
     
     
     figure
-    surface(X,Y,Z,'FaceColor', 'g', 'HandleVisibility', 'off')
-    surface(X,Y,-Z, 'FaceColor', 'g', 'DisplayName', 'Energy Ellispoid')
+    surface(X,Y,Z,'FaceAlpha', 0.5, 'FaceColor', 'g', 'HandleVisibility', 'off')
+    surface(X,Y,-Z,'FaceAlpha', 0.5, 'FaceColor', 'g', 'DisplayName', 'Energy Ellispoid')
     hold on
     
     a_mom = L/Ix;
@@ -87,8 +87,8 @@ function genPlots(Icm_prime, name, flag)
     end
     
     
-    surface(X,Y,Z,'FaceColor','b', 'HandleVisibility', 'off')
-    surface(X,Y,-Z,'FaceColor', 'b', 'DisplayName', 'Momentum Ellipsoid')
+    surface(X,Y,Z,'FaceAlpha', 0.5,'FaceColor','b', 'HandleVisibility', 'off')
+    surface(X,Y,-Z,'FaceAlpha', 0.5,'FaceColor', 'b', 'DisplayName', 'Momentum Ellipsoid')
     
     
     if flag
