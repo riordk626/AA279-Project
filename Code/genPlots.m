@@ -1,4 +1,4 @@
-function genPlots(Icm_prime, name)
+function genPlots(Icm_prime, name, flag)
 
     load_system("eulerPropagate")
     open_system("eulerPropagate")
@@ -18,17 +18,23 @@ function genPlots(Icm_prime, name)
     
     L = vecnorm(Lvec,2,2);
     
-    T = Tvec(1);
-    L = L(1);
+    T = Tvec(1)
+    L = L(1)
     
     
     % Integration
     figure 
     hold on
-    plot(t, om(:,1))
-    plot(t, om(:,2))
-    plot(t, om(:,3))
+    plot(t, om(:,1), 'LineWidth',2, 'DisplayName', '\omega_x')
+    plot(t, om(:,2), 'LineWidth',2, 'DisplayName', '\omega_y')
+    plot(t, om(:,3), 'LineWidth',2, 'DisplayName', '\omega_z')
     hold off
+    ax = gca();
+    ax.FontSize = 14;
+    xlabel('t [sec]')
+    ylabel('\omega [rad/s]')
+    legend
+    exportgraphics(gcf, ['../Images/omega_prop_', name, '.png'])
     
     % Energy and Momentum Ellipsoids
     Ix = Icm_prime(1,1);
@@ -83,8 +89,16 @@ function genPlots(Icm_prime, name)
     surface(X,Y,-Z,'FaceColor', 'b', 'DisplayName', 'Momentum Ellipsoid')
     
     
+    if flag
+        markerSim = 'o';
+        markerTheo = 'x';
+    else
+        markerSim = '-';
+        markerTheo = '--';
+    end
+
     % Polhode plots
-    plot3(om(:,1), om(:,2), om(:,3), 'r', 'LineWidth', 5, 'DisplayName', 'Polhode')
+    plot3(om(:,1), om(:,2), om(:,3), ['r' markerSim], 'LineWidth', 5, 'DisplayName', 'Polhode')
     axis equal
     view([1 1 0.5])
     ax = gca();
@@ -109,11 +123,11 @@ function genPlots(Icm_prime, name)
     ax = gca();
     ax.FontSize = 14;
     ax.LineWidth = 2;
-    plot(om(:,1), om(:,2), 'DisplayName', 'Simulated', 'LineWidth', 2)
+    plot(om(:,1), om(:,2), markerSim, 'DisplayName', 'Simulated', 'LineWidth', 2)
     hold on
     y = real( sqrt( (L^2 - 2*T*Iz - (Ix - Iz).*Ix.*x.^2)/((Iy - Iz)*Iy) ) );
-    plot(x,y, 'r--', 'HandleVisibility','off', 'LineWidth', 2)
-    plot(x,-y,'r--', 'DisplayName', 'Theoretical', 'LineWidth', 2)
+    plot(x,y, ['r', markerTheo], 'HandleVisibility','off', 'LineWidth', 2)
+    plot(x,-y,['r' markerTheo], 'DisplayName', 'Theoretical', 'LineWidth', 2)
     xlabel('x')
     ylabel('y')
     legend
@@ -122,24 +136,24 @@ function genPlots(Icm_prime, name)
     ax = gca();
     ax.FontSize = 14;
     ax.LineWidth = 2;
-    plot(om(:,1), om(:,3), 'LineWidth', 2)
+    plot(om(:,1), om(:,3), markerSim, 'LineWidth', 2)
     hold on
     xlabel('x')
     ylabel('z')
     z = real( sqrt( (L^2 - 2*T*Iy - (Ix - Iy).*Ix.*x.^2)/((Iz - Iy)*Iz) ) );
-    plot(x,z, 'r--', 'LineWidth', 2)
+    plot(x,z, ['r' markerTheo], 'LineWidth', 2)
     axis equal
     subplot(3,1,3)
     ax = gca();
     ax.FontSize = 14;
     ax.LineWidth = 2;
-    plot(om(:,2), om(:,3), 'LineWidth', 2)
+    plot(om(:,2), om(:,3), markerSim, 'LineWidth', 2)
     hold on
     xlabel('y')
     ylabel('z')
-    y = x;
+    y = linspace(ymin,ymax,n);
     z = real( sqrt( (L^2 - 2*T*Ix - (Iy - Ix).*Iy.*y.^2)/((Iz - Ix)*Iz) ) );
-    plot(y,z, 'r--', 'LineWidth', 2)
+    plot(y,z, ['r' markerTheo], 'LineWidth', 2)
     axis equal
 
     exportgraphics(gcf, ['../Images/planar_polhode_', name, '.png'])
