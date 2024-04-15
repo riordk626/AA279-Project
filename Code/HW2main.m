@@ -179,7 +179,7 @@ function genPlots(Icm_prime, name, flag)
     hold on
     xlabel('y')
     ylabel('z')
-    y = x;
+    y = linspace(ymin,ymax,n);
     z = real( sqrt( (L^2 - 2*T*Ix - (Iy - Ix).*Iy.*y.^2)/((Iz - Ix)*Iz) ) );
     plot(y,z, ['r' markerTheo], 'LineWidth', 2)
     axis equal
