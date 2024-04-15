@@ -71,6 +71,11 @@ function genPlots(Icm_prime, name, flag)
     quiver3(0,0,0, 0, b_energy,0, 'LineWidth', 5, 'DisplayName', 'b')
     quiver3(0,0,0, 0, 0,c_energy, 'LineWidth', 5, 'DisplayName', 'c')
     view([1 1 0.5])
+    ax = gca();
+    ax.FontSize = 14;
+    xlabel('x')
+    ylabel('y')
+    zlabel('z')
     legend
     exportgraphics(gcf, ['../Images/energy_axes_', name, '.png'])
     
@@ -101,6 +106,11 @@ function genPlots(Icm_prime, name, flag)
     quiver3(0,0,0, 0, b_mom,0, 'LineWidth', 5, 'DisplayName', 'b')
     quiver3(0,0,0, 0, 0,c_mom, 'LineWidth', 5, 'DisplayName', 'c')
     view([1 1 0.5])
+    ax = gca();
+    ax.FontSize = 14;
+    xlabel('x')
+    ylabel('y')
+    zlabel('z')
     legend
     exportgraphics(gcf, ['../Images/momentum_axes_', name, '.png'])
 
