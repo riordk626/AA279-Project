@@ -25,7 +25,8 @@ t_span = [0 T]; % Propagate for 10000 seconds
 orbital_eqns = @(t, y) orbital_derivatives(t, y, mu);
 
 % Use ode45 solver to propagate orbit
-[t, y] = ode45(orbital_eqns, t_span, [r0; v0]);
+% [t, y] = ode45(orbital_eqns, t_span, [r0; v0]);
+[t, y] = ode23(orbital_eqns, t_span, [r0; v0]);
 
 % Extract position and velocity vectors from solution
 r = y(:, 1:3);
