@@ -3,6 +3,40 @@
 
 \subsubsection{Define orbit initial conditions and make sure you can propagate the orbit of the satellite over multiple orbits using either a Keplerian propagator or a numerical integration scheme.}
 
+The orbit initial conditions were chosen to closely replicate those of the Aqua satellite. The orbit is sun-synchronous, has an eccentricity of almost zero, and has an altitude similar to that of Aqua.
+
+\begin{center}
+    a = 7080.6 km \\
+    e = 0.0000979 \\
+    i = 98.2\degree \\
+    $\omega$ = 120.4799\degree \\
+    $\Omega$ = 95.2063\degree \\
+    $\nu$ = 0\degree
+\end{center}
+
+To propagate the orbit, these orbital elements were first converted to the initial position and velocity in the Earth centered Inertial (ECI) frame. The ECI frame is defined such that it doesn't rotate with Earth's surface. The x-axis points in the direction of the vernal equinox (the ascending node of the sun), the z-axis points towards the north pole, and the y-axis completes the triad. To initially propagate the orbit and serve as a point of reference, Simulink was used to sweep the mean anomaly over a given time span and time steps and calculate the position in the ECI frame at each time step. The Simulink model is shown below in Figure \ref{fig:simulink-prop}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 15.5cm]{Images/simulink_prop.png}
+    \caption{Simulink Model for Keplerian Propagator}
+    \label{fig:simulink-prop}
+\end{figure}
+
+The Keplerian propagator was then used to plot the orbit for a time span roughly equal to three orbital periods. The resulting orbit along with a spherical model of Earth is shown below in Figure \ref{fig:kep_orbit}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 8.5cm]{Images/aqua_orbit_kepler.png}
+    \caption{Aqua Orbit for Keplerian Propagator}
+    \label{fig:kep_orbit}
+\end{figure}
+
+The Matlab function that was used for the Keplerian propagator can also be seen here.
+
+
+
+
 \subsubsection{In general the body axes are not the principal axes. Identify principal axes through the eigenvector/eigenvalue problem discussed in class and compute the rotation matrix from body to principal axes.} \label{sec:principal_inertia_def_and_calc}
 
 To resolve an inertia tensor $\boldsymbol{I_{CM}}$ to a diagonal matrix of principal moments of inertia, there must exist a matrix, $\boldsymbol{A}$ such that the Equation \ref{eq:principal_moments} holds, where $\boldsymbol{I_{CM}'}$ is the principal moment of inertia tensor about the center of mass.
