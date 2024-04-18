@@ -1,4 +1,4 @@
-function [rcm, Itotal] = aquaMassProps()
+function [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps()
 
 
 % Instrument Moments of Inertia
@@ -87,11 +87,13 @@ x0s = xis - rcm(1);
 y0s = yis - rcm(2);
 z0s = zis - rcm(3);
 
-Itotal = zeros([3 3]);
+Itotal_b = zeros([3 3]);
 
 for i=1:9
-    Itotal = Itotal + parallelAxis(Icms(:,:,i), x0s(i), y0s(i), z0s(i), rhos(i), Vs(i));
+    Itotal_b = Itotal_b + parallelAxis(Icms(:,:,i), x0s(i), y0s(i), z0s(i), rhos(i), Vs(i));
 end
+
+[A_ptob,Itotal_p] = eig(Itotal_b);
 
 % Sub-Functions
 

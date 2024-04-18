@@ -1,4 +1,4 @@
-function genPlots(Icm_prime, name, flag)
+function genPlots(I_sim, name, flag)
 
     load_system("eulerPropagate")
     open_system("eulerPropagate")
@@ -12,7 +12,7 @@ function genPlots(Icm_prime, name, flag)
     Tvec = zeros([n 1]);
     Lvec = zeros([n 3]);
     for i=1:n
-        Lvec(i,:) = Icm_prime*om(i,:).';
+        Lvec(i,:) = I_sim*om(i,:).';
         Tvec(i) = 0.5*dot(om(i,:).', Lvec(i,:).');
     end
     
@@ -39,9 +39,9 @@ function genPlots(Icm_prime, name, flag)
     exportgraphics(gcf, ['../Images/omega_prop_', name, '.png'])
     
     % Energy and Momentum Ellipsoids
-    Ix = Icm_prime(1,1);
-    Iy = Icm_prime(2,2);
-    Iz = Icm_prime(3,3);
+    Ix = I_sim(1,1);
+    Iy = I_sim(2,2);
+    Iz = I_sim(3,3);
     % Energy and Momentum Ellipsoids
     a_energy = sqrt(2*T/Ix);
     b_energy = sqrt(2*T/Iy);

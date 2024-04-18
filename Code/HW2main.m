@@ -1,14 +1,11 @@
 clc, clear
 close all
 
-[rcm, Icm] = aquaMassProps();
-
+[rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
+I_sim = Itotal_p;
 %rcm = rcm.*100
 
-[A,Icm_prime] = eig(Icm);
-
-
-rcm_prime = A.'*rcm.';
+rcm_prime = A_ptob.'*rcm.';
 
 
 % Random ICs
@@ -17,12 +14,12 @@ x0_deg = [-7, 2, 5].';
 x0 = x0_deg*pi/180;
 Tfinal = 120;
 
-genPlots(Icm_prime, 'random', 0)
+genPlots(I_sim, 'random', 0)
 
 x0_deg = [10, 0, 0].';
 x0 = x0_deg*pi/180;
 Tfinal = 120;
 
-genPlots(Icm_prime, 'principal', 1)
+genPlots(I_sim, 'principal', 1)
 
 
