@@ -60,3 +60,4 @@ xlabel('t [sec]')
 ylabel('Error [rad/s]')
 legend
 exportgraphics(gcf, '../Images/sim_vs_anlt_error.png')
+
