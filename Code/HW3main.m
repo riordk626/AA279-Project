@@ -8,14 +8,22 @@ I_sim = Itotal_p;
 
 I_sim(2,2) = I_sim(1,1);
 
-Tfinal = 500;
+
 x0_deg = [-7, 2, 5].';
 x0 = deg2rad(x0_deg);
+Tfinal = 300;
+axesFlag = 0;
+M = timeseries(20.*ones([3 2]), [0 Tfinal]);
+simIn = Simulink.SimulationInput('eulerPropagate');
+simIn = simIn.setVariable('M', M);
 
 load_system("eulerPropagate")
-open_system("eulerPropagate")
+% open_system("eulerPropagate")
 
-sim("eulerPropagate")
+simOut = sim(simIn);
+
+om_p = simOut.om_p;
+t = simOut.t;
 
 om_sim = om_p;
 

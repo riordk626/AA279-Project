@@ -1,11 +1,11 @@
-function genPlots(I_sim, name, flag)
+function genPlots(I_sim, name, flag, simIn)
 
-    load_system("eulerPropagate")
-    open_system("eulerPropagate")
+    load_system('eulerPropagate.slx')
     
-    sim("eulerPropagate")
+    simOut = sim(simIn);
     
-    om = om_p;
+    om = simOut.om_p;
+    t = simOut.t;
     
     n = size(t,1);
     
