@@ -13,12 +13,9 @@ x0_deg = [-7, 2, 5].';
 x0 = x0_deg*pi/180;
 Tfinal = 500;
 axesFlag = 0;
-M = timeseries(20.*ones([4 2]), [0 Tfinal]);
+M = timeseries(zeros([3 2]), [0 Tfinal]);
 simIn = Simulink.SimulationInput('eulerPropagate');
-simIn.ExternalInput()
-simIn = simIn.setVariable('M', M);
-% simOut = Simulink.SimulationOutput('eulerPropagate');
-% simOut = simOut.
+simIn.ExternalInput = M;
 
 genPlots(I_sim, 'random', 0, simIn)
 

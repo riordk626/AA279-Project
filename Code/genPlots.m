@@ -1,6 +1,6 @@
 function genPlots(I_sim, name, flag, simIn)
 
-    load_system('eulerPropagate.slx')
+    % load_system('eulerPropagate.slx')
     
     simOut = sim(simIn);
     
