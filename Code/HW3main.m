@@ -4,6 +4,8 @@ close all
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
 
+%% Axis Symmetric
+
 I_sim = Itotal_p;
 
 I_sim(2,2) = I_sim(1,1);
@@ -68,4 +70,9 @@ xlabel('t [sec]')
 ylabel('Error [rad/s]')
 legend
 exportgraphics(gcf, '../Images/sim_vs_anlt_error.png')
+
+plot3(simOut.om{1}.Values.Data(:,1), simOut.om{1}.Values.Data(:,2), simOut.om{1}.Values.Data(:,3))
+%% Asymmetric
+
+I_sim = Itotal_p;
 
