@@ -4,7 +4,7 @@ function genPlots(I_sim, name, flag, simIn)
     
     simOut = sim(simIn);
     
-    om = simOut.om_p;
+    om = squeeze(simOut.om_p).';
     t = simOut.t;
     
     n = size(t,1);

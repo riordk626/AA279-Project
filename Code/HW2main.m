@@ -9,8 +9,8 @@ rcm_prime = A_ptob.'*rcm.';
 
 % Random ICs
 
-x0_deg = [-7, 2, 5].';
-x0 = x0_deg*pi/180;
+om0_deg = [-7, 2, 5].';
+om0 = om0_deg*pi/180;
 Tfinal = 500;
 axesFlag = 0;
 M = timeseries(zeros([3 2]), [0 Tfinal]);
@@ -19,8 +19,8 @@ simIn.ExternalInput = M;
 
 genPlots(I_sim, 'random', 0, simIn)
 
-x0_deg = [10, 0, 0].';
-x0 = x0_deg*pi/180;
+om0_deg = [10, 0, 0].';
+om0 = om0_deg*pi/180;
 Tfinal = 120;
 
 genPlots(I_sim, 'principal', 1, simIn)
