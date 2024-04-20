@@ -1,4 +1,4 @@
-function genPlots(I_sim, name, flag, simIn)
+function genPlotsHW2(I_sim, name, flag, simIn)
 
     % load_system('eulerPropagate.slx')
     

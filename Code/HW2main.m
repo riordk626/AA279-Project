@@ -17,12 +17,12 @@ M = timeseries(zeros([3 2]), [0 Tfinal]);
 simIn = Simulink.SimulationInput('eulerPropagate');
 simIn.ExternalInput = M;
 
-genPlots(I_sim, 'random', 0, simIn)
+genPlotsHW2(I_sim, 'random', 0, simIn)
 
 om0_deg = [10, 0, 0].';
 om0 = om0_deg*pi/180;
 Tfinal = 120;
 
-genPlots(I_sim, 'principal', 1, simIn)
+genPlotsHW2(I_sim, 'principal', 1, simIn)
 
 

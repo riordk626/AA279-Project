@@ -83,8 +83,10 @@ u0 = [0.1 0.1 0.1].';
 simIn = Simulink.SimulationInput('aquaMasterModel');
 simIn.ExternalInput = M;
 
-legendNames = {{'\phi', '\theta', 'psi'}, {'q0', 'q1', 'q2', 'q3'}};
+legendNames = {{'\phi', '\theta', '\psi'}, {'q0', 'q1', 'q2', 'q3'}};
 stateNames = {'u', 'q'};
+unitNames = {'[rad]', ''};
+imageNames = {'EA.png', 'quat.png'};
 
 for Type = 1:2
     
@@ -111,21 +113,42 @@ for Type = 1:2
     eval([stateNames{Type}, '= squeeze(simOut.', stateNames{Type}, ');'])
     % Genrates time history of attitude parameters
     figure
-    eval(['plot(t, ', stateNames{Type}, ')'])
+    eval(['plot(t, ', stateNames{Type}, ', ''LineWidth'', 2)'])
+    ax = gca();
+    ax.FontSize = 14;
+    xlabel('t [sec]')
+    ylabel([stateNames{Type}, ' ', unitNames{Type}])
+    legend(legendNames{Type})
+    exportgraphics(gcf, ['../Images/time_history_', imageNames{Type}])
     
     % Generate herpolhode plot (ineretial frame polhode)
     figure
     plot3(om_i(1,:), om_i(2,:), om_i(3,:), 'LineWidth', 2)
+    ax = gca();
+    ax.FontSize = 14;
     axis equal
+    xlabel('\omega_x')
+    ylabel('\omega_y')
+    zlabel('\omega_z')
     % hold off
+    exportgraphics(gcf, ['../Images/herpolhode_', imageNames{Type}])
 
     % Generate angular momentum vector plot (inertial)
     figure
     plot3(L_i(1,:), L_i(2,:), L_i(3,:), 'LineWidth', 2)
+    ax = gca();
+    ax.FontSize = 14;
+    xlabel('L_x')
+    ylabel('L_y')
+    zlabel('L_z')
     axis equal
+    exportgraphics(gcf, ['../Images/angular_momentum_', imageNames{Type}])
 
     % Generate reference frame plot in motion
-    figure
-
-    axis equal
+    % figure
+    % 
+    % ax = gca();
+    % ax.FontSize = 14;
+    % axis equal
+    % exportgraphics(gcf, ['../Images/reference_frame_motion_', imageNames{Type}])
 end
