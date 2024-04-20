@@ -13,9 +13,9 @@ x0_deg = [-7, 2, 5].';
 x0 = deg2rad(x0_deg);
 Tfinal = 300;
 axesFlag = 0;
-M = timeseries(20.*ones([3 2]), [0 Tfinal]);
+M = timeseries(zeros([3 2]), [0 Tfinal]);
 simIn = Simulink.SimulationInput('eulerPropagate');
-simIn = simIn.setVariable('M', M);
+simIn.ExternalInput = M;
 
 load_system("eulerPropagate")
 % open_system("eulerPropagate")
