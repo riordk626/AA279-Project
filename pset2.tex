@@ -14,7 +14,7 @@ The orbit initial conditions were chosen to closely replicate those of the Aqua 
     $\nu$ = 0\degree
 \end{center}
 
-To propagate the orbit, these orbital elements were first converted to the initial position and velocity in the Earth centered Inertial (ECI) frame. The ECI frame is defined such that it doesn't rotate with Earth's surface. The x-axis points in the direction of the vernal equinox (the ascending node of the sun), the z-axis points towards the north pole, and the y-axis completes the triad. To initially propagate the orbit and serve as a point of reference, Simulink was used to sweep the mean anomaly over a given time span and time steps and calculate the position in the ECI frame at each time step. The Simulink model is shown below in Figure \ref{fig:simulink-prop}.
+To propagate the orbit, these orbital elements were first converted to the initial position and velocity in the Earth centered inertial (ECI) frame. The ECI frame is defined such that it doesn't rotate with Earth's surface. The x-axis points in the direction of the vernal equinox (the ascending node of the sun), the z-axis points towards the north pole, and the y-axis completes the triad. To initially propagate the orbit and serve as a point of reference, Simulink was used to sweep the mean anomaly over a given time span and calculate the position in the ECI frame at each time step. The Simulink model is shown below in Figure \ref{fig:simulink-prop}.
 
 \begin{figure}[H]
     \centering
@@ -46,7 +46,7 @@ Additionally, a numerical propagator was created so that it could be used to acc
     \label{fig:numerical_orbit_rk}
 \end{figure}
 
-Because this integrator resulted in perturbations over time, the Adams-Bashforth-Moulton method was also used and is shown below.
+Because this integrator resulted in a noticable amount of cumulative error over time, the Adams-Bashforth-Moulton method was also used and is shown below.
 
 \begin{figure}[H]
     \centering
@@ -69,7 +69,7 @@ To resolve an inertia tensor $\boldsymbol{I_{CM}}$ to a diagonal matrix of princ
     \boldsymbol{I_{cm} A} = \boldsymbol{A I_{CM}'} 
 \end{equation}
 
-It can be seen that the principal moments of inertia are the eigenvalues of the inertia tensor and that the matrix $\boldsymbol{A}$ is a matrix whose columns are the right eigenvectors or the inertia tensor. For the AQUA spacecraft, the results that follow are shown below.
+It can be seen that the principal moments of inertia are the eigenvalues of the inertia tensor and that the matrix $\boldsymbol{A}$ is a matrix whose columns are the right eigenvectors of the inertia tensor. For the AQUA spacecraft, the results that follow are shown below.
 
 \begin{equation*}
     \boldsymbol{I_{CM}'} = \begin{bmatrix}
@@ -177,7 +177,7 @@ These quantities are both conserved, so the satellite's angular velocity must al
     \frac{\omega_x^2}{2T/I_x} + \frac{\omega_y^2}{2T/I_y} + \frac{\omega_z^2}{2T/I_z} = 1
 \end{equation}
 
-By inspection, the form of these equations is that of an ellipsoid. Therefore, if the Cartesian coordinates are chosen such that the x,y, and z components of the angular velocity lie along the x,y, and z axes, the tip of the angular velocity vector plotted on these axes will lie on the surface of these ellipsoids. The momentum ellipsoid is plotted along with its semi-axis lengths is plotted in Figure \ref{fig:momentum_axis_verification}. The same is done for the energy ellipsoid in Figure \ref{fig:energy_axis_verification}
+By inspection, the form of these equations is that of an ellipsoid. Therefore, if the Cartesian coordinates are chosen such that the x,y, and z components of the angular velocity lie along the x,y, and z axes, the tip of the angular velocity vector plotted on these axes will lie on the surface of these ellipsoids. The momentum ellipsoid is plotted along with its semi-axis lengths is plotted in Figure \ref{fig:momentum_axis_verification}. The same is done for the energy ellipsoid in Figure \ref{fig:energy_axis_verification}.
 
 \begin{figure}[H]
     \centering
