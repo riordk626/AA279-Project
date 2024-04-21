@@ -11,7 +11,7 @@ rcm_prime = A_ptob.'*rcm.';
 
 om0_deg = [-7, 2, 5].';
 om0 = om0_deg*pi/180;
-Tfinal = 500;
+Tfinal = 300;
 axesFlag = 0;
 M = timeseries(zeros([3 2]), [0 Tfinal]);
 simIn = Simulink.SimulationInput('eulerPropagate');
