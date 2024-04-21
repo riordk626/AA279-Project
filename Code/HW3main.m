@@ -83,7 +83,7 @@ u0 = [0.1 0.1 0.1].';
 simIn = Simulink.SimulationInput('aquaMasterModel');
 simIn.ExternalInput = M;
 
-legendNames = {{'\phi', '\theta', '\psi'}, {'q0', 'q1', 'q2', 'q3'}};
+legendNames = {{'\phi', '\theta', '\psi'}, {'q_0', 'q_1', 'q_2', 'q_3'}};
 stateNames = {'u', 'q'};
 unitNames = {'[rad]', ''};
 imageNames = {'EA.png', 'quat.png'};
