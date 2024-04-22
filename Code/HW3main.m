@@ -103,11 +103,16 @@ for Type = 1:2
     om_p = squeeze(simOut.om_p).';
     om_i = zeros(size(om_p.'));
     L_i = zeros(size(om_i));
+    coords_p = zeros(size(R));
+    coords_b = zeros(size(coords_p));
     
     for i=1:n
         om_i(:,i) = R(:,:,i).' * om_p(i,:).';
         L_p = Itotal_p * om_p(i,:).';
         L_i(:,i) = R(:,:,i).' * L_p;
+
+        coords_p(:,:,i) = R(:,:,i).';
+        coords_b(:,:,i) = coords_p(:,:,i) * A_ptob.';
     end
 
     eval([stateNames{Type}, '= squeeze(simOut.', stateNames{Type}, ');'])
@@ -124,6 +129,9 @@ for Type = 1:2
     % Generate herpolhode plot (ineretial frame polhode)
     figure
     plot3(om_i(1,:), om_i(2,:), om_i(3,:), 'LineWidth', 2)
+    hold on
+    L_scaled = (L_i(:,end)./norm(L_i(:,end))).*norm(om_i(:,end));
+    quiver3(0,0,0,L_scaled(1), L_scaled(2), L_scaled(3))
     ax = gca();
     ax.FontSize = 14;
     axis equal
@@ -132,6 +140,9 @@ for Type = 1:2
     zlabel('\omega_z')
     % hold off
     exportgraphics(gcf, ['../Images/herpolhode_', imageNames{Type}])
+    viewVec = cross(om_i(:,end), L_scaled);
+    view(viewVec)
+    exportgraphics(gcf, ['../Images/herpolhode_normal_', imageNames{Type}])
 
     % Generate angular momentum vector plot (inertial)
     figure
@@ -145,10 +156,54 @@ for Type = 1:2
     exportgraphics(gcf, ['../Images/angular_momentum_', imageNames{Type}])
 
     % Generate reference frame plot in motion
-    % figure
-    % 
-    % ax = gca();
-    % ax.FontSize = 14;
-    % axis equal
+    
+    figure
+    axis equal
+    xlim([-1.5 1.5])
+    ylim([-1.5 1.5])
+    zlim([-1.5 1.5])
+    xlabel('x')
+    ylabel('y')
+    zlabel('z')
+    ax = gca();
+    ax.FontSize = 14;
+    view([1 1 1])
+    hold on
+    quiver3(0,0,0,1,0,0, 'Color', 'k', 'DisplayName', 'Ineretial Frame')
+    quiver3(0,0,0,0,1,0, 'Color', 'k', 'HandleVisibility', 'off')
+    quiver3(0,0,0,0,0,1, 'Color', 'k', 'HandleVisibility', 'off')
+    
+    axNames_p = {'xp', 'yp', 'zp'};
+    axNames_b = {'xb', 'yb', 'zb'};
+    dataNames = {'UData', 'VData', 'WData'};
+    for j=1:3
+        eval([axNames_p{j}, ' = quiver3(0,0,0,coords_p(1,j,1), coords_p(2,j,1), coords_p(3,j,1), ''Color'', ''b'');'])
+        eval([axNames_b{j}, ' = quiver3(0,0,0,coords_b(1,j,1), coords_b(2,j,1), coords_b(3,j,1), ''Color'', ''g'');'])
+    end
+    
+    xp.DisplayName = 'Principal Frame';
+    yp.HandleVisibility = 'off';
+    zp.HandleVisibility = 'off';
+    xb.DisplayName = 'Body Frame';
+    yb.HandleVisibility = 'off';
+    zb.HandleVisibility = 'off';
+
+    legend
+
+    for i=1:n
+        hold on
+        for j=1:3
+            for k=1:3
+                eval([axNames_p{j}, '.', dataNames{k}, ' = coords_p(k,j,i);'])
+                eval([axNames_b{j}, '.', dataNames{k}, ' = coords_b(k,j,i);'])
+            end
+        end
+        
+        if i < n
+            pause(0.001)
+        end
+        
+        hold off
+    end
     % exportgraphics(gcf, ['../Images/reference_frame_motion_', imageNames{Type}])
 end
