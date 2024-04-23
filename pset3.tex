@@ -111,7 +111,15 @@ Therefore, knowing the angular velocity of the spacecraft at each point in time,
 
 \subsubsection{Go back to your original satellite inertia tensor. Numerically integrate Euler AND Kinematic equations from arbitrary initial conditions (warning: stay far from singularity of adopted parameterization). Multiple revolutions. The output is the evolution of the attitude parameters over time. These attitude parameters describe orientation of principal axes relative to inertial axes.}
 
-The time history of Euler angles versus time can be seen plotted in \ref{}.
+The time history of Euler angles versus time can be seen plotted in  Figure \ref{fig:time_history_EA}.
+
+\begin{figure} [H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 10cm] {Images/time_history_EA.png}
+    \caption{Time History of Euler Angles}
+    \label{fig:time_history_EA}
+\end{figure}
 
 Additionally, a time history of all quaternion components can be seen plotted against time in Figure \ref{fig:time_history_quaternion}. 
 
@@ -125,10 +133,34 @@ Additionally, a time history of all quaternion components can be seen plotted ag
 
 \subsubsection{Since inertial position, velocity, and attitude, are known at the same time throughout the simulation, it is now possible to express vectors in the reference systems of interest}
 
-To compute the angular momentum in the inertial frame, the angular momentum must first be computed in the principal axis frame. This momentum vector is then rotation using the rotation matrix $\boldsymbol{R}$ using Equation \ref{eq:body_to_inertial}. This is done for each time step in the simulation. and the path traced by the tip of the vector is plotted in Figure \ref{}. 
+\paragraph{Compute angular momentum vector in inertial coordinates and verify that it is constant (not only its magnitude as in PS2) by plotting its components.} To compute the angular momentum in the inertial frame, the angular momentum must first be computed in the principal axis frame. This momentum vector is then rotation using the rotation matrix $\boldsymbol{R}$ using Equation \ref{eq:body_to_inertial}. This is done for each time step in the simulation. and the path traced by the tip of the vector is plotted in Figure \ref{fig:angular_momentum_trace}. While there is some variation seen in this plot, this can be taken as error in the numerical integration. Averaging over all points, the angular momentum vector in the inertial frame is $\vec{L} = \begin{bmatrix} -2227 & 66 & 3209 \end{bmatrix}^T$ kg m\textsuperscript{2}. 
 
-\paragraph{Compute angular momentum vector in inertial coordinates and verify that it is constant (not only its magnitude as in PS2) by plotting its components.}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 10cm]{Images/angular_momentum_EA.png}
+    \caption{Trace of Angular Momentum in Inertial Frame over Time}
+    \label{fig:angular_momentum_trace}
+\end{figure}
 
 \paragraph{Compute angular velocity vector in inertial coordinates and plot the herpolhode in 3D (line drawn in inertial space by angular velocity). Is the herpolhode contained in a plane perpendicular to the angular momentum vector? Show it}
+
+Similarly to the angular momentum, the angular velocity in the inertial frame is calculated using Equation \ref{eq:body_to_inertial}. The trace of this inertial vector generates the herpolhode, which is plotted in Figure \ref{fig:herpolhode}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 10cm]{Images/herpolhode_EA.png}
+    \caption{Herpolhode Plotted over Inertial Axes}
+    \label{fig:herpolhode}
+\end{figure}
+
+Theory states that the herpolhode should lie in a plane perpendicular to the angular velocity vector. This follows from the fact that the projection of the angular velocity onto the angular momentum must be constant from the conservation of rotational energy. Figure \ref{fig:herpolhode_perpendicular} presents a vector oriented along the angular momentum plotted alongside the herpolhode. The view for this plot was chosen to lie along a vector generated from the cross product of these two vectors. 
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 10cm]{Images/herpolhode_normal_EA.png}
+    \caption{Herpolhode and Angular Momentum Direction Viewed Perpendicular to Angular Velocity and Angular Momentum}
+    \label{fig:herpolhode_perpendicular}
+\end{figure}
 
 \paragraph{Compute and plots unit vectors of orbital frame, body axes, and principal axes in 3D as a function of time in inertial coordinates. (Be creative on how to show moving vectors in 3D).}
