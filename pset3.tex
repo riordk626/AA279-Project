@@ -66,7 +66,7 @@ The vector components for both the simulated results and analytical results for 
     \label{fig:axis_symmetric_errors}
 \end{figure}
 
-The small error in each component suggests that the behavior of the satellite follows the expected analytical solution. The simulation does tend to diverge from the analytical solution over time at a roughly linear rate. This error growth might be mitigated via further tuning of the step size and tolerances within the numerical integration.
+The small error in each component suggests that the behavior of the satellite in simulation follows the expected analytical solution. The simulation does tend to diverge from the analytical solution over time at a roughly linear rate. This error growth might be mitigated via further tuning of the step size and tolerances within the numerical integration.
 
 \subsubsection{Program Kinematic equations of motion correspondent to a nominal attitude parameterization of your choice.}
 
@@ -124,3 +124,11 @@ Additionally, a time history of all quaternion components can be seen plotted ag
 \end{figure}
 
 \subsubsection{Since inertial position, velocity, and attitude, are known at the same time throughout the simulation, it is now possible to express vectors in the reference systems of interest}
+
+To compute the angular momentum in the inertial frame, the angular momentum must first be computed in the principal axis frame. This momentum vector is then rotation using the rotation matrix $\boldsymbol{R}$ using Equation \ref{eq:body_to_inertial}. This is done for each time step in the simulation. and the path traced by the tip of the vector is plotted in Figure \ref{}. 
+
+\paragraph{Compute angular momentum vector in inertial coordinates and verify that it is constant (not only its magnitude as in PS2) by plotting its components.}
+
+\paragraph{Compute angular velocity vector in inertial coordinates and plot the herpolhode in 3D (line drawn in inertial space by angular velocity). Is the herpolhode contained in a plane perpendicular to the angular momentum vector? Show it}
+
+\paragraph{Compute and plots unit vectors of orbital frame, body axes, and principal axes in 3D as a function of time in inertial coordinates. (Be creative on how to show moving vectors in 3D).}
