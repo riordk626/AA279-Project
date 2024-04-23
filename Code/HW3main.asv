@@ -71,20 +71,12 @@ ylabel('Error [rad/s]')
 legend
 exportgraphics(gcf, '../Images/sim_vs_anlt_error.png')
 
-L_as = I_sim * om_p;
+L_as = I_sim * simOut.om{1}.Values.Data(:,:);
 L_as_mag = vecnorm(L_as,2,1);
-L_as = (L_as./vecnorm(L_as,2,1));
-% L_as = L_as.*0.1067;
-L_as = L_as.*(om_p(3,end)/L_as(3,end));
-% L_as = om_p(3,end).*(L_as./vecnorm(L_as,2,1));
+L_as = L_as./vecnorm(L_as,2,1)%  .* vecnorm(simOut.om{1}.Values.Data(:,:), 2, 1);
 figure()
-xlim([-0.15 0.15])
-ylim([-0.15 0.15])
-zlim([0 0.1])
-axis equal
-view([1 1 0.5])
 hold on
-plot3(om_p(1,:), om_p(2,:), om_p(3,:))
+plot3(simOut.om{1}.Values.Data(1,:), simOut.om{1}.Values.Data(2,:), simOut.om{1}.Values.Data(3,:))
 plot3(L_as(1, :), L_as(2, :), L_as(3, :))
 exportgraphics(gcf, '../Images/axis_symmetric_polhode.png')
 %% Asymmetric
@@ -195,7 +187,7 @@ for Type = 1:2
     ax.FontSize = 14;
     view([1 1 1])
     hold on
-    quiver3(0,0,0,1,0,0, 'Color', 'k', 'DisplayName', 'Inertial Frame')
+    quiver3(0,0,0,1,0,0, 'Color', 'k', 'DisplayName', 'Ineretial Frame')
     quiver3(0,0,0,0,1,0, 'Color', 'k', 'HandleVisibility', 'off')
     quiver3(0,0,0,0,0,1, 'Color', 'k', 'HandleVisibility', 'off')
     
