@@ -259,6 +259,6 @@ for Type = 1:2
         end
         hold off
     end
-    
+    legend(axcp)
     exportgraphics(f2, ['../Images/reference_frame_motion_', imageNames{Type}], 'Resolution', 300)
 end
