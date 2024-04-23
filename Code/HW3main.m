@@ -84,8 +84,9 @@ zlim([0 0.1])
 axis equal
 view([1 1 0.5])
 hold on
-plot3(om_p(1,:), om_p(2,:), om_p(3,:))
-plot3(L_as(1, :), L_as(2, :), L_as(3, :))
+plot3(om_p(1,:), om_p(2,:), om_p(3,:), 'DisplayName', 'Polhode')
+plot3(L_as(1, :), L_as(2, :), L_as(3, :), 'DisplayName', 'Angular Momentum')
+legend
 exportgraphics(gcf, '../Images/axis_symmetric_polhode.png')
 %% Asymmetric
 
@@ -183,7 +184,8 @@ for Type = 1:2
 
     % Generate reference frame plot in motion
     
-    figure
+    f1 = figure;
+    ax1 = axes('parent', f1);
     axis equal
     xlim([-1.5 1.5])
     ylim([-1.5 1.5])
@@ -191,8 +193,7 @@ for Type = 1:2
     xlabel('x')
     ylabel('y')
     zlabel('z')
-    ax = gca();
-    ax.FontSize = 14;
+    ax1.FontSize = 14;
     view([1 1 1])
     hold on
     quiver3(0,0,0,1,0,0, 'Color', 'k', 'DisplayName', 'Inertial Frame')
@@ -215,8 +216,12 @@ for Type = 1:2
     zb.HandleVisibility = 'off';
 
     legend
-
+    
+    frameNumber = 1;
+    frameFlags = int32(linspace(1, n, 4));
+    f2 = figure;
     for i=1:n
+        f1;
         hold on
         for j=1:3
             for k=1:3
@@ -229,7 +234,27 @@ for Type = 1:2
             pause(0.001)
         end
         
+        if any(i == frameFlags)
+            f2;
+            axFrame = subplot(2,2,frameNumber, 'parent', f2);
+            % ax2 = gca();
+            % ax1Chil = ax1.Children;
+            axcp = copyobj(ax1, f2);
+            set(axcp,'Position',get(axFrame,'position'))
+            % set(axcp,)
+            delete(axFrame)
+            subtitle = matlab.graphics.primitive.Text;
+            subtitle.String = ['t = ', num2str(ceil(t(i))), ' s'];
+            set(axcp,'Title', subtitle)
+
+            if frameNumber == 4
+                legend
+            end
+
+            frameNumber = frameNumber + 1;
+        end
         hold off
     end
-    % exportgraphics(gcf, ['../Images/reference_frame_motion_', imageNames{Type}])
+    
+    exportgraphics(gcf, ['../Images/reference_frame_motion_', imageNames{Type}], 'Resolution', 300)
 end
