@@ -103,6 +103,7 @@ legendNames = {{'\phi', '\theta', '\psi'}, {'q_0', 'q_1', 'q_2', 'q_3'}};
 stateNames = {'u', 'q'};
 unitNames = {'[rad]', ''};
 imageNames = {'EA.png', 'quat.png'};
+gifNames = {'EA.gif', 'quat.gif'};
 
 for Type = 1:2
     
@@ -218,9 +219,11 @@ for Type = 1:2
     legend
     
     frameNumber = 1;
-    frameFlags = int32(linspace(1, n, 4));
+    ngif = n/2;
+    frameFlags = floor(linspace(1, ngif, 4));
+    exportgraphics(f1, ['../Images/reference_frame_gif_', gifNames{Type}])
     f2 = figure;
-    for i=1:n
+    for i=1:ngif
         f1;
         hold on
         for j=1:3
@@ -230,9 +233,7 @@ for Type = 1:2
             end
         end
         
-        if i < n
-            pause(0.001)
-        end
+        pause(0.001)
         
         if any(i == frameFlags)
             f2;
@@ -253,8 +254,11 @@ for Type = 1:2
 
             frameNumber = frameNumber + 1;
         end
+        if Type == 1
+            exportgraphics(f1, ['../Images/reference_frame_gif_', gifNames{Type}], Append=true)
+        end
         hold off
     end
     
-    exportgraphics(gcf, ['../Images/reference_frame_motion_', imageNames{Type}], 'Resolution', 300)
+    exportgraphics(f2, ['../Images/reference_frame_motion_', imageNames{Type}], 'Resolution', 300)
 end
