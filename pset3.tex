@@ -66,7 +66,15 @@ The vector components for both the simulated results and analytical results for 
     \label{fig:axis_symmetric_errors}
 \end{figure}
 
-The small error in each component suggests that the behavior of the satellite in simulation follows the expected analytical solution. The simulation does tend to diverge from the analytical solution over time at a roughly linear rate. This error growth might be mitigated via further tuning of the step size and tolerances within the numerical integration.
+The small error in each component suggests that the behavior of the satellite in simulation follows the expected analytical solution. The simulation does tend to diverge from the analytical solution over time at a roughly linear rate. This error growth might be mitigated via further tuning of the step size and tolerances within the numerical integration. The polhode for the axis-symmetric case can be seen in Figure \ref{fig:axis_symmetric_polhode} plotted alongside the angular momentum vector projected into the plane of the polhode. The magnitude of the angular velocity is constant at $L = 3867$ kg m\textsuperscript{2}/s. This follows the expected behavior.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 10cm]{Images/axis_symmetric_polhode.png}
+    \caption{Polhode and Projection of Angular Momentum Plotted for Axis-Symmetric Torque-Free Motion}
+    \label{fig:axis_symmetric_polhode}
+\end{figure}
 
 \subsubsection{Program Kinematic equations of motion correspondent to a nominal attitude parameterization of your choice.}
 
