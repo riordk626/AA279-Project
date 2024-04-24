@@ -78,7 +78,7 @@ The small error in each component suggests that the behavior of the satellite in
 
 \subsubsection{Program Kinematic equations of motion correspondent to a nominal attitude parameterization of your choice.}
 
-The nominal attitude parametrization for the Aqua satellite is a 313 Euler Angle representation. 
+The nominal attitude parameterization for the Aqua satellite is a 313 Euler Angle representation. 
 
 The rotation matrix $\boldsymbol{R}$ that defines the orientation of a body fixed frame on the satellite with respect to an inertial frame behaves as described in Equations \ref{eq:inertial_to_body} and \ref{eq:body_to_inertial} where an arbitrary vector $\vec{v}_I$ is in the inertial frame and $\vec{v}$ is in a body fixed frame of interest. Equation \ref{eq:body_to_inertial} holds the implicit assumption that $\boldsymbol{R}$ is an orthogonal matrix. 
 \begin{eqnarray}
@@ -86,12 +86,15 @@ The rotation matrix $\boldsymbol{R}$ that defines the orientation of a body fixe
     \vec{v}_I &= \boldsymbol{R}^T \vec{v} \label{eq:body_to_inertial}
 \end{eqnarray}
 
+Euler angles break down the 3x3 rotation matrix or the Direction Cosign Matrix (DCM) into three elementary rotations about the original set of axes. For a 313 
+Euler angle representation, axis $\vec3$ is first rotated by a given angle that results in a new coordinate frame where axes $\vec1$ and $\vec2$ are now represented by 
+
 \begin{figure}[H]
     \centering
     \captionsetup{justification = centering}
-    \includegraphics[width = 10cm]{Code/eulerAnglePropagate.slx}
-    \caption{Polhode and Projection of Angular Momentum Plotted for Axis-Symmetric Torque-Free Motion}
-    \label{fig:axis_symmetric_polhode}
+    \includegraphics[width = 10cm]{Images/simulink_euler_angle.png}
+    \caption{Simulink Model Used to Propagate Euler Angles}
+    \label{fig:simulink_euler_angles}
 \end{figure}
 
 \begin{figure} [H]
@@ -154,6 +157,14 @@ The rotation matrix $\boldsymbol{R}$ that represents the rotation between the bo
 \end{equation*}
 
 Therefore, knowing the angular velocity of the spacecraft at each point in time, the rate change of the quaternion components can be computed. Therefore, the entire attitude state can be propagated.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 10cm]{Images/simulink_quat.png}
+    \caption{Simulink Model Used to Propagate Quaternions}
+    \label{fig:simulink_quats}
+\end{figure}
 
 \begin{figure} [H]
     \centering
