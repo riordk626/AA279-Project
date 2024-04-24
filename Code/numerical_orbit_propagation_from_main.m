@@ -16,7 +16,7 @@ nu = 0; % True Anomaly (in radians)
 T = 2*pi*sqrt((a)^3 / mu); % Orbital period in seconds
 
 % Define time span for propagation
-t_span = simOut.t; % Propagate for 10000 seconds
+t_span = orbit_prop_time_series; 
 
 % Define initial conditions (position and velocity vectors)
 [r0, v0] = keplerian2ECI(a, e, i, Omega, omega, nu, mu);

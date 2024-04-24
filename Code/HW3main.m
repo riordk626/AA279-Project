@@ -133,6 +133,7 @@ for Type = 1:2
     end
 
     % Orbital Frame Propagator 
+    orbit_prop_time_series = simOut.t;
     run('numerical_orbit_propagation_from_main.m');
 
     eval([stateNames{Type}, '= squeeze(simOut.', stateNames{Type}, ');'])
@@ -228,7 +229,7 @@ for Type = 1:2
     
     frameNumber = 1;
     ngif = n/2;
-    frameFlags = floor(linspace(1, ngif, 4));
+    frameFlags = floor(linspace(1, ngif, 3));
     exportgraphics(f1, ['../Images/reference_frame_gif_', gifNames{Type}])
     f2 = figure;
     for i=1:ngif
@@ -265,6 +266,83 @@ for Type = 1:2
         end
         if Type == 1
             exportgraphics(f1, ['../Images/reference_frame_gif_', gifNames{Type}], Append=true)
+        end
+        hold off
+    end
+    legend(axcp)
+    exportgraphics(f2, ['../Images/reference_frame_motion_', imageNames{Type}], 'Resolution', 300)
+
+    % Generate reference frame plot in motion in RTN for 1 orbit (100 mins)
+    
+    % Orbital Frame Propagator 
+    orbit_prop_time_series = simOut.t * 20;
+    run('numerical_orbit_propagation_from_main.m');
+
+    f1 = figure;
+    ax1 = axes('parent', f1);
+    axis equal
+    xlim([-1.5 1.5])
+    ylim([-1.5 1.5])
+    zlim([-1.5 1.5])
+    xlabel('x')
+    ylabel('y')
+    zlabel('z')
+    ax1.FontSize = 14;
+    view([1 1 1])
+    hold on
+    quiver3(0,0,0,1,0,0, 'Color', 'k', 'DisplayName', 'Inertial Frame')
+    quiver3(0,0,0,0,1,0, 'Color', 'k', 'HandleVisibility', 'off')
+    quiver3(0,0,0,0,0,1, 'Color', 'k', 'HandleVisibility', 'off')
+    
+    axNames_o = {'xo', 'yo', 'zo'};
+    dataNames = {'UData', 'VData', 'WData'};
+    for j=1:3
+        eval([axNames_o{j}, ' = quiver3(0,0,0,coords_orbital(1,j,1), coords_orbital(2,j,1), coords_orbital(3,j,1), ''Color'', ''r'');'])
+    end
+
+    xo.DisplayName = 'Orbital Frame';
+    yo.HandleVisibility = 'off';
+    zo.HandleVisibility = 'off';
+
+    legend
+    
+    frameNumber = 1;
+    ngif = n/2;
+    frameFlags = floor(linspace(1, ngif, 3));
+    exportgraphics(f1, ['../Images/reference_frame_gif_orbital_', gifNames{Type}])
+    f2 = figure;
+    for i=1:ngif
+        f1;
+        hold on
+        for j=1:3
+            for k=1:3
+                eval([axNames_o{j}, '.', dataNames{k}, ' = coords_orbital(k,j,i);'])
+            end
+        end
+        
+        pause(0.001)
+        
+        if any(i == frameFlags)
+            f2;
+            axFrame = subplot(2,2,frameNumber, 'parent', f2);
+            % ax2 = gca();
+            % ax1Chil = ax1.Children;
+            axcp = copyobj(ax1, f2);
+            set(axcp,'Position',get(axFrame,'position'))
+            % set(axcp,)
+            delete(axFrame)
+            subtitle = matlab.graphics.primitive.Text;
+            subtitle.String = ['t = ', num2str(ceil(t(i))), ' s'];
+            set(axcp,'Title', subtitle)
+
+            if frameNumber == 3
+                legend
+            end
+
+            frameNumber = frameNumber + 1;
+        end
+        if Type == 1
+            exportgraphics(f1, ['../Images/reference_frame_gif_orbital_', gifNames{Type}], Append=true)
         end
         hold off
     end
