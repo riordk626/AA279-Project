@@ -229,7 +229,7 @@ for Type = 1:2
     
     frameNumber = 1;
     ngif = n/2;
-    frameFlags = floor(linspace(1, ngif, 3));
+    frameFlags = floor(linspace(1, ngif, 4));
     exportgraphics(f1, ['../Images/reference_frame_gif_', gifNames{Type}])
     f2 = figure;
     for i=1:ngif
@@ -259,7 +259,8 @@ for Type = 1:2
             set(axcp,'Title', subtitle)
 
             if frameNumber == 4
-                legend
+                % Add legend outside of the plot area
+                legend('Location', 'northoutside', 'Orientation', 'vertical');
             end
 
             frameNumber = frameNumber + 1;
@@ -270,12 +271,16 @@ for Type = 1:2
         hold off
     end
     legend(axcp)
+    % Set the units to inches
+    set(f2, 'Units', 'inches');
+    f2.Position(3) = 7; % Set width to 8 inches
+    f2.Position(4) = 10; % Set height to 6 inches
     exportgraphics(f2, ['../Images/reference_frame_motion_', imageNames{Type}], 'Resolution', 300)
 
     % Generate reference frame plot in motion in RTN for 1 orbit (100 mins)
     
     % Orbital Frame Propagator 
-    orbit_prop_time_series = simOut.t * 20;
+    orbit_prop_time_series = simOut.t * 60;
     run('numerical_orbit_propagation_from_main.m');
 
     f1 = figure;
@@ -308,7 +313,7 @@ for Type = 1:2
     
     frameNumber = 1;
     ngif = n/2;
-    frameFlags = floor(linspace(1, ngif, 3));
+    frameFlags = floor(linspace(1, ngif, 4));
     exportgraphics(f1, ['../Images/reference_frame_gif_orbital_', gifNames{Type}])
     f2 = figure;
     for i=1:ngif
@@ -320,7 +325,7 @@ for Type = 1:2
             end
         end
         
-        pause(0.001)
+        pause(0.00001)
         
         if any(i == frameFlags)
             f2;
@@ -335,8 +340,8 @@ for Type = 1:2
             subtitle.String = ['t = ', num2str(ceil(t(i))), ' s'];
             set(axcp,'Title', subtitle)
 
-            if frameNumber == 3
-                legend
+            if frameNumber == 4
+                legend('Location', 'northoutside', 'Orientation', 'vertical');
             end
 
             frameNumber = frameNumber + 1;
@@ -347,5 +352,9 @@ for Type = 1:2
         hold off
     end
     legend(axcp)
-    exportgraphics(f2, ['../Images/reference_frame_motion_', imageNames{Type}], 'Resolution', 300)
+    % Set the units to inches
+    set(f2, 'Units', 'inches');
+    f2.Position(3) = 7; % Set width to 8 inches
+    f2.Position(4) = 10; % Set height to 6 inches
+    exportgraphics(f2, ['../Images/reference_frame_motion_orbital_', imageNames{Type}], 'Resolution', 300)
 end
