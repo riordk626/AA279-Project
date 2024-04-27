@@ -15,6 +15,7 @@ om0_deg = [-7, 2, 5].';
 om0 = deg2rad(om0_deg);
 Tfinal = 300;
 axesFlag = 0;
+dynamicsType="default";
 M = timeseries(zeros([3 2]), [0 Tfinal]);
 simIn = Simulink.SimulationInput('eulerPropagate');
 simIn.ExternalInput = M;
@@ -105,7 +106,10 @@ unitNames = {'[rad]', ''};
 imageNames = {'EA.png', 'quat.png'};
 gifNames = {'EA.gif', 'quat.gif'};
 
+attitudeTypes = {"euler", "quat"};
+
 for Type = 1:2
+    attitudeType = attitudeTypes{Type};
     
     load_system("aquaMasterModel")
     % open_system("eulerPropagate")
