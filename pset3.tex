@@ -78,18 +78,59 @@ The small error in each component suggests that the behavior of the satellite in
 
 \subsubsection{Program Kinematic equations of motion correspondent to a nominal attitude parameterization of your choice.}
 
-The nominal attitude parametrization for the Aqua satellite is a 313 Euler Angle representation. 
+The nominal attitude parameterization for the Aqua satellite is a 313 Euler Angle representation. 
 
 The rotation matrix $\boldsymbol{R}$ that defines the orientation of a body fixed frame on the satellite with respect to an inertial frame behaves as described in Equations \ref{eq:inertial_to_body} and \ref{eq:body_to_inertial} where an arbitrary vector $\vec{v}_I$ is in the inertial frame and $\vec{v}$ is in a body fixed frame of interest. Equation \ref{eq:body_to_inertial} holds the implicit assumption that $\boldsymbol{R}$ is an orthogonal matrix. 
 \begin{eqnarray}
     \vec{v} &= \boldsymbol{R} \vec{v}_I \label{eq:inertial_to_body} \\
     \vec{v}_I &= \boldsymbol{R}^T \vec{v} \label{eq:body_to_inertial}
 \end{eqnarray}
+
+Euler angles break down the 3x3 rotation matrix or the Direction Cosign Matrix (DCM) into three elementary rotations about the original set of axes. For a 313 
+Euler angle representation, axis $\vec3$ is first rotated by a given angle that results in a new coordinate frame where axes $\vec1$ and $\vec2$ are now represented by 
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 10cm]{Images/simulink_euler_angle.png}
+    \caption{Simulink Model Used to Propagate Euler Angles}
+    \label{fig:simulink_euler_angles}
+\end{figure}
+
+\begin{figure} [H]
+    \centering
+    \begin{lstlisting}
+function [R, udot] = eulerAnglePropagate(om_b, u)
+
+% udot = zeros(size(u));
+
+phi = u(1);
+theta = u(2);
+psi = u(3);
+
+E_prime_inv = (1/sin(theta)) .* 
+[-sin(phi)*cos(theta), -cos(phi)*cos(theta), sin(theta);
+cos(phi)*sin(theta), -sin(phi)*sin(theta), 0;
+sin(phi), cos(phi), 0];
+
+udot = E_prime_inv*om_b;
+
+
+R = [cos(phi)*cos(psi) - sin(phi)*cos(theta)*sin(psi) , cos(phi)*sin(psi) + sin(phi)*cos(theta)*cos(psi), sin(phi)*sin(theta);
+-sin(phi)*cos(psi) - cos(phi)*cos(theta)*sin(psi), -sin(phi)*sin(psi) + cos(phi)*cos(theta)*cos(psi), cos(phi)*sin(theta);
+sin(theta)*sin(psi), -sin(theta)*cos(psi), cos(theta)];
+
+end
+    \end{lstlisting}
+    \caption{Euler Angle Propagation Simulink Model}
+    \label{fig:euler_angle_prop_model}
+\end{figure}
+
 \subsubsection{Program Kinematic equations of motion correspondent to a different attitude parameterization from the previous step. This is used for comparison, to get familiar with different approaches, and as fall back solution in the case of singularities.}
 
-A secondary paramterization of the spacecraft attitude utilizes quaternions. Quaternions are composed of a scalar component $q_0$ and a vector component $\vec{q} = \begin{bmatrix}  q_1 & q_2 & q_3  \end{bmatrix}^T$. In short $q = \{q_0, \vec{q}\}$. 
+A secondary parameterization of the spacecraft attitude utilizes quaternions. Quaternions are composed of a scalar component $q_0$ and a vector component $\vec{q} = \begin{bmatrix}  q_1 & q_2 & q_3  \end{bmatrix}^T$. In short $q = \{q_0, \vec{q}\}$. 
 
-To propagate the spacecraft state in terms of this attitude representation, the rate change of all components of the quaternion is represented by Equation \ref{eq:quat_rate_change}. The vector concatentation of the scalar component with the vector component of the quaternion is given by $q_{0:3}$, and the angular velocity is represented in the body fixed frame.
+To propagate the spacecraft state in terms of this attitude representation, the rate change of all components of the quaternion is represented by Equation \ref{eq:quat_rate_change}. The vector concatenation of the scalar component with the vector component of the quaternion is given by $q_{0:3}$, and the angular velocity is represented in the body fixed frame.
 
 \begin{equation} \label{eq:quat_rate_change}
     \dot{q}_{0:3} = \frac{1}{2} \boldsymbol{W}^T \vec{\omega}
@@ -116,6 +157,44 @@ The rotation matrix $\boldsymbol{R}$ that represents the rotation between the bo
 \end{equation*}
 
 Therefore, knowing the angular velocity of the spacecraft at each point in time, the rate change of the quaternion components can be computed. Therefore, the entire attitude state can be propagated.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 10cm]{Images/simulink_quat.png}
+    \caption{Simulink Model Used to Propagate Quaternions}
+    \label{fig:simulink_quats}
+\end{figure}
+
+\begin{figure} [H]
+    \centering
+    \begin{lstlisting}
+function [R, qdot] = quaternionPropagate(om_b, q)
+
+% udot = zeros(size(u));
+% q = q./norm(q);
+q0 = q(1);
+q1 = q(2);
+q2 = q(3);
+q3 = q(4);
+% qvec = q(2:end);
+
+W_prime = [-q1, q0, q3, -q2;
+            -q2, -q3, q0, q1;
+            -q3, q2, -q1, q0];
+
+qdot = (1/2)*(W_prime.')*om_b;
+
+
+R = [q0^2 + q1^2 - q2^2 - q3^2, 2*q1*q2 + 2*q0 *q3, 2*(q1*q3 - q0*q2);
+    2*(q1*q2 - q0*q3), q0^2 - q1^2 + q2^2 - q3^2, 2*(q2*q3 + q0*q1);
+    2*(q1*q3 + q0*q2), 2*(q2*q3 - q0*q1), q0^2 - q1^2 - q2^2 + q3^2];
+
+end
+    \end{lstlisting}
+    \caption{Quaternion Propagation Simulink Model}
+    \label{fig:quat_prop_model}
+\end{figure}
 
 \subsubsection{Go back to your original satellite inertia tensor. Numerically integrate Euler AND Kinematic equations from arbitrary initial conditions (warning: stay far from singularity of adopted parameterization). Multiple revolutions. The output is the evolution of the attitude parameters over time. These attitude parameters describe orientation of principal axes relative to inertial axes.}
 
