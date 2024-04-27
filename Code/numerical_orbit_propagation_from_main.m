@@ -41,7 +41,7 @@ for i = 1:t_size
     v_vec = v(i, :);
 
     % Store rotation matrix
-    dcm = eci2rtn(r_vec, v_vec);
+    dcm = eci2rtn(r_vec, v_vec).';
     coords_orbital(:,:,i) = dcm;
     
 end
@@ -88,8 +88,8 @@ function R_eci_to_rtn = eci2rtn(r_eci, v_eci)
     
     % Compute radial, transverse, and normal vectors in ECI frame
     r_radial_eci = r_eci;
-    r_transverse_eci = cross(r_radial_eci, v_eci);
-    r_normal_eci = cross(r_radial_eci, r_transverse_eci);
+    r_normal_eci = cross(r_radial_eci, v_eci);
+    r_transverse_eci = -cross(r_radial_eci, r_normal_eci);
     
     % Normalize radial, transverse, and normal vectors to obtain unit vectors
     r_radial_eci_unit = r_radial_eci / norm(r_radial_eci);
