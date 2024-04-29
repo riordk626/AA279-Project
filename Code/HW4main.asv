@@ -30,12 +30,6 @@ n = size(t,1);
 om_p = squeeze(simOut.om_p).';
 u = squeeze(simOut.u);
 
-% q = squeeze(simOut.q);
-% 
-% u = zeros([3 size(q,2)]);
-% for i=1:size(u,2)
-%     u(:,i) = RtoEuler313(R_ItoP(:,:,i));
-% end
 
 figure
 aplot = plot(t, om_p, 'LineWidth', 2);
@@ -179,7 +173,6 @@ load_system("aquaMasterModel")
 simOut = sim(simIn);
 
 R_ItoP = simOut.yout{1}.Values.Data;
-% R_ItoRTN = simout.yout{2}.Values.Data;
 t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
@@ -219,7 +212,7 @@ load_system("aquaMasterModel")
 simOut = sim(simIn);
 
 R_ItoP = simOut.yout{1}.Values.Data;
-% R_ItoRTN = simout.yout{2}.Values.Data;
+R_ECItoRTN = simout.yout{2}.Values.Data; % ORBIT DCM OUTPUT
 t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
