@@ -42,7 +42,6 @@ om_al(2,:) = om0(1).*sin(lambda.*t) + om0(2).*cos(lambda.*t);
 
 error = om_al - om_sim;
 
-
 figure()
 subplot(2,1,1)
 splot = plot(t, om_sim, 'LineWidth',2);

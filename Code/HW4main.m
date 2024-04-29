@@ -16,9 +16,8 @@ simIn.ExternalInput = M;
 
 % Part a - Inertial Alignment 
 
-% u0 = [0,0.000001,0].';
-attitudeType="quat";
-q0 = [1 0 0 0].';
+u0 = [0,1e-9,0].';
+attitudeType="euler";
 om0 = deg2rad([10 0 0]).';
 
 load_system("aquaMasterModel")
@@ -29,13 +28,14 @@ R_ItoP = simOut.yout{1}.Values.Data;
 t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
-% u = squeeze(simOut.u);
-q = squeeze(simOut.q);
+u = squeeze(simOut.u);
 
-u = zeros([3 size(q,2)]);
-for i=1:size(u,2)
-    u(:,i) = RtoEuler313(R_ItoP(:,:,i));
-end
+% q = squeeze(simOut.q);
+% 
+% u = zeros([3 size(q,2)]);
+% for i=1:size(u,2)
+%     u(:,i) = RtoEuler313(R_ItoP(:,:,i));
+% end
 
 figure
 aplot = plot(t, om_p, 'LineWidth', 2);
@@ -106,8 +106,10 @@ legend
 
 rng(10)
 om0_array = deg2rad(10.*eye(3)) + 0.01.*rand([3 3]);
-u0 = [0,0.000001,0].';
+u0 = [0,1e-9,0].';
 u0 = u0 + 0.01.*rand(size(u0));
+
+attitudeType="euler";
 
 fomega = figure();
 fangles = figure();
@@ -163,12 +165,13 @@ dynamicsType="wheel";
 
 Ir = 1;
 omr = 1;
-r = [0 0 1].';
 
 % Momentum Wheel Equilibrium Analysis
 
+r = [0 0 1].';
+
 % Part a - Inertial Alignment 
-u0 = [0,0.000001,0].';
+u0 = [0,1e-9,0].';
 om0 = deg2rad([0 0 10]).';
 
 load_system("aquaMasterModel")
@@ -203,7 +206,12 @@ exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_inertial_angles.png')
 legend
 
 % Part b - RTN Alignment
-u0 = [0,0.000001,0].';
+
+% r0 = [] INITIAL ORBIT RADIUS IN ECI
+% v0 = [] INITIAL VELOCITY IN ECI
+R0 = eci2rtn(r0, v0);
+u0 = RtoEuler313(R0);
+attitudeType="euler";
 om0 = deg2rad([0 0 10]).';
 
 load_system("aquaMasterModel")
@@ -215,7 +223,12 @@ R_ItoP = simOut.yout{1}.Values.Data;
 t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
-u = squeeze(simOut.u);
+
+u = zeros([3 size(t,1)]);
+for i=1:size(u,2)
+    R = R_ItoP(:,:,i) * R_ECItoRTN.';
+    u(:,i) = RtoEuler313(R);
+end
 
 figure
 aplot = plot(t, om_p, 'LineWidth', 2);
@@ -241,7 +254,11 @@ legend
 
 rng(10)
 om0_array = deg2rad(10.*eye(3)) + 0.01.*rand([3 3]);
-u0 = [0,0.000001,0].';
+r_array = eye(3);
+Ir = 1;
+omr = 1;
+omr = omr + 0.01.*rand(1);
+u0 = [0,1e-9,0].';
 u0 = u0 + 0.01.*rand(size(u0));
 
 fomega = figure();
@@ -249,6 +266,7 @@ fangles = figure();
 
 for i=1:3
     om0 = om0_array(:,i);
+    r = r(:,i);
     load_system("aquaMasterModel")
     
     simOut = sim(simIn);
@@ -294,7 +312,81 @@ exportgraphics(fangles, '../Images/PS4/mom_wheel_stability_history_angles.png')
 
 % Intermediate Stability
 
+Ir = 1;
+r = [0 1 0].';
+om0 = deg2rad([0 10 0]).';
+
+load_system("aquaMasterModel")
+
+simOut = sim(simIn);
+
+R_ItoP = simOut.yout{1}.Values.Data;
+t = simOut.t;
+n = size(t,1);
+om_p = squeeze(simOut.om_p).';
+u = squeeze(simOut.u);
+
+figure(fomega.Number)
+aplot = plot(t, om_p, 'LineWidth', 2);
+set(aplot, {'DisplayName'}, {'\omega_x';'\omega_y'; '\omega_z'})
+ylabel('\omega [rad/s]')
+hold on
+xlabel('t [sec]')
+legend
+ax = gca();
+ax.FontSize = 14;
+f1 = gcf();
+
+
+figure(fangles.Number)
+aplot = plot(t, u, 'LineWidth', 2);
+set(aplot, {'DisplayName'}, {'\phi';'\theta'; '\psi'})
+ylabel('u [rad]')
+hold on
+xlabel('t [sec]')
+legend
+ax = gca();
+ax.FontSize = 14;
+f2 = gcf();
+
 % Arbitrary Axis Stability
+
+Ir = 1;
+r = A_ptob.' * [0 1 0].';
+om0 = A_ptob.' * deg2rad([0 10 0]).';
+
+load_system("aquaMasterModel")
+
+simOut = sim(simIn);
+
+R_ItoP = simOut.yout{1}.Values.Data;
+t = simOut.t;
+n = size(t,1);
+om_p = squeeze(simOut.om_p).';
+u = squeeze(simOut.u);
+
+figure(fomega.Number)
+aplot = plot(t, om_p, 'LineWidth', 2);
+set(aplot, {'DisplayName'}, {'\omega_x';'\omega_y'; '\omega_z'})
+ylabel('\omega [rad/s]')
+hold on
+xlabel('t [sec]')
+legend
+ax = gca();
+ax.FontSize = 14;
+f1 = gcf();
+
+
+figure(fangles.Number)
+aplot = plot(t, u, 'LineWidth', 2);
+set(aplot, {'DisplayName'}, {'\phi';'\theta'; '\psi'})
+ylabel('u [rad]')
+hold on
+xlabel('t [sec]')
+legend
+ax = gca();
+ax.FontSize = 14;
+f2 = gcf();
 
 
 %% Functions
