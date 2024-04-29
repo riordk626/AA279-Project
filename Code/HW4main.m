@@ -8,7 +8,6 @@ I_sim = Itotal_p;
 Tfinal = 300;
 axesFlag = 0;
 dynamicsType="default";
-attitudeType="euler";
 M = timeseries(zeros([3 2]), [0 Tfinal]);
 simIn = Simulink.SimulationInput('aquaMasterModel');
 simIn.ExternalInput = M;
@@ -16,19 +15,27 @@ simIn.ExternalInput = M;
 %% Problem 1 - Equilibrium Analysis
 
 % Part a - Inertial Alignment 
-u0 = [0,0.000001,0].';
-om0 = deg2rad([0 0 10]).';
+
+% u0 = [0,0.000001,0].';
+attitudeType="quat";
+q0 = [1 0 0 0].';
+om0 = deg2rad([10 0 0]).';
 
 load_system("aquaMasterModel")
 
 simOut = sim(simIn);
 
 R_ItoP = simOut.yout{1}.Values.Data;
-% R_ItoRTN = simout.yout{2}.Values.Data;
 t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
-u = squeeze(simOut.u);
+% u = squeeze(simOut.u);
+q = squeeze(simOut.q);
+
+u = zeros([3 size(q,2)]);
+for i=1:size(u,2)
+    u(:,i) = RtoEuler313(R_ItoP(:,:,i));
+end
 
 figure
 aplot = plot(t, om_p, 'LineWidth', 2);
@@ -51,7 +58,12 @@ exportgraphics(gcf, '../Images/PS4/equilibrium_inertial_angles.png')
 legend
 
 % Part b - RTN Alignment
-u0 = [0,0.000001,0].';
+% r0 = [] INITIAL ORBIT RADIUS IN ECI
+% v0 = [] INITIAL VELOCITY IN ECI
+R0 = eci2rtn(r0, v0);
+u0 = RtoEuler313(R0);
+attitudeType="euler";
+
 om0 = deg2rad([0 0 10]).';
 
 load_system("aquaMasterModel")
@@ -59,11 +71,16 @@ load_system("aquaMasterModel")
 simOut = sim(simIn);
 
 R_ItoP = simOut.yout{1}.Values.Data;
-% R_ItoRTN = simout.yout{2}.Values.Data;
+% R_ECItoRTN = simOut.yout{2}.Values.Data; % ORBIT DCM OUTPUT
 t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
-u = squeeze(simOut.u);
+
+u = zeros([3 size(t,1)]);
+for i=1:size(u,2)
+    R = R_ItoP(:,:,i) * R_ECItoRTN.';
+    u(:,i) = RtoEuler313(R);
+end
 
 figure
 aplot = plot(t, om_p, 'LineWidth', 2);
@@ -278,3 +295,33 @@ exportgraphics(fangles, '../Images/PS4/mom_wheel_stability_history_angles.png')
 % Intermediate Stability
 
 % Arbitrary Axis Stability
+
+
+%% Functions
+
+function u = RtoEuler313(R)
+
+    u = zeros([3 1]);
+
+    u(1) = atan2(R(1,3), R(2,3));
+    u(2) = acos(R(3,3));
+    u(3) = atan2(R(3,1), -R(3,2));
+
+end
+
+function R_eci_to_rtn = eci2rtn(r_eci, v_eci)
+    
+    % Compute radial, transverse, and normal vectors in ECI frame
+    r_radial_eci = r_eci;
+    r_normal_eci = cross(r_radial_eci, v_eci);
+    r_transverse_eci = -cross(r_radial_eci, r_normal_eci);
+    
+    % Normalize radial, transverse, and normal vectors to obtain unit vectors
+    r_radial_eci_unit = r_radial_eci / norm(r_radial_eci);
+    r_transverse_eci_unit = r_transverse_eci / norm(r_transverse_eci);
+    r_normal_eci_unit = r_normal_eci / norm(r_normal_eci);
+    
+    % Construct rotation matrix from ECI to RTN
+    R_eci_to_rtn = [r_radial_eci_unit; r_transverse_eci_unit; r_normal_eci_unit];
+
+end
