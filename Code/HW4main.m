@@ -8,6 +8,7 @@ I_sim = Itotal_p;
 Tfinal = 300;
 axesFlag = 0;
 dynamicsType="default";
+disturbance="none";
 M = timeseries(zeros([3 2]), [0 Tfinal]);
 simIn = Simulink.SimulationInput('aquaMasterModel');
 simIn.ExternalInput = M;
@@ -67,6 +68,7 @@ ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/equilibrium_inertial_velocities.png')
 legend
+title('Velocity Equilibrium Default')
 
 figure
 aplot = plot(t, u, 'LineWidth', 2);
@@ -77,6 +79,7 @@ ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/equilibrium_inertial_angles.png')
 legend
+title('Angle Equilibrium Default')
 
 % Part b - RTN Alignment
 [r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
@@ -111,6 +114,7 @@ ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/equilibrium_RTN_velocities.png')
 legend
+title('Velocity Equilibrium RTN')
 
 figure
 aplot = plot(t, u, 'LineWidth', 2);
@@ -121,6 +125,8 @@ ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/equilibrium_RTN_angles.png')
 legend
+title('Angle Equilibrium RTN')
+
 
 %% Testing simulink orbit propagator -- may remove later 
 
@@ -139,9 +145,9 @@ Tfinal = 300;
 
 %% Problem 2 - Stability Test
 
-rng(10)
-om0_array = deg2rad(10.*eye(3)) + 0.01.*rand([3 3]);
+om0_array = deg2rad(10.*eye(3));
 u0 = [0,1e-9,0].';
+
 u0 = u0 + 0.01.*rand(size(u0));
 
 attitudeType="euler";
@@ -152,7 +158,7 @@ fangles = figure();
 for i=1:3
     om0 = om0_array(:,i);
     load_system("aquaMasterModel")
-    
+
     simOut = sim(simIn);
 
     R_ItoP = simOut.yout{1}.Values.Data;
@@ -192,14 +198,16 @@ for i=1:3
 end
 
 exportgraphics(fomega, '../Images/PS4/stability_history_velocity.png')
+sgtitle(fomega, 'Velocity Stability Default')
 exportgraphics(fangles, '../Images/PS4/stability_history_angles.png')
+sgtitle(fangles, 'Angles Stability Default')
 
 %% Problem 3 - Momentum Wheel
 
 dynamicsType="wheel";
 
-Ir = 1;
-omr = 1;
+Ir = 50;
+omr = 100;
 
 % Momentum Wheel Equilibrium Analysis
 
@@ -228,6 +236,7 @@ ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_inertial_velocities.png')
 legend
+title('Momentum Wheel Velocity Equilibrium')
 
 figure
 aplot = plot(t, u, 'LineWidth', 2);
@@ -238,6 +247,7 @@ ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_inertial_angles.png')
 legend
+title('Momentum Wheel Angle Equilibrium')
 
 % Part b - RTN Alignment
 
@@ -272,6 +282,7 @@ ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_RTN_velocities.png')
 legend
+title('Momentum Wheel Velocity Equilibrium RTN')
 
 figure
 aplot = plot(t, u, 'LineWidth', 2);
@@ -282,14 +293,15 @@ ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_RTN_angles.png')
 legend
+title('Momentum Wheel Angle Equilibrium RTN')
 
 % Momentum Stability Test
 
 rng(10)
 om0_array = deg2rad(10.*eye(3)) + 0.01.*rand([3 3]);
 r_array = eye(3);
-Ir = 1;
-omr = 1;
+% Ir = 1;
+% omr = 1;
 omr = omr + 0.01.*rand(1);
 u0 = [0,1e-9,0].';
 u0 = u0 + 0.01.*rand(size(u0));
@@ -299,7 +311,7 @@ fangles = figure();
 
 for i=1:3
     om0 = om0_array(:,i);
-    r = r(:,i);
+    r = r_array(:,i);
     load_system("aquaMasterModel")
     
     simOut = sim(simIn);
@@ -341,14 +353,16 @@ for i=1:3
 end
 
 exportgraphics(fomega, '../Images/PS4/mom_wheel_stability_history_velocity.png')
+sgtitle(fomega, 'Momentum Wheel Velocity Stability')
 exportgraphics(fangles, '../Images/PS4/mom_wheel_stability_history_angles.png')
+sgtitle(fangles, 'Momentum Wheel Angles Stability')
 
 % Intermediate Stability
 
-fomega = figure()
-fangles = figure()
+fomega = figure();
+fangles = figure();
 
-Ir = 1;
+% Ir = 1;
 r = [0 1 0].';
 om0 = deg2rad([0 10 0]).';
 
@@ -385,9 +399,14 @@ ax = gca();
 ax.FontSize = 14;
 f2 = gcf();
 
+exportgraphics(fomega, '../Images/PS4/mom_wheel_intermediate_stability_history_velocity.png')
+sgtitle(fomega, 'Momentum Wheel Intermediate Velocity Stability')
+exportgraphics(fangles, '../Images/PS4/mom_wheel_intermediate_stability_history_angles.png')
+sgtitle(fangles, 'Momentum Wheel Intermediate Angles Stability')
+
 % Arbitrary Axis Stability
 
-Ir = 1;
+% Ir = 1;
 r = A_ptob.' * [0 1 0].';
 om0 = A_ptob.' * deg2rad([0 10 0]).';
 
@@ -396,10 +415,20 @@ load_system("aquaMasterModel")
 simOut = sim(simIn);
 
 R_ItoP = simOut.yout{1}.Values.Data;
+R_ECItoRTN = simOut.rtn.Data; % ORBIT DCM OUTPUT
 t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
-u = squeeze(simOut.u);
+% u = squeeze(simOut.u);
+
+u = zeros([3 size(t,1)]);
+for i=1:size(u,2)
+    R = A_ptob * R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
+    u(:,i) = RtoEuler313(R);
+end
+
+fomega = figure();
+fangles = figure();
 
 figure(fomega.Number)
 aplot = plot(t, om_p, 'LineWidth', 2);
@@ -424,7 +453,14 @@ ax = gca();
 ax.FontSize = 14;
 f2 = gcf();
 
+exportgraphics(fomega, '../Images/PS4/mom_wheel_mission_stability_history_velocity.png')
+sgtitle(fomega, 'Momentum Wheel Mission Velocity Stability')
+exportgraphics(fangles, '../Images/PS4/mom_wheel_mission_stability_history_angles.png')
+sgtitle(fangles, 'Momentum Wheel Mission Angles Stability')
 
+%% Problem 4 - Gravity Gradient Disturbance
+
+disturbance = "grav";
 %% Functions
 
 function u = RtoEuler313(R)
