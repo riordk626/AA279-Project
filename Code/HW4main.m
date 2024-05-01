@@ -562,8 +562,9 @@ exportgraphics(gcf, '../Images/PS4/gravity_torque_RTN_aligned.png')
 title('Gravity Gradient Disturbance for RTN Aligned')
 
 % Body Aligned with RTN (mission req. non-zero torques expected)
+sequence="313";
 R0 = A_ptob.' * [0 1 0;0 0 1;1 0 0] * eci2rtn(r0, v0);
-u0 = RtoEuler312(R0);
+u0 = RtoEuler313(R0);
 om0 = A_ptob' * [0 n_float 0].';
 Tfinal = 3*T;
 
