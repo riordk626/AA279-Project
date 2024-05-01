@@ -67,9 +67,9 @@ aplot = plot(t, om_p, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'\omega_x';'\omega_y'; '\omega_z'})
 ylabel('\omega [rad/s]')
 xlabel('t [sec]')
+legend
 ax = gca();
 ax.FontSize = 14;
-legend
 exportgraphics(gcf, '../Images/PS4/equilibrium_inertial_velocities.png')
 title('Velocity Equilibrium Default')
 
@@ -78,9 +78,9 @@ aplot = plot(t, u, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'\phi';'\theta'; '\psi'})
 ylabel('u [rad]')
 xlabel('t [sec]')
+legend
 ax = gca();
 ax.FontSize = 14;
-legend
 exportgraphics(gcf, '../Images/PS4/equilibrium_inertial_angles.png')
 title('Angle Equilibrium Default')
 
@@ -112,10 +112,10 @@ aplot = plot(t, om_p, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'\omega_x';'\omega_y'; '\omega_z'})
 ylabel('\omega [rad/s]')
 xlabel('t [sec]')
+legend
 ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/equilibrium_RTN_velocities.png')
-legend
 title('Velocity Equilibrium RTN')
 
 figure
@@ -123,10 +123,10 @@ aplot = plot(t, u, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'\phi';'\theta'; '\psi'})
 ylabel('u [rad]')
 xlabel('t [sec]')
+legend
 ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/equilibrium_RTN_angles.png')
-legend
 title('Angle Equilibrium RTN')
 
 
@@ -236,10 +236,11 @@ end
 figure
 aplot = plot(t, L_i, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'L_x'; 'L_y'; 'L_z'})
-ax = gca();
-ax.FontSize = 14;
 xlabel('t [sec]')
 ylabel('L [kg m/s]')
+legend
+ax = gca();
+ax.FontSize = 14;
 exportgraphics(gcf, '../Images/mom_wheel_angular_momentum.png')
 title('Angular Momentum Wheel Conservation')
 
@@ -267,10 +268,10 @@ aplot = plot(t, om_p, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'\omega_x';'\omega_y'; '\omega_z'})
 ylabel('\omega [rad/s]')
 xlabel('t [sec]')
+legend
 ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_inertial_velocities.png')
-legend
 title('Momentum Wheel Velocity Equilibrium')
 
 figure
@@ -278,10 +279,10 @@ aplot = plot(t, u, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'\phi';'\theta'; '\psi'})
 ylabel('u [rad]')
 xlabel('t [sec]')
+legend
 ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_inertial_angles.png')
-legend
 title('Momentum Wheel Angle Equilibrium')
 
 
@@ -314,10 +315,10 @@ aplot = plot(t, om_p, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'\omega_x';'\omega_y'; '\omega_z'})
 ylabel('\omega [rad/s]')
 xlabel('t [sec]')
+legend
 ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_RTN_velocities.png')
-legend
 title('Momentum Wheel Velocity Equilibrium RTN')
 
 figure
@@ -325,10 +326,10 @@ aplot = plot(t, u, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'\phi';'\theta'; '\psi'})
 ylabel('u [rad]')
 xlabel('t [sec]')
+legend
 ax = gca();
 ax.FontSize = 14;
 exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_RTN_angles.png')
-legend
 title('Momentum Wheel Angle Equilibrium RTN')
 
 % Momentum Stability Test
