@@ -49,6 +49,7 @@ close all
 % Part a - Inertial Alignment 
 
 u0 = [0,0,0].';
+% R0 = eye(3);
 om0 = deg2rad([10 0 0]).';
 
 load_system("aquaMasterModel")
@@ -521,6 +522,7 @@ sequence = "312";
 R0 = eci2rtn(r0, v0);
 u0 = RtoEuler312(R0);
 om0 = [0 0 n_float].';
+Tfinal = 3*T;
 
 % Magnitude Validation
 Ixyz = diag(I_sim);
@@ -547,14 +549,16 @@ for i=1:size(u,2)
 end
 
 figure()
-aplot = plot(t, M_grav, 'LineWidth', 2);
+aplot = plot(t./T, M_grav, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'M_x'; 'M_y';'M_z'})
 yplot = yline(M_grav_indicator, 'LineWidth', 2);
 set(yplot, {'LineStyle'}, {'--'; '--'; '--'})
 set(yplot, {'Color'}, get(aplot, 'Color'));
 set(yplot, {'DisplayName'}, {'M_{x,expected}';'M_{y,expected}';'M_{z_expected}'})
 legend
-xlabel('t [sec]')
+xticks([0 1 2 3])
+xlim([0 3])
+xlabel('t [orbit periods]')
 ylabel('M [Nm]')
 ax = gca();
 ax.FontSize = 14;
