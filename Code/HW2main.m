@@ -14,6 +14,10 @@ om0 = om0_deg*pi/180;
 Tfinal = 300;
 axesFlag = 0;
 M = timeseries(zeros([3 2]), [0 Tfinal]);
+dynamicsType = "wheel";
+Ir = 0;
+omr = 0;
+r = ones([3 1])./sqrt(3);
 simIn = Simulink.SimulationInput('eulerPropagate');
 simIn.ExternalInput = M;
 

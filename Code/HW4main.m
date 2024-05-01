@@ -39,13 +39,14 @@ mean_motion = [[0, n_float],
     [10000000, n_float]];
 
 orbitType = "num";
+attitudeType="euler";
 
+linPert = 0.01;
 %% Problem 1 - Equilibrium Analysis
 
 % Part a - Inertial Alignment 
 
 u0 = [0,1e-9,0].';
-attitudeType="euler";
 om0 = deg2rad([10 0 0]).';
 
 load_system("aquaMasterModel")
@@ -85,7 +86,6 @@ title('Angle Equilibrium Default')
 [r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
 R0 = eci2rtn(r0, v0);
 u0 = RtoEuler313(R0);
-attitudeType="euler";
 
 om0 = deg2rad([0 0 10]).';
 
@@ -99,6 +99,7 @@ t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
 
+% Compute Euler Angles between RTN frame and Principal Frame
 u = zeros([3 size(t,1)]);
 for i=1:size(u,2)
     R = R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
@@ -145,12 +146,11 @@ Tfinal = 300;
 
 %% Problem 2 - Stability Test
 
-om0_array = deg2rad(10.*eye(3));
+Tfinal = T;
+om0_array = deg2rad(10.*eye(3)) + linPert.*randn([3 3]);
 u0 = [0,1e-9,0].';
 
-u0 = u0 + 0.01.*rand(size(u0));
-
-attitudeType="euler";
+u0 = u0 + linPert.*rand(size(u0));
 
 fomega = figure();
 fangles = figure();
@@ -206,8 +206,39 @@ sgtitle(fangles, 'Angles Stability Default')
 
 dynamicsType="wheel";
 
+% Conservation Test
+
 Ir = 50;
 omr = 100;
+
+r = ones([3 1])./sqrt(3);
+
+u0 = [0,1e-9,0].';
+om0 = deg2rad([-5 2 9]).';
+
+load_system("aquaMasterModel")
+
+simOut = sim(simIn);
+om_p = squeeze(simOut.om_p).';
+R_ItoP = simOut.yout{1}.Values.Data;
+t = simOut.t;
+
+L_i = zeros(size(om_p.'));
+
+for i=1:size(L_i, 2)
+    L_p = Itotal_p * om_p(i,:).' + Ir*omr.*r;
+    L_i(:,i) = R_ItoP(:,:,i).' * L_p;
+end
+
+figure
+aplot = plot(t, L_i, 'LineWidth', 2);
+set(aplot, {'DisplayName'}, {'L_x'; 'L_y'; 'L_z'})
+ax = gca();
+ax.FontSize = 14;
+xlabel('t [sec]')
+ylabel('L [kg m/s]')
+exportgraphics(gcf, '../Images/mom_wheel_angular_momentum.png')
+title('Angular Momentum Wheel Conservation')
 
 % Momentum Wheel Equilibrium Analysis
 
@@ -226,6 +257,7 @@ t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
 u = squeeze(simOut.u);
+
 
 figure
 aplot = plot(t, om_p, 'LineWidth', 2);
@@ -249,13 +281,13 @@ exportgraphics(gcf, '../Images/PS4/mom_wheel_equilibrium_inertial_angles.png')
 legend
 title('Momentum Wheel Angle Equilibrium')
 
+
 % Part b - RTN Alignment
 
 [r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
 R0 = eci2rtn(r0, v0);
 u0 = RtoEuler313(R0);
-attitudeType="euler";
-om0 = deg2rad([0 0 10]).';
+om0 = [0 0 n_float].';
 
 load_system("aquaMasterModel")
 
@@ -267,6 +299,7 @@ t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
 
+% Computes Euler Angles between RTN frame and Principal Frame
 u = zeros([3 size(t,1)]);
 for i=1:size(u,2)
     R = R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
@@ -298,13 +331,13 @@ title('Momentum Wheel Angle Equilibrium RTN')
 % Momentum Stability Test
 
 rng(10)
-om0_array = deg2rad(10.*eye(3)) + 0.01.*rand([3 3]);
+om0_array = deg2rad(10.*eye(3)) + linPert.*rand([3 3]);
 r_array = eye(3);
 % Ir = 1;
 % omr = 1;
-omr = omr + 0.01.*rand(1);
+omr = omr + linPert.*rand(1);
 u0 = [0,1e-9,0].';
-u0 = u0 + 0.01.*rand(size(u0));
+u0 = u0 + linPert.*rand(size(u0));
 
 fomega = figure();
 fangles = figure();
@@ -363,8 +396,12 @@ fomega = figure();
 fangles = figure();
 
 % Ir = 1;
+% omr = 1;
 r = [0 1 0].';
+u0 = [0 1e-9 0].';
 om0 = deg2rad([0 10 0]).';
+om0 = om0 + linPert.*randn(size(om0));
+u0 = u0 + linPert.*rand(size(u0));
 
 load_system("aquaMasterModel")
 
@@ -406,9 +443,16 @@ sgtitle(fangles, 'Momentum Wheel Intermediate Angles Stability')
 
 % Arbitrary Axis Stability
 
+[r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
+R0 = A_ptob.' * [0 1 0;0 0 1;1 0 0] * eci2rtn(r0, v0);
+u0 = RtoEuler313(R0);
 % Ir = 1;
+% omr = 1;
 r = A_ptob.' * [0 1 0].';
-om0 = A_ptob.' * deg2rad([0 10 0]).';
+om0 = A_ptob.' * deg2rad([0 10 0].');
+
+om0 = om0 + linPert.*randn(size(om0));
+u0 = u0 + linPert.*rand(size(u0));
 
 load_system("aquaMasterModel")
 
@@ -420,7 +464,9 @@ t = simOut.t;
 n = size(t,1);
 om_p = squeeze(simOut.om_p).';
 % u = squeeze(simOut.u);
+om_b = A_ptob * om_p.';
 
+% Compute Euler Angles between RTN Frame and Body Frame
 u = zeros([3 size(t,1)]);
 for i=1:size(u,2)
     R = A_ptob * R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
@@ -431,7 +477,7 @@ fomega = figure();
 fangles = figure();
 
 figure(fomega.Number)
-aplot = plot(t, om_p, 'LineWidth', 2);
+aplot = plot(t, om_b, 'LineWidth', 2);
 set(aplot, {'DisplayName'}, {'\omega_x';'\omega_y'; '\omega_z'})
 ylabel('\omega [rad/s]')
 hold on
@@ -461,6 +507,108 @@ sgtitle(fangles, 'Momentum Wheel Mission Angles Stability')
 %% Problem 4 - Gravity Gradient Disturbance
 
 disturbance = "grav";
+dynamicsType="default";
+
+% Principal Aligned with RTN (expect zero torque)
+
+[r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
+R0 = eci2rtn(r0, v0);
+u0 = RtoEuler313(R0);
+om0 = [0 0 n_float].';
+
+% Magnitude Validation
+Ixyz = diag(I_sim);
+% mu = 3.89e14;
+rmag = norm(r0.*1e3);
+M_grav_indicator = (3*mu_float*1e9/(rmag^3)).*[(Ixyz(3) - Ixyz(2))/3;(Ixyz(1) - Ixyz(3))/3;(Ixyz(2) - Ixyz(1))/3]
+
+load_system("aquaMasterModel")
+
+simOut = sim(simIn);
+
+R_ItoP = simOut.yout{1}.Values.Data;
+R_ECItoRTN = simOut.rtn.Data; % ORBIT DCM OUTPUT
+t = simOut.t;
+n = size(t,1);
+om_p = squeeze(simOut.om_p).';
+M_grav = squeeze(simOut.M_grav);
+
+% Computes Euler Angles between RTN frame and Principal Frame
+u = zeros([3 size(t,1)]);
+for i=1:size(u,2)
+    R = R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
+    u(:,i) = RtoEuler313(R);
+end
+
+figure()
+aplot = plot(t, M_grav, 'LineWidth', 2);
+set(aplot, {'DisplayName'}, {'M_x'; 'M_y';'M_z'})
+yplot = yline(M_grav_indicator, 'LineWidth', 2);
+set(yplot, {'LineStyle'}, {'--'; '--'; '--'})
+set(yplot, {'Color'}, get(aplot, 'Color'));
+set(yplot, {'DisplayName'}, {'M_{x,expected}';'M_{y,expected}';'M_{z_expected}'})
+legend
+xlabel('t [sec]')
+ylabel('M [Nm]')
+ax = gca();
+ax.FontSize = 14;
+
+% Body Aligned with RTN (mission req. non-zero torques expected)
+R0 = A_ptob.' * [0 1 0;0 0 1;1 0 0] * eci2rtn(r0, v0);
+u0 = RtoEuler313(R0);
+om0 = A_ptob' * [0 n_float 0].';
+Tfinal = 3*T;
+
+load_system("aquaMasterModel")
+
+simOut = sim(simIn);
+
+R_ItoP = simOut.yout{1}.Values.Data;
+R_ECItoRTN = simOut.rtn.Data; % ORBIT DCM OUTPUT
+t = simOut.t;
+n = size(t,1);
+om_p = squeeze(simOut.om_p).';
+M_grav = squeeze(simOut.M_grav);
+
+% Computes Euler Angles between RTN frame and Body Frame
+u = zeros([3 size(t,1)]);
+for i=1:size(u,2)
+    R = A_ptob * R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
+    u(:,i) = RtoEuler313(R);
+end
+
+figure()
+aplot = plot(t./T, M_grav, 'LineWidth', 2);
+set(aplot, {'DisplayName'}, {'M_x'; 'M_y';'M_z'})
+legend
+xlabel('t [orbti periods]')
+xticks([0 1 2 3])
+xlim([0 3])
+ylabel('M [Nm]')
+ax = gca();
+ax.FontSize = 14;
+
+figure
+aplot = plot(t./T, om_p, 'LineWidth', 2);
+set(aplot, {'DisplayName'}, {'\omega_x';'\omega_y';'\omega_z'})
+legend
+xlabel('t [orbit periods]')
+xticks([0 1 2 3])
+xlim([0 3])
+ylabel('\omega [rad/s]')
+ax = gca();
+ax.FontSize = 14;
+
+figure
+aplot = plot(t./T, u, 'LineWidth', 2);
+set(aplot, {'DisplayName'}, {'\phi';'\theta';'\psi'})
+legend
+xlabel('t [orbit periods]')
+xticks([0 1 2 3])
+xlim([0 3])
+ylabel('u [rad]')
+ax = gca();
+ax.FontSize = 14;
 %% Functions
 
 function u = RtoEuler313(R)
