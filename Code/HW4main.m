@@ -69,8 +69,8 @@ ylabel('\omega [rad/s]')
 xlabel('t [sec]')
 ax = gca();
 ax.FontSize = 14;
-exportgraphics(gcf, '../Images/PS4/equilibrium_inertial_velocities.png')
 legend
+exportgraphics(gcf, '../Images/PS4/equilibrium_inertial_velocities.png')
 title('Velocity Equilibrium Default')
 
 figure
@@ -80,8 +80,8 @@ ylabel('u [rad]')
 xlabel('t [sec]')
 ax = gca();
 ax.FontSize = 14;
-exportgraphics(gcf, '../Images/PS4/equilibrium_inertial_angles.png')
 legend
+exportgraphics(gcf, '../Images/PS4/equilibrium_inertial_angles.png')
 title('Angle Equilibrium Default')
 
 % Part b - RTN Alignment
