@@ -9,6 +9,7 @@ Tfinal = 300;
 axesFlag = 0;
 dynamicsType="default";
 disturbance="none";
+sequence="312";
 M = timeseries(zeros([3 2]), [0 Tfinal]);
 simIn = Simulink.SimulationInput('aquaMasterModel');
 simIn.ExternalInput = M;
@@ -43,10 +44,11 @@ attitudeType="euler";
 
 linPert = 0.01;
 %% Problem 1 - Equilibrium Analysis
+close all
 
 % Part a - Inertial Alignment 
 
-u0 = [0,1e-9,0].';
+u0 = [0,0,0].';
 om0 = deg2rad([10 0 0]).';
 
 load_system("aquaMasterModel")
@@ -85,8 +87,7 @@ title('Angle Equilibrium Default')
 % Part b - RTN Alignment
 [r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
 R0 = eci2rtn(r0, v0);
-u0 = RtoEuler313(R0);
-
+u0 = RtoEuler312(R0);
 om0 = deg2rad([0 0 10]).';
 
 load_system("aquaMasterModel")
@@ -103,7 +104,7 @@ om_p = squeeze(simOut.om_p).';
 u = zeros([3 size(t,1)]);
 for i=1:size(u,2)
     R = R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
-    u(:,i) = RtoEuler313(R);
+    u(:,i) = RtoEuler312(R);
 end
 
 figure
@@ -145,8 +146,9 @@ plot_orbit(r, rE);
 Tfinal = 300;
 
 %% Problem 2 - Stability Test
+close all
 
-Tfinal = T;
+Tfinal = 300;
 om0_array = deg2rad(10.*eye(3)) + linPert.*randn([3 3]);
 u0 = [0,1e-9,0].';
 
@@ -203,17 +205,18 @@ exportgraphics(fangles, '../Images/PS4/stability_history_angles.png')
 sgtitle(fangles, 'Angles Stability Default')
 
 %% Problem 3 - Momentum Wheel
+close all
 
 dynamicsType="wheel";
 
 % Conservation Test
 
-Ir = 50;
-omr = 100;
+Ir = 25;
+omr = 200;
 
 r = ones([3 1])./sqrt(3);
 
-u0 = [0,1e-9,0].';
+u0 = [0,0,0].';
 om0 = deg2rad([-5 2 9]).';
 
 load_system("aquaMasterModel")
@@ -286,8 +289,8 @@ title('Momentum Wheel Angle Equilibrium')
 
 [r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
 R0 = eci2rtn(r0, v0);
-u0 = RtoEuler313(R0);
-om0 = [0 0 n_float].';
+u0 = RtoEuler312(R0);
+om0 = deg2rad([0 0 10].');
 
 load_system("aquaMasterModel")
 
@@ -303,7 +306,7 @@ om_p = squeeze(simOut.om_p).';
 u = zeros([3 size(t,1)]);
 for i=1:size(u,2)
     R = R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
-    u(:,i) = RtoEuler313(R);
+    u(:,i) = RtoEuler312(R);
 end
 
 figure
@@ -442,7 +445,7 @@ exportgraphics(fangles, '../Images/PS4/mom_wheel_intermediate_stability_history_
 sgtitle(fangles, 'Momentum Wheel Intermediate Angles Stability')
 
 % Arbitrary Axis Stability
-
+sequence = "313";
 [r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
 R0 = A_ptob.' * [0 1 0;0 0 1;1 0 0] * eci2rtn(r0, v0);
 u0 = RtoEuler313(R0);
@@ -505,15 +508,17 @@ exportgraphics(fangles, '../Images/PS4/mom_wheel_mission_stability_history_angle
 sgtitle(fangles, 'Momentum Wheel Mission Angles Stability')
 
 %% Problem 4 - Gravity Gradient Disturbance
+close all
 
 disturbance = "grav";
 dynamicsType="default";
+sequence = "312";
 
 % Principal Aligned with RTN (expect zero torque)
 
 [r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
 R0 = eci2rtn(r0, v0);
-u0 = RtoEuler313(R0);
+u0 = RtoEuler312(R0);
 om0 = [0 0 n_float].';
 
 % Magnitude Validation
@@ -537,7 +542,7 @@ M_grav = squeeze(simOut.M_grav);
 u = zeros([3 size(t,1)]);
 for i=1:size(u,2)
     R = R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
-    u(:,i) = RtoEuler313(R);
+    u(:,i) = RtoEuler312(R);
 end
 
 figure()
@@ -552,10 +557,12 @@ xlabel('t [sec]')
 ylabel('M [Nm]')
 ax = gca();
 ax.FontSize = 14;
+exportgraphics(gcf, '../Images/PS4/gravity_torque_RTN_aligned.png')
+title('Gravity Gradient Disturbance for RTN Aligned')
 
 % Body Aligned with RTN (mission req. non-zero torques expected)
 R0 = A_ptob.' * [0 1 0;0 0 1;1 0 0] * eci2rtn(r0, v0);
-u0 = RtoEuler313(R0);
+u0 = RtoEuler312(R0);
 om0 = A_ptob' * [0 n_float 0].';
 Tfinal = 3*T;
 
@@ -574,7 +581,7 @@ M_grav = squeeze(simOut.M_grav);
 u = zeros([3 size(t,1)]);
 for i=1:size(u,2)
     R = A_ptob * R_ItoP(:,:,i) * R_ECItoRTN(:,:,i).';
-    u(:,i) = RtoEuler313(R);
+    u(:,i) = RtoEuler312(R);
 end
 
 figure()
@@ -587,6 +594,8 @@ xlim([0 3])
 ylabel('M [Nm]')
 ax = gca();
 ax.FontSize = 14;
+exportgraphics(gcf, '../Images/PS4/gravity_torque_mission_aligned.png')
+title('Gravity Gradient Torque for Mission Aligned')
 
 figure
 aplot = plot(t./T, om_p, 'LineWidth', 2);
@@ -598,6 +607,7 @@ xlim([0 3])
 ylabel('\omega [rad/s]')
 ax = gca();
 ax.FontSize = 14;
+exportgraphics(gcf, '../Images/PS4/angular_velocity_under_grav.png')
 
 figure
 aplot = plot(t./T, u, 'LineWidth', 2);
@@ -609,6 +619,7 @@ xlim([0 3])
 ylabel('u [rad]')
 ax = gca();
 ax.FontSize = 14;
+exportgraphics(gcf, '../Images/PS4/attitude_under_grav.png')
 %% Functions
 
 function u = RtoEuler313(R)
@@ -618,6 +629,16 @@ function u = RtoEuler313(R)
     u(1) = atan2(R(1,3), R(2,3));
     u(2) = acos(R(3,3));
     u(3) = atan2(R(3,1), -R(3,2));
+
+end
+
+function u = RtoEuler312(R)
+
+    u = zeros([3 1]);
+
+    u(1) = atan2(R(1,2), R(2,2));
+    u(2) = -asin(R(3,2));
+    u(3) = atan2(R(3,1), R(3,3));
 
 end
 
@@ -634,7 +655,7 @@ function R_eci_to_rtn = eci2rtn(r_eci, v_eci)
     r_normal_eci_unit = r_normal_eci / norm(r_normal_eci);
     
     % Construct rotation matrix from ECI to RTN
-    R_eci_to_rtn = [r_radial_eci_unit, r_transverse_eci_unit, r_normal_eci_unit];
+    R_eci_to_rtn = [r_radial_eci_unit.'; r_transverse_eci_unit.'; r_normal_eci_unit.'];
 
 end
 
