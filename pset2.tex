@@ -34,7 +34,7 @@ The Keplerian propagator was then used to plot the orbit for a time span roughly
 
 The Matlab function that was used for the Keplerian propagator can also be seen here.
 
-\lstinputlisting{Code/orbit_propogator_simulink.m}
+\lstinputlisting{Code/orbit_propogator_kep.m}
 
 Additionally, a numerical propagator was created so that it could be used to account for perturbations and other forces later on in the project. Similarly to the keplerian propagator, the orbital elements were first converted to the initial position and velocity of the spacecraft. From there, the gravitational force of Earth ($\dot v$) and the velocity ($\dot r$) were stacked to created a state vector that could be propagated with a Matlab integrator. The resulting orbit from using a Runge-Kutta method solver is shown below in Figure \ref{fig:numerical_orbit_rk}.
 
@@ -57,7 +57,7 @@ Because this integrator resulted in a noticable amount of cumulative error over 
 
 The functions used to obtain these are results are shown below.
 
-\lstinputlisting{Code/numerical_orbit_propagation.m}
+\lstinputlisting{Code/orbit_propogator_num.m}
 
 
 
