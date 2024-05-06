@@ -1,12 +1,15 @@
-function initOrbital(orbitType)
+function initOrbital(orbitType, dataSource)
 model = 'orbit_propagator';
 load_system(model)
 
 mws = get_param(model, 'modelworkspace');
+mws.DataSource = dataSource;
 mws.DataSource = 'MATLAB File';
 mws.FileName = 'orbitConstants';
+mws.reload
+
+mws.save('orbitConstants.mat')
 
 mws.assignin('orbitType', orbitType)
-mws.reload
 
 save_system(model)

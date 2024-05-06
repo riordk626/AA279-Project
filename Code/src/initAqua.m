@@ -11,13 +11,12 @@ M = timeseries(zeros([3 2]), [0 Tfinal]);
 simIn = Simulink.SimulationInput(masterModel);
 simIn.ExternalInput = M;
 
-initOrbital(orbitStruct.orbitType)
+initOrbital(orbitStruct.orbitType, orbitStruct.dataSource)
 
 initPlant(plantStruct.I_sim, plantStruct.axesFlag, plantStruct.dynamicsType, ...
             plantStruct.attitudeType, plantStruct.sequence, ICstruct)
 
-initDisturbance(distStruct.disturbance)
+initDisturbance(distStruct.disturbance, plantStruct)
 
-masterWS.reload
 
 save_system(masterModel)
