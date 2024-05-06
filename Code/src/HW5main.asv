@@ -1,0 +1,22 @@
+clc, clear
+close all
+
+[rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
+
+Tfinal = 300;
+
+%% Problem 1
+
+cb = [0 0 1].';
+cp = A_ptob.' * cb;
+cx = cp(1);
+cy = cp(2);
+cz = cp(3);
+
+orbitConstants;
+
+omz = sqrt(3*n_float^2 * cz);
+omx = 3*n_float^2 * cz * cz/omz;
+omy = 3*n_flaot;
+
+om0 = 

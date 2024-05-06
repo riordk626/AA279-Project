@@ -1,0 +1,16 @@
+function initPlant(I_sim, axesFlag, dynamicsType, sequence)
+modelDynamics = 'eulerPropagate';
+modelKinematics = 'attitduePropagate';
+
+load_system(modelDynamics)
+dynMWS = get_param(modelDynamics, 'modelworkspace');
+dynMWS.evalin('I_sim', I_sim)
+dynMWS.evalin('axesFlag', axesFlag)
+dynMWS.evalin('dynamicsType', dynamicsType)
+
+load_system()
+
+I_sim = Itotal_p;
+axesFlag = 0;
+dynamicsType="default";
+sequence="312";
