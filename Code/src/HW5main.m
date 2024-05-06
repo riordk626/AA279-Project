@@ -21,8 +21,6 @@ plantStruct.sequence = "313";
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
-Tfinal = 300;
-
 %% Problem 1
 
 omz = 0;
@@ -38,6 +36,13 @@ ICstruct.om0 = om0; ICstruct.R0 = R0;
 
 distStruct.disturbance = "grav";
 
+Tfinal = 3*T;
+
 simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
 
 simOut = sim(simIn);
+
+t = simOut.t;
+R = simOut.yout{1}.Values.Data;
+M_grav = squeeze(simOut.M_grav);
+om_p = squeeze(simOut.om_p);
