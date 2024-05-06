@@ -12,6 +12,7 @@ load('orbitConstants.mat')
 
 orbitStruct.orbitType = "num";
 orbitStruct.dataSource = 'MAT-File';
+% orbitStruct.dataSource = 'MATLAB File';
 
 plantStruct.I_sim = Itotal_p;
 plantStruct.axesFlag = 0;
