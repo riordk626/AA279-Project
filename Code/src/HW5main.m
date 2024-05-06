@@ -5,7 +5,8 @@ close all
 projectStartup;
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
-[r0, v0] = orbitalICs();
+
+[r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
 
 Tfinal = 300;
 
@@ -16,8 +17,6 @@ cp = A_ptob.' * cb;
 cx = cp(1);
 cy = cp(2);
 cz = cp(3);
-
-orbitConstants;
 
 omz = sqrt(3*n_float^2 * cz);
 omx = 3*n_float^2 * cz * cx/omz;
@@ -35,7 +34,10 @@ plantStruct.I_sim = Itotal_p;
 plantStruct.axesFlag = 0;
 plantStruct.dynamicsType = "default";
 plantStruct.attitudeType = "euler";
+plantStruct.sequence = "313";
 
 distStruct.disturbance = "grav";
 
-initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct)
+simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
+
+simOut = sim(simIn);

@@ -4,4 +4,8 @@ model = 'distMoment';
 load_system(model)
 
 mws = get_param(model, 'modelworkspace');
-mws.evalin('disturbance', disturbace)
+mws.assignin('disturbance', disturbace)
+
+mws.reload
+
+save_system(model)
