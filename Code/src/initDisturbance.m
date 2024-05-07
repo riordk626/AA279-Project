@@ -8,11 +8,19 @@ mws.assignin('disturbance', disturbace)
 
 switch disturbace
     case "grav"
-        gravModel = 'gravityGradient';
-        load_system(gravModel)
-        gravMWS = get_param(gravModel, 'ModelWorkspace');
-        gravMWS.assignin('I_sim', plantStuct.I_sim)
+        distModel = 'gravityGradient';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.assignin('I_sim', plantStuct.I_sim)
+    case "mag"
+        distModel = 'magneticField';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.DataSource = 'MATLAB File';
+        distMWS.FileName = 'magConstants';
+        distMWS.reload
+        distMWS.assignin("magnetic", "dipole")
 end
 
-save_system(gravModel)
+save_system(distModel)
 save_system(model)

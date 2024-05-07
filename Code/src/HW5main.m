@@ -35,7 +35,8 @@ R0 = R_RTNtoP * R_ECItoRTN;
 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 
-distStruct.disturbance = "grav";
+% distStruct.disturbance = "grav";
+distStruct.disturbance = "mag";
 
 Tfinal = 3*T;
 
