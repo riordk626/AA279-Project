@@ -62,7 +62,7 @@ Ixd = Ixyd(1);
 Iyd = Ixyd(2);
 
 Id = diag([Ixd Iyd Iza]);
-% Id = Id./(Iza*1e-4)
+Id = Id./(Iza*1e-4)
 
 
 % Stability in Narrow Region
@@ -74,29 +74,29 @@ Ixe = Ixye(1);
 Iye = Ixye(2);
 
 Ie = diag([Ixe Iye Iza]);
-% Ie = Ie./(Iza*1e-4)
+Ie = Ie./(Iza*1e-4)
 %% Problem 1 - Simulation
 
 % Simulation Verification of Stability/Instability
 omx = 0;
 omy = 0;
-omz = n_float;
+omz = rad2deg(n_float);
 
 om0 = [omx omy omz].';
-om0 = om0 + 0.01.*omz.*rand([3 1]);
+% om0 = om0 + 0.01.*rand([3 1]);
 R_ECItoRTN = eci2rtn(r0, v0);
 % R_RTNtoP = [0 0 -1;0 1 0;1 0 0];
 R_RTNtoP = eye(3);
 R0 = R_RTNtoP * R_ECItoRTN;
-R0 = perturbDCM(R0);
+% R0 = perturbDCM(R0);
 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 
 distStruct.disturbance = "grav";
 
-Tfinal = 5*T;
+Tfinal = 3*T;
 
-inertiaArray = {Itotal_p;Ib;Ic;Id;Ie};
+inertiaArray = {Ia;Ib;Ic;Id;Ie};
 
 for i=1:length(inertiaArray)
     plantStruct.I_sim = inertiaArray{i};
@@ -114,6 +114,5 @@ for i=1:length(inertiaArray)
     
     stabilityPlot(t,om_p,u)
 
-    % figure()
-    % plot(t, M_grav)
-end
+    figure()
+    plot(t, M_grav)

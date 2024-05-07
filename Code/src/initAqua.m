@@ -19,4 +19,4 @@ initPlant(plantStruct.I_sim, plantStruct.axesFlag, plantStruct.dynamicsType, ...
 initDisturbance(distStruct.disturbance, plantStruct)
 
 
-save_system(masterModel)
+% save_system(masterModel)

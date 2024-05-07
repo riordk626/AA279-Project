@@ -35,6 +35,6 @@ if attitdueType == "euler"
     attMWS.assignin("sequence", sequence)
 end
 
-save_system(attModel)
-save_system(modelDynamics)
-save_system(modelKinematics)
+% save_system(attModel)
+% save_system(modelDynamics)
+% save_system(modelKinematics)
