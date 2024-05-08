@@ -25,6 +25,22 @@ switch disturbace
         distMWS.save('magConstants.mat')
 
         distMWS.assignin("magnetic", "dipole")
+    case "solar"
+        distModel = 'solarMoment';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.assignin('normalVectors', plantStuct.normalVectors)
+        distMWS.assignin('areas', plantStuct.areas)
+        distMWS.assignin('rcm', plantStuct.rcm)
+        distMWS.assignin('centroids', plantStuct.centroids)
+    case "aero"
+        distModel = 'AerodynamicMoment';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.assignin('normalVectors', plantStuct.normalVectors)
+        distMWS.assignin('areas', plantStuct.areas)
+        distMWS.assignin('rcm', plantStuct.rcm)
+        distMWS.assignin('centroids', plantStuct.centroids)
 end
 
 % save_system(distModel)
