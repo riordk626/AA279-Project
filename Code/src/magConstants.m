@@ -18,3 +18,4 @@ end
 [~, ~, ~, A_ptob] = aquaMassProps();
 
 m_sat = A_ptob.' * m_satb;
+m_sat = sum(m_sat, 2);

@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = true;
+exportflag = false;
 figurePath = '../../Images/PS5/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -15,6 +15,7 @@ load('orbitConstants.mat')
 orbitStruct.orbitType = "num";
 orbitStruct.dataSource = 'MAT-File';
 % orbitStruct.dataSource = 'MATLAB File';
+distStruct.dataSource = 'MAT-File';
 
 plantStruct.I_sim = Itotal_p;
 plantStruct.axesFlag = 0;
@@ -112,16 +113,63 @@ for i=1:length(inertiaArray)
     M_grav = squeeze(simOut.M_grav);
     om_p = squeeze(simOut.om_p);
     R_ECItoRTN = simOut.rtn.Data; % ORBIT DCM OUTPUT
-    % u = attitudeECItoRTN(R_ItoP, R_ECItoRTN, "313");
-    u = squeeze(simOut.u);
+    u = attitudeECItoRTN(R_ItoP, R_ECItoRTN, "312");
+    % u = squeeze(simOut.u);
     values = {om_p, u, M_grav};
     valueNames = {'\omega [rad/s]', 'u [rad]', 'M_{grav} [Nm]'};
     valueLabels = {{'\omega_x';'\omega_y';'\omega_z'}, {'\phi'; '\theta'; '\psi'}, ...
                     {'M_x';'M_y';'M_z'}};
     figureName = [figurePath, 'point_', inertiaNames{i} ,'_grav_stability.png'];
     
-    timeHistoryPlot(t,values,valueNames,valueLabels,figureName,exportflag)
-
-    % figure()
-    % plot(t, M_grav)
+    fig = figure();
+    timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
+    
+    
 end
+
+
+%% Problem 3 - Disturbanc Moment Verification
+
+omx = 0;
+omy = 0;
+omz = n_float;
+
+om0 = [omx omy omz].';
+R_ECItoRTN = eci2rtn(r0, v0);
+% R_RTNtoP = [0 0 -1;0 1 0;1 0 0];
+R_RTNtoP = eye(3);
+R0 = R_RTNtoP * R_ECItoRTN;
+
+ICstruct.om0 = om0; ICstruct.R0 = R0;
+
+plantStruct.I_sim = Itotal_p;
+
+distStruct.disturbance = "mag";
+
+simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+r = squeeze(simOut.r.Data);
+M_mag = squeeze(simOut.M_mag);
+r_mag = vecnorm(r,2,1);
+mag_data = load('magConstants.mat', 'm_sat', 'Re', 'B0');
+m_sat = mag_data.m_sat;
+Re = mag_data.Re;
+B0 = mag_data.B0;
+m_sat_mag = norm(m_sat);
+
+M_mag_bound = 2*m_sat_mag*Re^3*B0./(r_mag.^3);
+
+figure()
+plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
+hold on
+plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
+p = plot(t, M_mag, 'LineWidth', 2);
+set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
+xlabel('t [sec]')
+ylabel('M [Nm]')
+ax = gca();
+ax.FontSize = 14;
+legend

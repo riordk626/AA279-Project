@@ -1,4 +1,4 @@
-function initDisturbance(disturbace, plantStuct)
+function initDisturbance(disturbace, plantStuct, dataSource)
 
 model = 'distMoment';
 load_system(model)
@@ -18,9 +18,12 @@ switch disturbace
         distModel = 'magneticField';
         load_system(distModel)
         distMWS = get_param(distModel, 'ModelWorkspace');
-        distMWS.DataSource = 'MATLAB File';
+        distMWS.DataSource = dataSource;
         distMWS.FileName = 'magConstants';
         distMWS.reload
+
+        distMWS.save('magConstants.mat')
+
         distMWS.assignin("magnetic", "dipole")
 end
 

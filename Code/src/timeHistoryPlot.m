@@ -1,8 +1,8 @@
-function timeHistoryPlot(t, values, valueNames, valueLabels, figureName, exportflag)
+function timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 n = length(values);
 
-figure()
+fig;
 
 for i=1:n
     subplot(n,1,i)

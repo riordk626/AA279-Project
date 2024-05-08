@@ -16,7 +16,7 @@ initOrbital(orbitStruct.orbitType, orbitStruct.dataSource)
 initPlant(plantStruct.I_sim, plantStruct.axesFlag, plantStruct.dynamicsType, ...
             plantStruct.attitudeType, plantStruct.sequence, ICstruct)
 
-initDisturbance(distStruct.disturbance, plantStruct)
+initDisturbance(distStruct.disturbance, plantStruct, distStruct.dataSource)
 
 
 % save_system(masterModel)
