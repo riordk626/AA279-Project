@@ -41,22 +41,22 @@ There are five points indicated in Figure \ref{fig:grav_gradient_stability}, the
     \label{tab:k_plane_points}
 \end{table}
 
-The point that corresponds to Aqua's nominal configuration is Point (a). It can be seen that this lies in a stable (unshaded) region in the first quadrant of Figure \ref{fig:grav_gradient_stability}. Initializing the simulation with the the velocities and Euler angles slightly perturbed from the equilibrium state described above, the stability can be verified in simulation. Figure \ref{fig:point_a_grav_stability} shows a time history of the velocities, the Euler angles describing rotation between the principal and RTN frames, and lastly the components of the gravity gradient induced moment expressed in the principal frame. 
+The point that corresponds to Aqua's nominal configuration is Point (a). It can be seen that this lies in a stable (unshaded) region in the first quadrant of Figure \ref{fig:grav_gradient_stability}. Initializing the simulation with the the velocities and Euler angles slightly perturbed from the equilibrium state described above, the stability can be verified in simulation. Figure \ref{fig:point_a_grav_stability} shows a time history of the velocities, the Euler angles describing rotation between the principal and RTN frames in a 312 sequence, and lastly the components of the gravity gradient induced moment expressed in the principal frame. This plot confirms the prediction that the satellite is stable, with the angular velocities all being periodically oscillating about equilibrium with a small amplitude and only slight misalignment of the principal frame from the body frame. The low magnitude of the gravity induced torque is also a good indicator that the satellite is remaining close to equilibrium.
 
 \begin{figure}[H]
     \centering
     \captionsetup{justification = centering}
-    \includegraphics[width = 12cm]{Images/PS5/}
+    \includegraphics[width = 12cm]{Images/PS5/point_a_grav_stability.png}
     \caption{Time History of Perturbed Equilibrium for Point (a)}
     \label{fig:point_a_grav_stability}
 \end{figure}
 
-Points (b)--(d) describe unstable conditions along various axes. The following plots (Figures \ref{point_b_grav_stability}--\ref{point_d_grav_stability} shows the same stability analysis performed for these points.
+Points (b)--(d) describe unstable conditions along various axes. The following plots (Figures \ref{fig:point_b_grav_stability}--\ref{fig:point_d_grav_stability} shows the same stability analysis performed for these points.
 
 \begin{figure}[H]
     \centering
     \captionsetup{justification = centering}
-    \includegraphics[width = 12cm]{Images/PS5/}
+    \includegraphics[width = 12cm]{Images/PS5/point_b_grav_stability.png}
     \caption{Time History of Perturbed Equilibrium for Point (b)}
     \label{fig:point_b_grav_stability}
 \end{figure}
@@ -64,7 +64,7 @@ Points (b)--(d) describe unstable conditions along various axes. The following p
 \begin{figure}[H]
     \centering
     \captionsetup{justification = centering}
-    \includegraphics[width = 12cm]{Images/PS5/}
+    \includegraphics[width = 12cm]{Images/PS5/point_c_grav_stability.png}
     \caption{Time History of Perturbed Equilibrium for Point (c)}
     \label{fig:point_c_grav_stability}
 \end{figure}
@@ -72,23 +72,23 @@ Points (b)--(d) describe unstable conditions along various axes. The following p
 \begin{figure}[H]
     \centering
     \captionsetup{justification = centering}
-    \includegraphics[width = 12cm]{Images/PS5/}
+    \includegraphics[width = 12cm]{Images/PS5/point_d_grav_stability.png}
     \caption{Time History of Perturbed Equilibrium for Point (d)}
     \label{fig:point_d_grav_stability}
 \end{figure}
 
-Through the analysis of Figure \ref{fig:grav_gradient_stability}, Point (b) is predicted to be unstable strictly in pitch. 
+Through the analysis of Figure \ref{fig:grav_gradient_stability}, Point (b) is predicted to be unstable strictly in pitch. The time history plot for this configuration show the x- and y-components of angular velocity remain periodically stable while the z-component (i.e. the pitch component) oscillates in an unstable fashion. The angle $\phi$ also deviates from 0 radians, indicating a drift away from equilibrium. Lastly the moments in the x- and y-directions stay nearly constant and close to zero while the moment in the z-direction grows.
 
-Point (c), however, is predicted to be unstable in yaw, pitch, and roll.
+Point (c), however, is predicted to be unstable in yaw, pitch, and roll. The simulation results clearly show all angular velocity components varying wildly in a non-periodic manner. All attitude components drift away from RTN alignment and all components of the moment vector oscillate chaotically.
 
-Lastly, Point (d) is expected to be yaw and roll unstable while still stable in pitch.
+Lastly, Point (d) is expected to be yaw and roll unstable while still stable in pitch. The angular velocities in the principal frame indicate that z-component swaps direction but remains nearly the same in magnitude while the x- and y-components oscillate non-periodically. The z-component of the gravity induced torque remains nearly zero as well, while the x- and y- components grow.
 
-Another stable condition where the spacecraft is spinning about the minimum inertia is corresponds to Point (e). The stability behavior of this satellite is seen in Figure \ref{fig:point_e_grav_stability}.
+Another stable condition where the spacecraft is spinning about the minimum inertia is corresponds to Point (e). The stability behavior of this satellite is seen in Figure \ref{fig:point_e_grav_stability}. The time history behaves similarly for that of Point (a) as expected.
 
 \begin{figure}[H]
     \centering
     \captionsetup{justification = centering}
-    \includegraphics[width = 12cm]{Images/PS5/}
+    \includegraphics[width = 12cm]{Images/PS5/point_e_grav_stability.png}
     \caption{Time History of Perturbed Equilibrium for Point (e)}
     \label{fig:point_e_grav_stability}
 \end{figure}
@@ -99,7 +99,28 @@ The spacecraft is already stable about the equilibrium described above, however 
 
 \subsection{In addition to gravity gradient, start programming perturbation torques due to magnetic field, solar radiation pressure, and atmospheric drag.}
 
-To create a simple, early use model for the magnetic disturbance torques, the Earth is modeled as a magnetic dipole. This assumption is not accurate for LEO, but will give helpful insight to how the spacecraft motion will be affected by this disturbance along with the ability to size actuators. A more accurate model will be investigated in the future. 
-When modeling the magnetic dipole of the spacecraft, a major simplification was made. The spacecraft was split into two main components---the chassis along and instruments as one component with the solar panel as another. Each component is modeled as a insulating cylinder with an electromagnetic coil wrapped around it. The model for the dipole moment created by each of these components is described in Equation \ref{eq:spacecraft_dipole}, where $\mu_0$ is the permeability of vacuum, $S$ is the surface area between each coil, $n$ is the number of coils, and $\Delta I$ is the variable current passing through the coil. For the current state of the model, these numbers were chosen very arbitrarily. They are reported in Table \ref{tab:spacecraft_dipole_data} along with the direction and magnitude of the resulting dipole moment.
+To create a simple, early use model for the magnetic disturbance torques, the Earth is modeled as a magnetic dipole. This assumption is not accurate for LEO, but will give helpful insight to how the spacecraft motion will be affected by this disturbance along with the ability to size actuators. A more accurate model will be investigated in the future. The dipole model for the Earth is given by Equation \ref{eq:earth_mag_field} where $R_E$ is the radius of the earth (6371.8 km), $B_0$ is the strength of Earth's magnetic field at the surface (30800 nT), $\vec{R} = R \hat{R}$ is the vector from the center of the Earth to the center of mass of the spacecraft, and $\hat{m}$ represents the direction of Earth's magnetic dipole.
+
+\begin{equation} \label{eq:earth_mag_field}
+    \vec{B}(\vec{R}) = -\frac{R_E^3 B_0}{R^3} \left[ 3\left( \hat{m} \cdot \hat{R} \right) - \hat{m} \right]
+\end{equation}
+
+When modeling the magnetic dipole of the spacecraft, a major simplification was made. The spacecraft was split into two main components---the chassis along and instruments as one component with the solar panel as another. Each component is modeled as a insulating cylinder with an electromagnetic coil wrapped around it. The model for the dipole moment created by each of these components is described in Equation \ref{eq:spacecraft_dipole}, where $\mu_0$ is the permeability of vacuum (1.25663706212 $\times$ 10 \textsuperscript{-9} N A \textsuperscript{-2}), S is the surface area between each coil, $n$ is the number of coils, and $\Delta I$ is the variable current passing through the coil. For the current state of the model, these numbers were chosen very arbitrarily. They are reported in Table \ref{tab:spacecraft_dipole_data} along with the direction in the body frame and magnitude of the resulting dipole moment.
+
+\begin{equation} \label{eq:spacecraft_dipole}
+    \vec{m} = \mu_0 S n \Delta I \hat{m}
+\end{equation}
+
+\begin{table}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \begin{tabular}{c|ccccc}
+    Component  & S [m\textsuperscript{2}] & $n$ & $\Delta I$ [A] & $\hat{m}$  & m [Nm/T] \\ \hline
+    Chassis + Instruments &   3     &   15    &   1    &   $\begin{bmatrix}  1 & 0 & 0  \end{bmatrix}^T$    &  0.5655 \\
+    Solar Panel &   0.2     &  15    &   1    &    $\begin{bmatrix}  0 & 1 & 0  \end{bmatrix}^T$   &  0.0377  \\  
+    \end{tabular}
+    \caption{Heuristics used for Spacecraft Dipole Moment Modeling}
+    \label{tab:spacecraft_dipole_data}
+\end{table}
 
 This approximation of the disturbance was implemented using the Simulink model depicted in Figure \ref{fig:simulink_mag}.
