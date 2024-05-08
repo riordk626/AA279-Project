@@ -7,6 +7,7 @@ exportflag = false;
 figurePath = '../../Images/PS5/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
+[areas, centroids, normalVectors] = aquaSurfaceProps();
 
 load('orbitConstants.mat')
 
@@ -22,6 +23,11 @@ plantStruct.axesFlag = 0;
 plantStruct.dynamicsType = "default";
 plantStruct.attitudeType = "euler";
 plantStruct.sequence = "313";
+
+plantStruct.normalVectors = normalVectors;
+plantStruct.areas = areas;
+plantStruct.rcm = rcm;
+plantStruct.centroids = centroids;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
