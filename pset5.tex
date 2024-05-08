@@ -1,0 +1,105 @@
+\section{\Large PROBLEM SET 5}
+
+\subsection{Problem 1 - Gravity Gradient Torque (Stability)}
+
+\subsubsection{Calculate the coefficients Ki of the moments of inertia which drive stability under gravity gradient. Compute and plot regions of stable and unstable motion.}
+
+Using Demos, an online graphing calculator tool, the plot shown in Figure \ref{fig:grav_gradient_stability} was produced. As shown in annotations on the figure, this plot represents regions in the $k_Tk_R$ plane for which stability is achieved. The equilibrium point about which this stability is described is one in which the principal axes of the spacecraft are aligned with the RTN frame, and the angular velocity of the spacecraft expressed in the principal frame is $\vec{\omega} = \begin{bmatrix} 0 & 0 & n \end{bmatrix}^T$, where $n$ is the mean motion of the spacecraft in its orbit. 
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering}
+    \includegraphics[width = 15cm]{Images/PS5/gravityGradientStabilityPlot.png}
+    \caption{Plot of Stability Regions in the $k_Tk_R$ Plane with Various Simulated Test Points which Describe Several States of Stability and Instability}
+    \label{fig:grav_gradient_stability}
+\end{figure}
+
+The definitions of $k_N$, $k_T$, and $k_R$ are seen in Equations \ref{eq:k_N}, \ref{eq:k_T}, and \ref{eq:k_R} respectively. 
+
+\begin{eqnarray}
+    k_N &= \frac{I_y - I_x}{I_z} \label{eq:k_N} \\
+    k_T &= \frac{I_z - I_x}{I_y} \label{eq:k_T} \\
+    k_R &= \frac{I_z - I_y}{I_x} \label{eq:k_R}
+\end{eqnarray}
+
+\subsubsection{Considering the results from 1a, comments on the expected stability of the attitude motion of your satellite about equilibrium. Try to reproduce stable and unstable motion by setting proper initial conditions and perturbing those conditions slightly (e.g., by 1\%). Plot attitude parameters (e.g., Euler angles) to show stability or instability}
+
+There are five points indicated in Figure \ref{fig:grav_gradient_stability}, the coordinates of which are shown in Table \ref{tab:k_plane_points} along with the respective principal inertia values that yield the listed configurations.
+
+\begin{table}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \begin{tabular}{c|ccccc}
+    Point  & $k_T$ & $k_R$ & $I_{xx}$ [kg m\textsuperscript{2}] & $I_{yy}$ [kg m\textsuperscript{2}] & $I_{zz}$ [kg m\textsuperscript{2}] \\ \hline
+    a &   0.7933     &   0.7212    &   17510    &   23616    &  36245 \\
+    b &   0.7212     &  0.7993     &   23616    &   17510    &  36245  \\  
+    c &   -0.7933     &  -0.1685     &   36245    &   23616    &  17510  \\ 
+    d &   0.5000     &  -0.2500     &   16109    &   40272    &  36245  \\ 
+    e &   -0.0500     &  -0.2500     &   38539    &   45879    &  36245  \\ 
+    \end{tabular}
+    \caption{Test Points in $k_Tk_R$ Plane for Various Stability and Instability Conditions}
+    \label{tab:k_plane_points}
+\end{table}
+
+The point that corresponds to Aqua's nominal configuration is Point (a). It can be seen that this lies in a stable (unshaded) region in the first quadrant of Figure \ref{fig:grav_gradient_stability}. Initializing the simulation with the the velocities and Euler angles slightly perturbed from the equilibrium state described above, the stability can be verified in simulation. Figure \ref{fig:point_a_grav_stability} shows a time history of the velocities, the Euler angles describing rotation between the principal and RTN frames, and lastly the components of the gravity gradient induced moment expressed in the principal frame. 
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 12cm]{Images/PS5/}
+    \caption{Time History of Perturbed Equilibrium for Point (a)}
+    \label{fig:point_a_grav_stability}
+\end{figure}
+
+Points (b)--(d) describe unstable conditions along various axes. The following plots (Figures \ref{point_b_grav_stability}--\ref{point_d_grav_stability} shows the same stability analysis performed for these points.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 12cm]{Images/PS5/}
+    \caption{Time History of Perturbed Equilibrium for Point (b)}
+    \label{fig:point_b_grav_stability}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 12cm]{Images/PS5/}
+    \caption{Time History of Perturbed Equilibrium for Point (c)}
+    \label{fig:point_c_grav_stability}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 12cm]{Images/PS5/}
+    \caption{Time History of Perturbed Equilibrium for Point (d)}
+    \label{fig:point_d_grav_stability}
+\end{figure}
+
+Through the analysis of Figure \ref{fig:grav_gradient_stability}, Point (b) is predicted to be unstable strictly in pitch. 
+
+Point (c), however, is predicted to be unstable in yaw, pitch, and roll.
+
+Lastly, Point (d) is expected to be yaw and roll unstable while still stable in pitch.
+
+Another stable condition where the spacecraft is spinning about the minimum inertia is corresponds to Point (e). The stability behavior of this satellite is seen in Figure \ref{fig:point_e_grav_stability}.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 12cm]{Images/PS5/}
+    \caption{Time History of Perturbed Equilibrium for Point (e)}
+    \label{fig:point_e_grav_stability}
+\end{figure}
+
+\subsubsection{How would you need to change the mass distribution and/or nominal attitude of your satellite to obtain stable motion from the gravity gradient torque? Would it make sense for your project? Show a couple of potential configurations in the Ki plane and resulting stability of attitude motion at the equilibrium. This is done by changing your inertia tensor and simulating numerically}
+
+The spacecraft is already stable about the equilibrium described above, however it might make sense to find an equilibrium such that the spacecraft is spinning about its minimum inertia. This would ensure that the craft was already in its lowest energy state, so any unmodeled dissipation would not result in the orientation of the spacecraft changing. Very fortunately, the minimum axis of inertia for the nominal Aqua model (i.e. the x-axis in the current principal frame) is closely aligned with the y-axis in the body frame. An Earth pointing orientation for this mission is synonymous with this axis being aligned with the N-axis in the RTN frame. Therefore, it would make sense to achieve stable equilibrium about this axis. The stability of the spacecraft in this orientation will be investigated in the future.
+
+\subsection{In addition to gravity gradient, start programming perturbation torques due to magnetic field, solar radiation pressure, and atmospheric drag.}
+
+To create a simple, early use model for the magnetic disturbance torques, the Earth is modeled as a magnetic dipole. This assumption is not accurate for LEO, but will give helpful insight to how the spacecraft motion will be affected by this disturbance along with the ability to size actuators. A more accurate model will be investigated in the future. 
+When modeling the magnetic dipole of the spacecraft, a major simplification was made. The spacecraft was split into two main components---the chassis along and instruments as one component with the solar panel as another. Each component is modeled as a insulating cylinder with an electromagnetic coil wrapped around it. The model for the dipole moment created by each of these components is described in Equation \ref{eq:spacecraft_dipole}, where $\mu_0$ is the permeability of vacuum, $S$ is the surface area between each coil, $n$ is the number of coils, and $\Delta I$ is the variable current passing through the coil. For the current state of the model, these numbers were chosen very arbitrarily. They are reported in Table \ref{tab:spacecraft_dipole_data} along with the direction and magnitude of the resulting dipole moment.
+
+This approximation of the disturbance was implemented using the Simulink model depicted in Figure \ref{fig:simulink_mag}.
