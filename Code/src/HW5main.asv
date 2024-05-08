@@ -3,8 +3,6 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = true;
-figurePath = '../../Images/PS5/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
 
@@ -99,7 +97,6 @@ distStruct.disturbance = "grav";
 Tfinal = 5*T;
 
 inertiaArray = {Itotal_p;Ib;Ic;Id;Ie};
-inertiaNames = {'a', 'b', 'c', 'd', 'e'};
 
 for i=1:length(inertiaArray)
     plantStruct.I_sim = inertiaArray{i};
@@ -114,13 +111,8 @@ for i=1:length(inertiaArray)
     R_ECItoRTN = simOut.rtn.Data; % ORBIT DCM OUTPUT
     % u = attitudeECItoRTN(R_ItoP, R_ECItoRTN, "313");
     u = squeeze(simOut.u);
-    values = {om_p, u, M_grav};
-    valueNames = {'\omega [rad/s]', 'u [rad]', 'M_{grav} [Nm]'};
-    valueLabels = {{'\omega_x';'\omega_y';'\omega_z'}, {'\phi'; '\theta'; '\psi'}, ...
-                    {'M_x';'M_y';'M_z'}};
-    figureName = [figurePath, 'point_', inertiaNames{i} ,'_grav_stability.png'];
     
-    timeHistoryPlot(t,values,valueNames,valueLabels,figureName,exportflag)
+    stabilityPlot(t,om_p,u)
 
     % figure()
     % plot(t, M_grav)
