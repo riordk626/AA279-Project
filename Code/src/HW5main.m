@@ -107,9 +107,9 @@ Tfinal = 5*T;
 
 %% debugging
 
-distStruct.disturbance = "solar";
-simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
-simOut = sim(simIn);
+% distStruct.disturbance = "solar";
+% simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
+% simOut = sim(simIn);
 
 %%
 
@@ -187,3 +187,4 @@ ylabel('M [Nm]')
 ax = gca();
 ax.FontSize = 14;
 legend
+figureName = [figurePath, 'magnetic_torque.png'];
