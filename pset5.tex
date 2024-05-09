@@ -57,7 +57,7 @@ Points (b)--(d) describe unstable conditions along various axes. The following p
     \centering
     \captionsetup{justification = centering}
     \includegraphics[width = 12cm]{Images/PS5/point_b_grav_stability.png}
-    \caption{Time History of Perturbed Equilibrium for Point (b)}
+    \caption{Time History of Perturbed Equilibrium for Point (b) [\emph{Pitch Unstable}]}
     \label{fig:point_b_grav_stability}
 \end{figure}
 
@@ -65,7 +65,7 @@ Points (b)--(d) describe unstable conditions along various axes. The following p
     \centering
     \captionsetup{justification = centering}
     \includegraphics[width = 12cm]{Images/PS5/point_c_grav_stability.png}
-    \caption{Time History of Perturbed Equilibrium for Point (c)}
+    \caption{Time History of Perturbed Equilibrium for Point (c) [\emph{Roll, Yaw, and Pitch Unstable}]}
     \label{fig:point_c_grav_stability}
 \end{figure}
 
@@ -73,7 +73,7 @@ Points (b)--(d) describe unstable conditions along various axes. The following p
     \centering
     \captionsetup{justification = centering}
     \includegraphics[width = 12cm]{Images/PS5/point_d_grav_stability.png}
-    \caption{Time History of Perturbed Equilibrium for Point (d)}
+    \caption{Time History of Perturbed Equilibrium for Point (d) [\emph{Roll and Yaw Unstable}]}
     \label{fig:point_d_grav_stability}
 \end{figure}
 
@@ -98,6 +98,8 @@ Another stable condition where the spacecraft is spinning about the minimum iner
 The spacecraft is already stable about the equilibrium described above, however it might make sense to find an equilibrium such that the spacecraft is spinning about its minimum inertia. This would ensure that the craft was already in its lowest energy state, so any unmodeled dissipation would not result in the orientation of the spacecraft changing. Very fortunately, the minimum axis of inertia for the nominal Aqua model (i.e. the x-axis in the current principal frame) is closely aligned with the y-axis in the body frame. An Earth pointing orientation for this mission is synonymous with this axis being aligned with the N-axis in the RTN frame. Therefore, it would make sense to achieve stable equilibrium about this axis. The stability of the spacecraft in this orientation will be investigated in the future.
 
 \subsection{In addition to gravity gradient, start programming perturbation torques due to magnetic field, solar radiation pressure, and atmospheric drag.}
+
+\subsubsection{Magnetic Field}
 
 To create a simple, early use model for the magnetic disturbance torques, the Earth is modeled as a magnetic dipole. This assumption is not accurate for LEO, but will give helpful insight to how the spacecraft motion will be affected by this disturbance along with the ability to size actuators. A more accurate model will be investigated in the future. The dipole model for the Earth is given by Equation \ref{eq:earth_mag_field} where $R_E$ is the radius of the earth (6371.8 km), $B_0$ is the strength of Earth's magnetic field at the surface (30800 nT), $\vec{R} = R \hat{R}$ is the vector from the center of the Earth to the center of mass of the spacecraft, and $\hat{m}$ represents the direction of Earth's magnetic dipole.
 
@@ -156,4 +158,76 @@ This approximation of the disturbance was implemented using the Simulink model d
     \includegraphics[trim={0cm 15cm 10cm 0cm},clip,width = 15cm]{Images/PS5/magneticField-6.png}
     \caption{Magnetic Dipole Model for Earth Magnetic Field Disturbance Torque}
     \label{fig:simulink_mag}
+\end{figure}
+
+\subsubsection{Solar Radiation Pressure}
+
+To approximate the torque caused by solar radiation pressure, the surfaces of our satellite that were approximated in Homework 1 to have the properties shown in Figure \ref{fig:surface_labels} needed to be summed over. Because each of our surfaces was approximated as planes, the following equation was used to find the solar radiation force for each of the surface.
+
+\begin{equation}
+    - P A cos(\theta) * \left [ (1-c_s)\hat{\boldsymbol{S}} + 2 \left( c_s cos(\theta) + \frac{1}{3} c_d \right) \hat{\boldsymbol{N}} \right]
+\end{equation}
+
+In this equation, $P$ is the mean momentum flux, $A$ is the area of the surface, $c_s$ and $c_d$ are the spectral and diffusion coefficients respectively, $\hat{\boldsymbol{S}}$ is the unit vector in the direction of the sun, $\hat{\boldsymbol{N}}$ is the unit vector normal to the surface, and $\theta$ is the angle between $\hat{\boldsymbol{S}}$ and $\hat{\boldsymbol{N}}$. Because the satellite is in a sun synchronous orbit, $\hat{\boldsymbol{S}}$ was approximated as the cross product between the radius and velocity since the direction of the sun would be roughly normal to the orbital plane. Furthermore, since the orbit was specifically chosen to avoid eclipses, they didn't need to be accounted for in the model. To determine whether a given surface of the satellite was lit by the sun or not, the dot product was taken between $\hat{\boldsymbol{S}}$ and $\hat{\boldsymbol{N}}$. If it was positive (i.e. the vectors point in the same direction) then it was approximated that the entire surface was lit by the sun. Because of this, more accuracy in shadowing could be implemented in the future. More research needs to be done into the selections for $c_s$ and $c_d$ and as well as $P$. For the time being, $c_s$ and $c_d$ were approximated as $\frac{1}{3}$ by assuming that there were equal parts absorption, deflection, and spectral diffusion. Once the solar radiation force was calculated for each surface, the torque contribution was calculated by taking the cross product with the distance between the center of mass of the spacecraft and center of pressure of the surface. 
+
+\begin{eqnarray}
+    \vec N = \sum^n_{i=1} \vec R_i \times \vec F_i
+\end{eqnarray}
+
+The following simulink models were implemented to calculate the moments for each of the surfaces.
+
+\begin{figure} [H]
+    \centering
+    \begin{lstlisting}
+function M = resultantAeroTorque(cd, rho, v, A, N, centroids, rcm, eci2principle, A_ptob, v_mag)
+force = zeros([3 1]);
+M = zeros([3 1]);
+n = size(A, 1);
+
+%Rotate everything to principle frame
+v = eci2principle*v;
+rcm = A_ptob * rcm;
+for i=1:n
+    N(:, i) = A_ptob * N(:, i);
+    centroids(:, i) = A_ptob * centroids(:, i);
+end 
+
+
+vUnit = v ./ v_mag;
+disp(dot(N(1, :), vUnit))
+
+for i=1:n
+    if dot(N(:, i), vUnit) > 0
+        force = -0.5 .* cd .* rho .* v_mag^2 .* A(i) .* dot(N(:, i), vUnit) .* vUnit;
+        M = M + cross(centroids(:, i) - rcm, force);
+    end
+end
+    \end{lstlisting}
+    \caption{Aerodynamic Torque}
+    \label{fig:dual_spin_simulink_code}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 15cm]{Images/PS5/aeroTorqueSimulink.png}
+    \caption{Solar Radiation Pressure Model}
+    \label{fig:simulink_sol}
+\end{figure}
+
+The above model only includes torques from the solar radiation pressure introduced directly from the sun. Contributions from Earth's reflectance and radiation were neglected.
+
+
+\subsubsection{Atmospheric Drag}
+
+Similarly to solar radiation, the 
+
+\subsection{Include all torques you have been able to model in numerical integration. Please show comparison of numerically computed disturbance torques with expected values and trend from theory (model) and tables (Wertz) referenced in class. Plot all torque components in principal axes over time. Plot the resultant (sum) of all torques in principal axes. Make sure that your model is not too ideal, i.e. make sure that center of pressure and center of mass do not coincide. }
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 15cm]{Images/PS5/magnetic_torque.png}
+    \caption{Solar Radiation Pressure Model}
+    \label{fig:simulink_sol}
 \end{figure}

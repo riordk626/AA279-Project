@@ -1,4 +1,4 @@
-function initDisturbance(disturbace, plantStuct)
+function initDisturbance(disturbace, plantStuct, dataSource)
 
 model = 'distMoment';
 load_system(model)
@@ -18,10 +18,29 @@ switch disturbace
         distModel = 'magneticField';
         load_system(distModel)
         distMWS = get_param(distModel, 'ModelWorkspace');
-        distMWS.DataSource = 'MATLAB File';
+        distMWS.DataSource = dataSource;
         distMWS.FileName = 'magConstants';
         distMWS.reload
+
+        distMWS.save('magConstants.mat')
+
         distMWS.assignin("magnetic", "dipole")
+    case "solar"
+        distModel = 'solarMoment';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.assignin('normalVectors', plantStuct.normalVectors)
+        distMWS.assignin('areas', plantStuct.areas)
+        distMWS.assignin('rcm', plantStuct.rcm)
+        distMWS.assignin('centroids', plantStuct.centroids)
+    case "aero"
+        distModel = 'AerodynamicMoment';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.assignin('normalVectors', plantStuct.normalVectors)
+        distMWS.assignin('areas', plantStuct.areas)
+        distMWS.assignin('rcm', plantStuct.rcm)
+        distMWS.assignin('centroids', plantStuct.centroids)
 end
 
 % save_system(distModel)

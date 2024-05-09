@@ -57,3 +57,13 @@ trueAnomaly = ...
   [0 0;
    1.0E+7 0];
 
+rE = 6371; %km
+altitudeFloat = a_float - rE; %km
+
+altitude = ...
+  [0 altitudeFloat;
+   1.0E+7 altitudeFloat];
+
+density = e-15; 
+
+
