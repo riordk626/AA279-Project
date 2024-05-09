@@ -107,7 +107,7 @@ Tfinal = 5*T;
 
 %% debugging
 
-distStruct.disturbance = "aero";
+distStruct.disturbance = "solar";
 simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
 simOut = sim(simIn);
 
