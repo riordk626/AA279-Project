@@ -111,8 +111,6 @@ distStruct.disturbance = "aero";
 simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
 simOut = sim(simIn);
 
-
-
 %%
 
 inertiaArray = {Itotal_p;Ib;Ic;Id;Ie};
