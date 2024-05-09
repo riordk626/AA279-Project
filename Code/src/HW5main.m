@@ -105,6 +105,16 @@ distStruct.disturbance = "grav";
 
 Tfinal = 5*T;
 
+%% debugging
+
+distStruct.disturbance = "aero";
+simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
+simOut = sim(simIn);
+
+
+
+%%
+
 inertiaArray = {Itotal_p;Ib;Ic;Id;Ie};
 inertiaNames = {'a', 'b', 'c', 'd', 'e'};
 
