@@ -105,14 +105,6 @@ distStruct.disturbance = "grav";
 
 Tfinal = 5*T;
 
-%% debugging
-
-% distStruct.disturbance = "solar";
-% simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
-% simOut = sim(simIn);
-
-%%
-
 inertiaArray = {Itotal_p;Ib;Ic;Id;Ie};
 inertiaNames = {'a', 'b', 'c', 'd', 'e'};
 
@@ -142,7 +134,7 @@ for i=1:length(inertiaArray)
 end
 
 
-%% Problem 3 - Disturbanc Moment Verification
+%% Problem 3 - Disturbance Moment Verification
 
 omx = 0;
 omy = 0;
@@ -157,6 +149,8 @@ R0 = R_RTNtoP * R_ECItoRTN;
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 
 plantStruct.I_sim = Itotal_p;
+
+% plots magnetic torque
 
 distStruct.disturbance = "mag";
 
@@ -188,3 +182,78 @@ ax = gca();
 ax.FontSize = 14;
 legend
 figureName = [figurePath, 'magnetic_torque.png'];
+
+exportgraphics(gcf, figureName)
+sgtitle(gcf, 'Magnetic Torque')
+
+% plots aero torque
+
+distStruct.disturbance = "aero";
+
+simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+r = squeeze(simOut.r.Data);
+M_mag = squeeze(simOut.M_mag);
+r_mag = vecnorm(r,2,1);
+% mag_data = load('magConstants.mat', 'm_sat', 'Re', 'B0');
+% m_sat = mag_data.m_sat;
+% Re = mag_data.Re;
+% B0 = mag_data.B0;
+% m_sat_mag = norm(m_sat);
+
+% M_mag_bound = 2*m_sat_mag*Re^3*B0./(r_mag.^3);
+
+figure()
+% plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
+hold on
+% plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
+p = plot(t, M_mag, 'LineWidth', 2);
+set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
+xlabel('t [sec]')
+ylabel('M [Nm]')
+ax = gca();
+ax.FontSize = 14;
+legend
+figureName = [figurePath, 'aero_torque.png'];
+
+exportgraphics(gcf, figureName)
+sgtitle(gcf, 'Aero Torque')
+
+% plots solar torque
+
+distStruct.disturbance = "solar";
+
+simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+r = squeeze(simOut.r.Data);
+M_mag = squeeze(simOut.M_mag);
+r_mag = vecnorm(r,2,1);
+% mag_data = load('magConstants.mat', 'm_sat', 'Re', 'B0');
+% m_sat = mag_data.m_sat;
+% Re = mag_data.Re;
+% B0 = mag_data.B0;
+% m_sat_mag = norm(m_sat);
+
+% M_mag_bound = 2*m_sat_mag*Re^3*B0./(r_mag.^3);
+
+figure()
+% plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
+hold on
+% plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
+p = plot(t, M_mag, 'LineWidth', 2);
+set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
+xlabel('t [sec]')
+ylabel('M [Nm]')
+ax = gca();
+ax.FontSize = 14;
+legend
+figureName = [figurePath, 'solar_torque.png'];
+
+exportgraphics(gcf, figureName)
+sgtitle(gcf, 'Solar Torque')
