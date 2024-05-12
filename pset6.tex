@@ -1,0 +1,45 @@
+\section{\Large PROBLEM SET 6}
+
+\subsection{Problem 1 - Complete the modeling and verification of perturbation torques as described in the previous pset}
+
+\subsection{Problem 2 - Compute the attitude control error even if a controller is not implemented yet. The attitude control error represents the rotation between the desired and actual attitude. Plot the attitude control error and give its interpretation. Note that this step requires the definition and computation of the desired or nominal or target attitude of the spacecraft. In general, this can be expressed in body or principal axes.}
+
+Recall that the mission for the Aqua satellite requires the instruments on the bottom of the craft to be Earth-pointing. With the selected body axes, this means that the desired attitude expressed as a rotation matrix from the RTN frame to the body frame is described as follows.
+
+\begin{equation*}
+    \boldsymbol{\bar{R}}_{RTN \rightarrow x'y'z'} = \begin{bmatrix}
+        0 & 1 & 0 \\ 0 & 0 & 1 \\ 1 & 0 & 0
+    \end{bmatrix}
+\end{equation*}
+
+To get the desired orientation of the principal frame we use the rotation described in Section \ref{sec:principal_inertia_def_and_calc}. Using Equation \ref{eq:desired_principal_RTN}, the desired attitude of the principal frame with respect to the RTN frame can computed, where $\boldsymbol{A}$ is represented by $\boldsymbol{R}_{xyz \rightarrow x'y'z'}$.
+
+\begin{equation} \label{eq:desired_principal_RTN}
+    \boldsymbol{\bar{R}}_{RTN \rightarrow xyz} = \boldsymbol{R}_{xyz \rightarrow x'y'z'}^T \boldsymbol{\bar{R}}_{RTN \rightarrow x'y'z'}
+\end{equation}
+
+Therefore, at each step in the simulation, the desired attitude with respect to the ECI frame is computed using Equation \ref{eq:desired_principal_ECI}.
+
+\begin{equation} \label{eq:desired_principal_ECI}
+    \boldsymbol{\bar{R}}_{ECI \rightarrow xyz} = \boldsymbol{\bar{R}}_{RTN \rightarrow xyz} \boldsymbol{R}_{ECI \rightarrow RTN}
+\end{equation}
+
+The error between the current and desired attitude can be represented by a rotation from the current attitude to the desired attitude. This rotation can be computed using Equation \ref{eq:error_rotation}
+
+\begin{equation} \label{eq:error_rotation}
+    \boldsymbol{R}_{\text{error}} = \boldsymbol{R}_{\overline{xyz} \rightarrow xyz} = \boldsymbol{R}_{ECI \rightarrow xyz} \boldsymbol{\bar{R}}_{ECI \rightarrow xyz}^T
+\end{equation}
+
+\subsection{Problem 3 - Note that the attitude control error represents a rotation matrix (DCM) which quantifies how far the actual attitude is from the true attitude. You can use any parameterization to plot the attitude control errors corresponding to this DCM. Give interpretation of the attitude control errors given the applied disturbances.}
+
+\subsection{Problem 4 - You can now start modeling the Simulink spacecraft subsystem which is what the satellite believes is happening (on-board). Initially, the sensors provide ideal measurements (no bias or noise). Just use an empty box for those. The outputs of the sensors are measurements which are used for attitude determination. These measurements are computed from the reference truth or oracle.}
+
+\subsection{Problem 5 - Assume a certain set of sensors. In general, a number of unit = vectors and angular velocities can be considered as measurements.}
+
+\subsubsection{Implement the deterministic attitude determination algorithm discussed in class and its variant which uses fictitious measurements to spread the errors across the measurements}
+
+\subsubsection{Implement the statistical attitude determination algorithm discussed in class (q-method)}
+
+\subsubsection{Implement angular velocity measurements and the reconstruction of the attitude from those (through kinematic equations coded identically to ground truth but replicated in the spacecraft on- board computer)}
+
+\subsection{Problem 6 - Plot the resulting estimated attitude in the absence of sensor errors. Show that it is identical to the true attitude (except for numerical errors).}
