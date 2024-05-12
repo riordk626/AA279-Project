@@ -1,4 +1,4 @@
-function simIn = initAqua(Tfinal, extInputStruct, ICstruct, orbitStruct, plantStruct, distStruct)
+function simIn = initAqua(Tfinal, targetAttitude, ICstruct, orbitStruct, plantStruct, distStruct)
 
 masterModel = 'aquaMasterModel';
 load_system(masterModel)
@@ -9,14 +9,10 @@ masterWS.assignin('R0', ICstruct.R0)
 masterWS.assignin('Tfinal', Tfinal)
 
 simIn = Simulink.SimulationInput(masterModel);
-extInputFields = fieldnames(extInputStruct);
-inDS = createInputDataset(masterModel);
-for i = length(extInputFields)
-    name = extInputFields{i};
-    var = extInputStruct.(name);
-    inDS{i} = var;
-end
-simIn = setExternalInput(simIn, );
+targetAttitude_data = targetAttitude;
+targetAttitude_data(:,:,2) = targetAttitude;
+R_RTNtoPdes = timeseries(targetAttitude_data, [0 Tfinal]);
+simIn.ExternalInput = R_RTNtoPdes;
 
 initOrbital(orbitStruct.orbitType, orbitStruct.dataSource)
 
