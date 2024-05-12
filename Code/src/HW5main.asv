@@ -108,8 +108,6 @@ Tfinal = 5*T;
 inertiaArray = {Itotal_p;Ib;Ic;Id;Ie};
 inertiaNames = {'a', 'b', 'c', 'd', 'e'};
 
-plot1 = false;
-if plot1
 for i=1:length(inertiaArray)
     plantStruct.I_sim = inertiaArray{i};
     simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
@@ -133,7 +131,6 @@ for i=1:length(inertiaArray)
     timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
     
     
-end
 end
 
 
@@ -168,11 +165,10 @@ r_mag = vecnorm(r,2,1);
 
 cg2cp = 7.6578;
 q = 0.66;
-meanSolarFlux = 4.4e-6;
-% A = 224.68;
-A = 54;
+P = 4.4e-6;
+A = 224.68;
 
-M_mag_bound = meanSolarFlux*A*(1+q)*cg2cp * ones(size(t));
+M_mag_bound = P*A*(1+q)*cg2cp;
 
 figure()
 plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
@@ -238,21 +234,19 @@ t = simOut.t;
 r = squeeze(simOut.r.Data);
 M_mag = squeeze(simOut.M_mag);
 r_mag = vecnorm(r,2,1);
-
 cg2cp = 7.6578;
-cd = 2;
-% A = 224.68;
-A = 54;
-rho = 1e-15;
-vMag = norm(simOut.v.Data(:, :, 1));
 
-M_mag_bound = 0.5*rho*vMag^2*A*cd*cg2cp * ones(size(t));
+P = 4.4e-6;
+A = 224.68;
+rho = 1e-15;
+
+M_mag_bound = P*A*(1+q)*cg2cp;
 
 
 figure()
-plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
+% plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
 hold on
-plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
+% plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
 p = plot(t, M_mag, 'LineWidth', 2);
 set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
 xlabel('t [sec]')

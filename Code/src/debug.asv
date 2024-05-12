@@ -87,8 +87,7 @@ sgtitle(gcf, 'Solar Torque')
 
 %% test actual function
 
-resultantSolarTorque(0.33, 0.33, 2, areas(1), normalVectors, centroids, rcm, A_ptob, [0; 0; 1])
-
+resultantSolarTorque(0.33, 0.33, 2, areas(1))
 function M = resultantSolarTorque(dragCoeff, cs, P, A, N, r_cent, rcm, A_ptob, sunUnit)
 M = zeros([3 1]);
 n = size(A, 1);
@@ -106,9 +105,7 @@ for i=1:n
     if dot(N(:, i), sunUnit) > 0
         theta = asin(dot(sunUnit, N(:, i)));
         sun_force = -P*A(i)*cos(theta)*(1-cs).*sunUnit;
-        disp(sun_force)
         normal_force = -P*A(i)*cos(theta)*2*(cs*cos(theta) + ((1/3)*dragCoeff)).*N(:,i);
-        disp(normal_force)
         total_force = sun_force + normal_force;
         M = M + cross(r_cent(:, i) - rcm, total_force);
     end
