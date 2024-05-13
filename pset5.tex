@@ -117,7 +117,7 @@ When modeling the magnetic dipole of the spacecraft, a major simplification was 
     \centering
     \captionsetup{justification = centering}
     \begin{tabular}{c|ccccc}
-    Component  & S [m\textsuperscript{2}] & $n$ & $\Delta I$ [A] & $\hat{m}$  & m [Nm/T] \\ \hline
+    Component  & S [m\textsuperscript{2}] & $n$ & $\Delta I$ [A] & $\hat{m}$  & m [$10^{-4}$ Nm/T] \\ \hline
     Chassis + Instruments &   3     &   15    &   1    &   $\begin{bmatrix}  1 & 0 & 0  \end{bmatrix}^T$    &  0.5655 \\
     Solar Panel &   0.2     &  15    &   1    &    $\begin{bmatrix}  0 & 1 & 0  \end{bmatrix}^T$   &  0.0377  \\  
     \end{tabular}
@@ -162,7 +162,7 @@ This approximation of the disturbance was implemented using the Simulink model d
 
 \subsubsection{Solar Radiation Pressure}
 
-To approximate the torque caused by solar radiation pressure, the surfaces of our satellite that were approximated in Homework 1 to have the properties shown in Figure \ref{fig:surface_labels} needed to be summed over. Because each of our surfaces was approximated as planes, the following equation was used to find the solar radiation force for each of the surface.
+To approximate the torque caused by solar radiation pressure, the surfaces of our satellite that were approximated in Homework 1 to have the properties shown in Figure \ref{fig:surface_labels} needed to be integrated over. Because each of our surfaces was approximated as being planar, the following equation was used to find the solar radiation force for each of the surfaces.
 
 \begin{equation}
     - P A cos(\theta) * \left [ (1-c_s)\hat{\boldsymbol{S}} + 2 \left( c_s cos(\theta) + \frac{1}{3} c_d \right) \hat{\boldsymbol{N}} \right]
@@ -170,11 +170,73 @@ To approximate the torque caused by solar radiation pressure, the surfaces of ou
 
 In this equation, $P$ is the mean momentum flux, $A$ is the area of the surface, $c_s$ and $c_d$ are the spectral and diffusion coefficients respectively, $\hat{\boldsymbol{S}}$ is the unit vector in the direction of the sun, $\hat{\boldsymbol{N}}$ is the unit vector normal to the surface, and $\theta$ is the angle between $\hat{\boldsymbol{S}}$ and $\hat{\boldsymbol{N}}$. Because the satellite is in a sun synchronous orbit, $\hat{\boldsymbol{S}}$ was approximated as the cross product between the radius and velocity since the direction of the sun would be roughly normal to the orbital plane. Furthermore, since the orbit was specifically chosen to avoid eclipses, they didn't need to be accounted for in the model. To determine whether a given surface of the satellite was lit by the sun or not, the dot product was taken between $\hat{\boldsymbol{S}}$ and $\hat{\boldsymbol{N}}$. If it was positive (i.e. the vectors point in the same direction) then it was approximated that the entire surface was lit by the sun. Because of this, more accuracy in shadowing could be implemented in the future. More research needs to be done into the selections for $c_s$ and $c_d$ and as well as $P$. For the time being, $c_s$ and $c_d$ were approximated as $\frac{1}{3}$ by assuming that there were equal parts absorption, deflection, and spectral diffusion. Once the solar radiation force was calculated for each surface, the torque contribution was calculated by taking the cross product with the distance between the center of mass of the spacecraft and center of pressure of the surface. 
 
-\begin{eqnarray}
+\begin{eqnarray} \label{eqn:torqueFromForce}
     \vec N = \sum^n_{i=1} \vec R_i \times \vec F_i
 \end{eqnarray}
 
 The following simulink models were implemented to calculate the moments for each of the surfaces.
+
+\begin{figure} [H]
+    \centering
+    \begin{lstlisting}
+function M = resultantSolarTorque(cd, cs, P, A, N, centroid, rcm, A_ptob, sunUnit)
+M = zeros([3 1]);
+n = size(A, 1);
+
+%Rotate everything to principle frame
+N = transpose(N);
+centroid = transpose(centroid);
+rcm = A_ptob.' * transpose(rcm);
+for i=1:n
+    N(:, i) = A_ptob.' * N(:, i);
+    centroid(:, i) = A_ptob.' * centroid(:, i);
+end 
+
+for i=1:n
+    if dot(N(:, i), sunUnit) > 0
+        theta = asin(dot(sunUnit, N(:, i)));
+        sun_force = -P*A(i)*cos(theta)*(1-cs);
+        normal_force = -P*A(i)*cos(theta)*2*(cs*cos(theta) + (1/3*cd));
+        total_force = sun_force + normal_force;
+        M = M + cross(centroid(:, i) - rcm, total_force);
+    end
+end
+end
+    \end{lstlisting}
+    \caption{Aerodynamic Torque}
+    \label{fig:solar_drag_code}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 15cm]{Images/PS5/solarTorqueSimulink.png}
+    \caption{Solar Radiation Pressure Model}
+    \label{fig:simulink_sol}
+\end{figure}
+
+The above model only includes torques from the solar radiation pressure introduced directly from the sun. Contributions from Earth's reflectance and radiation were neglected.
+
+
+\subsubsection{Atmospheric Drag}
+
+Similarly to solar radiation, the atmospheric drag was modeled through first considering the aerodynamic force on each of the surfaces of our satellite that were approximated in Homework 1 and are summarized in Figure \ref{fig:surface_labels}. Because atmospheric drag only affects the portion of the satellite's surface that faces in the direction of the velocity vector, the dot product between each of the normal vector's for the surfaces and the velocity vector was taken. If it was positive, the surface was included in the force calculation. Because each of the surfaces of the satellite was approximated to be planar, the following equation was used for all of them.
+
+\begin{equation}
+    - \frac{1}{2} c_d \rho v^2 A ( \hat{\boldsymbol{N}} \cdot \hat{\boldsymbol{V}} ) \hat{\boldsymbol{V}}
+\end{equation}
+
+In this equation, $c_d$ was the coefficient of drag and was approximated as 2 and $\rho$ was found through interpolating the value for an altitude of 710 km from the text which was on the magnitude of $10^{-15}$. Similarly to solar radiation pressure, the torque was then found by taking the cross product between each of the resultant forces and the vector between the centers of gravity and pressure as in Equation \ref{eqn:torqueFromForce}.
+
+The following simulink models were created to implement these functions.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{justification = centering}
+    \includegraphics[width = 15cm]{Images/PS5/aeroTorqueSimulink.png}
+    \caption{Atmospheric Drag Model}
+    \label{fig:simulink_aero}
+\end{figure}
 
 \begin{figure} [H]
     \centering
@@ -204,30 +266,25 @@ for i=1:n
 end
     \end{lstlisting}
     \caption{Aerodynamic Torque}
-    \label{fig:dual_spin_simulink_code}
+    \label{fig:aero_drag_simulink_code}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \captionsetup{justification = centering}
-    \includegraphics[width = 15cm]{Images/PS5/aeroTorqueSimulink.png}
-    \caption{Solar Radiation Pressure Model}
-    \label{fig:simulink_sol}
-\end{figure}
-
-The above model only includes torques from the solar radiation pressure introduced directly from the sun. Contributions from Earth's reflectance and radiation were neglected.
 
 
-\subsubsection{Atmospheric Drag}
+\subsection{Include all torques you have been able to model in numerical integration. Please show comparison of numerically computed disturbance torques with expected values and trend from theory (model) and tables (Wertz) referenced in class. Plot all torque components in principal axes over time. Plot the resultant (sum) of all torques in principal axes.}
 
-Similarly to solar radiation, the 
+The only torque that was fully modeled was the magnetic torque. In the following figure, the oscillating lines show the numerically integrated torque and the lower and upper bounds are from the following equation shown in class.
 
-\subsection{Include all torques you have been able to model in numerical integration. Please show comparison of numerically computed disturbance torques with expected values and trend from theory (model) and tables (Wertz) referenced in class. Plot all torque components in principal axes over time. Plot the resultant (sum) of all torques in principal axes. Make sure that your model is not too ideal, i.e. make sure that center of pressure and center of mass do not coincide. }
+\begin{equation}
+    m B_{max} = 2 m \frac{R_e^2 B_0}{R^3}
+\end{equation}
 
 \begin{figure}[H]
     \centering
     \captionsetup{justification = centering}
     \includegraphics[width = 15cm]{Images/PS5/magnetic_torque.png}
-    \caption{Solar Radiation Pressure Model}
+    \caption{Torque from Magnetic Disturbances}
     \label{fig:simulink_sol}
 \end{figure}
+
+The torques stay within the lower and upper bounds and follow an oscillatory pattern as expected.
