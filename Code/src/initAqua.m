@@ -1,10 +1,12 @@
-function simIn = initAqua(Tfinal, targetAttitude, ICstruct, orbitStruct, plantStruct, distStruct)
+function simIn = initAqua(Tfinal, targetAttitude, ICstruct, orbitStruct,...
+    plantStruct, distStruct, sensorStruct)
 
 masterModel = 'aquaMasterModel';
 load_system(masterModel)
 
 masterWS = get_param(masterModel, 'modelworkspace');
 masterWS.assignin('R0', ICstruct.R0)
+% masterWS.assignin('A_ptob', plantStruct.A_ptob)
 
 masterWS.assignin('Tfinal', Tfinal)
 
@@ -20,6 +22,9 @@ initPlant(plantStruct.I_sim, plantStruct.axesFlag, plantStruct.dynamicsType, ...
             plantStruct.attitudeType, plantStruct.sequence, ICstruct)
 
 initDisturbance(distStruct.disturbance, plantStruct, distStruct.dataSource)
+
+initAttitudeSensor(sensorStruct.measProcess, sensorStruct.attitudeSensorSolver,...
+                    sensorStruct.starCatalog, sensorStruct.sourceFileName)
 
 
 % save_system(masterModel)

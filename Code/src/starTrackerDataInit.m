@@ -2,18 +2,18 @@ clc, clear, close all
 
 rng(10)
 
-V = rand([3 2]);
-for i=1:size(V,2)
-    V(:,i) = V(:,i)./norm(V(:,i));
+Vstar = rand([3 2]);
+for i=1:size(Vstar,2)
+    Vstar(:,i) = Vstar(:,i)./norm(Vstar(:,i));
 end
 
-save('starTrackerSimpleUndersampled.mat', "V")
+save('starTrackerSimpleUndersampled.mat', "Vstar")
 
-clear V
+clear Vstar
 
-V = rand([3 10]);
-for i=1:size(V,2)
-    V(:,i) = V(:,i)./norm(V(:,i));
+Vstar = rand([3 10]);
+for i=1:size(Vstar,2)
+    Vstar(:,i) = Vstar(:,i)./norm(Vstar(:,i));
 end
 
-save('starTrackerSimpleOversampled.mat', "V")
+save('starTrackerSimpleOversampled.mat', "Vstar")
