@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = false;
+exportflag = true;
 figurePath = '../../Images/PS6/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -55,7 +55,10 @@ ICstruct.om0 = om0; ICstruct.R0 = R0;
 distStruct.disturbance = "solar";
 % distStruct.disturbance = "all":
 
-Tfinal = 10*T;
+% Tfinal = 365 * 24 * 3600;
+Tfinal = T * 5;
+
+
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
@@ -63,7 +66,7 @@ simOut = sim(simIn);
 
 t = simOut.t;
 r = squeeze(simOut.r.Data);
-M_mag = squeeze(simOut.M_mag);
+M_sol = squeeze(simOut.M_sol);
 r_mag = vecnorm(r,2,1);
 
 cg2cp = 7.6578;
@@ -71,13 +74,13 @@ q = 0.66;
 meanSolarFlux = 4.4e-6;
 A = 224.68;
 
-M_mag_bound = meanSolarFlux*A*(1+q)*cg2cp * ones(size(t));
+M_sol_bound = meanSolarFlux*A*(1+q)*cg2cp * ones(size(t));
 
 figure()
-plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
+plot(t, M_sol_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
 hold on
-plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
-p = plot(t, M_mag, 'LineWidth', 2);
+plot(t, -M_sol_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
+p = plot(t, M_sol, 'LineWidth', 2);
 set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
 xlabel('t [sec]')
 ylabel('M [Nm]')
@@ -134,7 +137,7 @@ simOut = sim(simIn);
 
 t = simOut.t;
 r = squeeze(simOut.r.Data);
-M_mag = squeeze(simOut.M_mag);
+M_aero = squeeze(simOut.M_aero);
 r_mag = vecnorm(r,2,1);
 
 cg2cp = 7.6578;
@@ -143,14 +146,14 @@ A = 224.68;
 rho = 1e-15;
 vMag = norm(simOut.v.Data(:, :, 1));
 
-M_mag_bound = 0.5*rho*vMag^2*A*cd*cg2cp * ones(size(t));
+M_aero_bound = 0.5*rho*vMag^2*A*cd*cg2cp * ones(size(t));
 
 
 figure()
-plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
+plot(t, M_aero_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
 hold on
-plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
-p = plot(t, M_mag, 'LineWidth', 2);
+plot(t, -M_aero_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
+p = plot(t, M_aero, 'LineWidth', 2);
 set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
 xlabel('t [sec]')
 ylabel('M [Nm]')
@@ -177,8 +180,8 @@ R0 = R_RTNtoPdes * R_ECItoRTN;
 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 
-distStruct.disturbance = "grav";
-% distStruct.disturbance = "all":
+% distStruct.disturbance = "grav";
+distStruct.disturbance = "all";
 
 Tfinal = 5*T;
 

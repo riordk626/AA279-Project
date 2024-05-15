@@ -53,6 +53,56 @@ grid on;
 axis equal;
 view(4);
 
+%% Sun Elements
+
+Sun_Omega = ...
+  [0 Sun_Omega_float;
+   1.0E+7 Sun_Omega_float];
+
+Sun_Omega_float = deg2rad(348.74);
+
+Sun_T = 365.256*24*3600;
+
+Sun_a_float = 149.6e6;
+
+Sun_e_float = 0.0167086;
+
+Sun_eccentricity = ...
+  [0 Sun_e_float;
+   1.0E+7 Sun_e_float];
+
+Sun_i_float = deg2rad(23.44);
+
+Sun_inclination = ...
+  [0 Sun_i_float;
+   1.0E+7 Sun_i_float];
+
+Sun_n_float = 2*pi / Sun_T; % Mean motion in rad/s
+
+Sun_mean_motion = ...
+  [0 Sun_n_float;
+   1.0E+7 Sun_n_float];
+
+Sun_mu_float = 1.327124e11;
+
+Sun_mu = ...
+  [0 Sun_mu_float;
+   1.0E+7 Sun_mu_float];
+
+Sun_omega_float = deg2rad(102.93);
+
+Sun_omega = ...
+  [0 Sun_omega_float;
+   1.0E+7 Sun_omega_float];
+
+Sun_semimajorAxis = ...
+  [0 7080.6;
+   1.0E+7 7080.6];
+
+Sun_trueAnomaly = ...
+  [0 0;
+   1.0E+7 0];
+
 function E = solveKeplersEquation(M, e, epsilon)
     E = M; % Initial Guess
     while true

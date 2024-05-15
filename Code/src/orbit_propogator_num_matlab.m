@@ -12,6 +12,20 @@ omega = deg2rad(120.4799); % Arguement of perigee (in radians)
 Omega = deg2rad(95.2063); % Ascending node (in radians)
 nu = 0; % True Anomaly (in radians)
 
+
+mu = 1.327124e11; % Gravitational parameter of the Earth in km^3/s^2
+
+% Define initial conditions (orbital elements)
+a = 149.6e6; % Semi-major axis (in km)
+e = 0.0167086;   % Eccentricity
+i = deg2rad(23.44); % Inclination (in radians)
+omega = deg2rad(102.93); % Arguement of perigee (in radians)
+Omega = deg2rad(348.74); % Ascending node (in radians)
+nu = 0; % True Anomaly (in radians)
+
+
+
+
 % Calculate orbital period
 T = 2*pi*sqrt((a)^3 / mu); % Orbital period in seconds
 
