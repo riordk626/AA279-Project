@@ -1,4 +1,4 @@
-function initAttitudeSensor(measProcess, attitudeSensorSolver, starCatalog, sourceFileName)
+function initAttitudeSensor(measProcess, noiseFactor, attitudeSensorSolver, starCatalog, sourceFileName)
 model = "attitudeSensors";
 load_system(model)
 
@@ -10,3 +10,4 @@ mws.reload
 mws.assignin('measProcess', measProcess)
 mws.assignin('attitudeSensorSolver', attitudeSensorSolver)
 mws.assignin('starCatalog', starCatalog)
+mws.assignin('attitudeNoiseFactor', noiseFactor)

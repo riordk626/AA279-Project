@@ -7,7 +7,9 @@ for i=1:size(Vstar,2)
     Vstar(:,i) = Vstar(:,i)./norm(Vstar(:,i));
 end
 
-save('starTrackerSimpleUndersampled.mat', "Vstar")
+wstar = rand([2 1]);
+
+save('starTrackerSimpleUndersampled.mat', "Vstar", "wstar")
 
 clear Vstar
 
@@ -16,4 +18,6 @@ for i=1:size(Vstar,2)
     Vstar(:,i) = Vstar(:,i)./norm(Vstar(:,i));
 end
 
-save('starTrackerSimpleOversampled.mat', "Vstar")
+wstar = rand([10 1]);
+
+save('starTrackerSimpleOversampled.mat', "Vstar", "wstar")

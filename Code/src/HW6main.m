@@ -29,6 +29,12 @@ plantStruct.areas = areas;
 plantStruct.rcm = rcm;
 plantStruct.centroids = centroids;
 
+sensorStruct.measProcess = "default";
+sensorStruct.attitudeNoiseFactor = 0;
+sensorStruct.attitudeSensorSolver = "deterministic";
+sensorStruct.starCatalog = "simple";
+sensorStruct.attitudeFileName = "starTrackerSimpleUndersampled.mat";
+
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
 %% Problem 1
@@ -51,7 +57,7 @@ distStruct.disturbance = "solar";
 
 Tfinal = 10*T;
 
-simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct);
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
 simOut = sim(simIn);
 
@@ -87,7 +93,7 @@ sgtitle(gcf, 'Solar Torque')
 
 distStruct.disturbance = "mag";
 
-simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct);
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
 simOut = sim(simIn);
 
@@ -123,7 +129,7 @@ sgtitle(gcf, 'Magnetic Torque')
 
 distStruct.disturbance = "aero";
 
-simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct);
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct);
 simOut = sim(simIn);
 
 t = simOut.t;
@@ -176,7 +182,7 @@ distStruct.disturbance = "grav";
 
 Tfinal = 5*T;
 
-simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct);
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct);
 
 simOut = sim(simIn);
 
@@ -198,3 +204,55 @@ figureName = [figurePath, 'attitude_error.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
+
+%% Problem 4, 5, & 6
+
+omx = deg2rad(0.03);
+omy = deg2rad(-0.02);
+omz = deg2rad(0.05);
+% % 
+om0 = [omx omy omz].';
+R_ECItoRTN = eci2rtn(r0, v0);
+R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
+R_RTNtoPdes = A_ptob.' * R_RTNtoBdes;
+R0 = R_RTNtoPdes * R_ECItoRTN;
+% 
+ICstruct.om0 = om0; ICstruct.R0 = R0;
+
+% plot solar torque
+distStruct.disturbance = "none";
+% distStruct.disturbance = "all":
+
+
+sensorStruct.measProcess = "default";
+sensorStruct.attitudeNoiseFactor = 0;
+sensorStruct.attitudeSensorSolver = "qmethod";
+sensorStruct.starCatalog = "simple";
+sensorStruct.attitudeFileName = "starTrackerSimpleUndersampled.mat";
+
+
+Tfinal = 3*T;
+
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+R_ItoP = simOut.yout{1}.Values.Data;
+u = wrapToPi(squeeze(simOut.alpha.Data));
+R_est = simOut.R_est.Data;
+nsteps = length(t);
+u_est = zeros([3 nsteps]);
+for i=1:nsteps
+    u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
+end
+
+u_est_error = u - u_est;
+values = {u, u_est, u_est_error};
+valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
+    {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
+figureName = [figurePath, 'attitude_estimation_undersampled_default.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
