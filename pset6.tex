@@ -27,7 +27,7 @@ Therefore, at each step in the simulation, the desired attitude with respect to 
 The error between the current and desired attitude can be represented by a rotation from the current attitude to the desired attitude. This rotation can be computed using Equation \ref{eq:error_rotation}
 
 \begin{equation} \label{eq:error_rotation}
-    \boldsymbol{R}_{\text{error}} = \boldsymbol{R}_{\overline{xyz} \rightarrow xyz} = \boldsymbol{R}_{ECI \rightarrow xyz} \boldsymbol{\bar{R}}_{ECI \rightarrow xyz}^T
+    \boldsymbol{R}_{\text{error}} = \boldsymbol{R}_{xyz \rightarrow \overline{xyz}} = \boldsymbol{\bar{R}}_{ECI \rightarrow xyz} \boldsymbol{R}_{ECI \rightarrow xyz}^T
 \end{equation}
 
 \subsection{Problem 3 - Note that the attitude control error represents a rotation matrix (DCM) which quantifies how far the actual attitude is from the true attitude. You can use any parameterization to plot the attitude control errors corresponding to this DCM. Give interpretation of the attitude control errors given the applied disturbances.}
