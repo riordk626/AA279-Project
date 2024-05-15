@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = false;
+exportflag = true;
 figurePath = '../../Images/PS6/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -55,7 +55,8 @@ ICstruct.om0 = om0; ICstruct.R0 = R0;
 distStruct.disturbance = "solar";
 % distStruct.disturbance = "all":
 
-Tfinal = 5*T;
+% Tfinal = 365 * 24 * 3600;
+Tfinal = T * 5;
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
@@ -63,7 +64,7 @@ simOut = sim(simIn);
 
 t = simOut.t;
 r = squeeze(simOut.r.Data);
-M_mag = squeeze(simOut.M_mag);
+M_sol = squeeze(simOut.M_sol);
 r_mag = vecnorm(r,2,1);
 
 cg2cp = 7.6578;
@@ -71,13 +72,13 @@ q = 0.66;
 meanSolarFlux = 4.4e-6;
 A = 224.68;
 
-M_mag_bound = meanSolarFlux*A*(1+q)*cg2cp * ones(size(t));
+M_sol_bound = meanSolarFlux*A*(1+q)*cg2cp * ones(size(t));
 
 figure()
-plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
+plot(t, M_sol_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
 hold on
-plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
-p = plot(t, M_mag, 'LineWidth', 2);
+plot(t, -M_sol_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
+p = plot(t, M_sol, 'LineWidth', 2);
 set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
 xlabel('t [sec]')
 ylabel('M [Nm]')
@@ -134,7 +135,7 @@ simOut = sim(simIn);
 
 t = simOut.t;
 r = squeeze(simOut.r.Data);
-M_mag = squeeze(simOut.M_mag);
+M_aero = squeeze(simOut.M_aero);
 r_mag = vecnorm(r,2,1);
 
 cg2cp = 7.6578;
@@ -143,14 +144,14 @@ A = 224.68;
 rho = 1e-15;
 vMag = norm(simOut.v.Data(:, :, 1));
 
-M_mag_bound = 0.5*rho*vMag^2*A*cd*cg2cp * ones(size(t));
+M_aero_bound = 0.5*rho*vMag^2*A*cd*cg2cp * ones(size(t));
 
 
 figure()
-plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
+plot(t, M_aero_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
 hold on
-plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
-p = plot(t, M_mag, 'LineWidth', 2);
+plot(t, -M_aero_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
+p = plot(t, M_aero, 'LineWidth', 2);
 set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
 xlabel('t [sec]')
 ylabel('M [Nm]')
@@ -162,6 +163,36 @@ figureName = [figurePath, 'aero_torque.png'];
 exportgraphics(gcf, figureName)
 sgtitle(gcf, 'Aero Torque')
 
+% plots all torques
+
+distStruct.disturbance = "all";
+
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct);
+simOut = sim(simIn);
+
+t = simOut.t;
+r = squeeze(simOut.r.Data);
+M_aero = squeeze(simOut.M_all);
+r_mag = vecnorm(r,2,1);
+
+M_bound = M_aero_bound + M_mag_bound + M_sol_bound;
+
+
+figure()
+plot(t, M_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
+hold on
+plot(t, -M_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
+p = plot(t, M_all, 'LineWidth', 2);
+set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
+xlabel('t [sec]')
+ylabel('M [Nm]')
+ax = gca();
+ax.FontSize = 14;
+legend
+figureName = [figurePath, 'all_torque.png'];
+
+exportgraphics(gcf, figureName)
+sgtitle(gcf, 'Total Torque')
 
 %% Problem 2 & 3
 
@@ -177,7 +208,8 @@ R0 = R_RTNtoPdes * R_ECItoRTN;
 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 
-distStruct.disturbance = "none";
+% distStruct.disturbance = "grav";
+distStruct.disturbance = "all";
 
 Tfinal = 5*T;
 
@@ -199,7 +231,7 @@ end
 values = {u_error};
 valueNames = {'u [rad]'};
 valueLabels = {{'\phi'; '\theta'; '\psi'}};
-figureName = [figurePath, 'attitude_error.png'];
+figureName = [figurePath, 'attitude_error_no_dist.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
@@ -225,12 +257,37 @@ end
 values = {u_error};
 valueNames = {'u [rad]'};
 valueLabels = {{'\phi'; '\theta'; '\psi'}};
-figureName = [figurePath, 'attitude_error.png'];
+figureName = [figurePath, 'attitude_error_dist.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
 
 %% Problem 4, 5, & 6
+
+% plot euler angles from obc for omega measurements and ground truth
+obc = squeeze(simOut.alphaMeasured.Data);
+groundTruth = squeeze(simOut.alpha.Data);
+t = simOut.t;
+
+figure()
+hold on
+p = plot(t, obc, 'LineWidth', 2);
+p2 = plot(t, groundTruth, 'LineWidth', 2);
+set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
+xlabel('t [sec]')
+ylabel('M [Nm]')
+ax = gca();
+ax.FontSize = 14;
+legend
+figureName = [figurePath, 'all_torque.png'];
+
+exportgraphics(gcf, figureName)
+sgtitle(gcf, 'Total Torque')
+
+
+
+
+Tfinal = 5*T;
 
 omx = deg2rad(0.03);
 omy = deg2rad(-0.02);
@@ -249,7 +306,7 @@ distStruct.disturbance = "none";
 % distStruct.disturbance = "all":
 
 %% Undersampled Hacked
-exportflag = true;
+exportflag = false;
 
 sensorStruct.measProcess = "default";
 sensorStruct.attitudeNoiseFactor = 0;
@@ -257,8 +314,6 @@ sensorStruct.attitudeSensorSolver = "deterministic";
 sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "starTrackerSimpleUndersampled.mat";
 
-
-Tfinal = 5*T;
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
@@ -313,7 +368,6 @@ timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 sensorStruct.measProcess = "default";
 sensorStruct.attitudeSensorSolver = "qmethod";
-sensorStruct.attitudeFileName = "starTrackerSimpleUndersampled.mat";
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
@@ -341,7 +395,7 @@ timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 
 %% Oversampled Hack
-exportflag = true;
+exportflag = false;
 
 sensorStruct.measProcess = "default";
 sensorStruct.attitudeSensorSolver = "deterministic";
@@ -366,7 +420,7 @@ values = {u, u_est, u_est_error};
 valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
 valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
     {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
-figureName = [figurePath, 'attitude_estimation_oversampled_default.png'];
+figureName = [figurePath, 'attitude_estimation_oversampled_det_default.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
@@ -394,7 +448,7 @@ values = {u, u_est, u_est_error};
 valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
 valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
     {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
-figureName = [figurePath, 'attitude_estimation_undersampled_default.png'];
+figureName = [figurePath, 'attitude_estimation_oversampled_q_default.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
