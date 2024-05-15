@@ -55,10 +55,14 @@ ICstruct.om0 = om0; ICstruct.R0 = R0;
 distStruct.disturbance = "solar";
 % distStruct.disturbance = "all":
 
+<<<<<<< HEAD
 % Tfinal = 365 * 24 * 3600;
 Tfinal = T * 5;
 
 
+=======
+Tfinal = 5*T;
+>>>>>>> main
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
@@ -168,11 +172,11 @@ sgtitle(gcf, 'Aero Torque')
 
 %% Problem 2 & 3
 
-omx = 0;
-omy = 0;
-omz = 0;
+ombx = 0;
+omby = 0;
+ombz = 0;
 
-om0 = [omx omy omz].';
+om0 = A_ptob.' * [ombx omby ombz].';
 R_ECItoRTN = eci2rtn(r0, v0);
 R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
 R_RTNtoPdes = A_ptob.' * R_RTNtoBdes;
@@ -180,8 +184,12 @@ R0 = R_RTNtoPdes * R_ECItoRTN;
 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 
+<<<<<<< HEAD
 % distStruct.disturbance = "grav";
 distStruct.disturbance = "all";
+=======
+distStruct.disturbance = "none";
+>>>>>>> main
 
 Tfinal = 5*T;
 
@@ -203,12 +211,39 @@ end
 values = {u_error};
 valueNames = {'u [rad]'};
 valueLabels = {{'\phi'; '\theta'; '\psi'}};
-figureName = [figurePath, 'attitude_error.png'];
+figureName = [figurePath, 'attitude_error_no_dist.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
+
+distStruct.disturbance = "grav";
+% distStruct.disturbance = "all";
+
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+R_ItoP = simOut.yout{1}.Values.Data;
+R_ECItoRTN = simOut.rtn.Data; % ORBIT DCM OUTPUT
+R_error = simOut.R_error.Data;
+% errorSeq = "313";
+errorSeq = "312";
+nsteps = length(t);
+u_error = zeros([3 nsteps]);
+for i=1:nsteps
+    u_error(:,i) = RtoEuler(R_error(:,:,i), errorSeq);
+end
+values = {u_error};
+valueNames = {'u [rad]'};
+valueLabels = {{'\phi'; '\theta'; '\psi'}};
+figureName = [figurePath, 'attitude_error_dist.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
 
 %% Problem 4, 5, & 6
+Tfinal = 5*T;
 
 omx = deg2rad(0.03);
 omy = deg2rad(-0.02);
@@ -226,15 +261,15 @@ ICstruct.om0 = om0; ICstruct.R0 = R0;
 distStruct.disturbance = "none";
 % distStruct.disturbance = "all":
 
+%% Undersampled Hacked
+exportflag = false;
 
 sensorStruct.measProcess = "default";
 sensorStruct.attitudeNoiseFactor = 0;
-sensorStruct.attitudeSensorSolver = "qmethod";
+sensorStruct.attitudeSensorSolver = "deterministic";
 sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "starTrackerSimpleUndersampled.mat";
 
-
-Tfinal = 3*T;
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
@@ -255,7 +290,121 @@ values = {u, u_est, u_est_error};
 valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
 valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
     {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
-figureName = [figurePath, 'attitude_estimation_undersampled_default.png'];
+figureName = [figurePath, 'attitude_estimation_undersampled_det_default.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
+
+sensorStruct.measProcess = "fictitious";
+sensorStruct.attitudeSensorSolver = "deterministic";
+
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+R_ItoP = simOut.yout{1}.Values.Data;
+u = wrapToPi(squeeze(simOut.alpha.Data));
+R_est = simOut.R_est.Data;
+nsteps = length(t);
+u_est = zeros([3 nsteps]);
+for i=1:nsteps
+    u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
+end
+
+u_est_error = u - u_est;
+values = {u, u_est, u_est_error};
+valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
+    {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
+figureName = [figurePath, 'attitude_estimation_undersampled_det_fictitious.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
+
+sensorStruct.measProcess = "default";
+sensorStruct.attitudeSensorSolver = "qmethod";
+
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+R_ItoP = simOut.yout{1}.Values.Data;
+u = wrapToPi(squeeze(simOut.alpha.Data));
+R_est = simOut.R_est.Data;
+nsteps = length(t);
+u_est = zeros([3 nsteps]);
+for i=1:nsteps
+    u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
+end
+
+u_est_error = u - u_est;
+values = {u, u_est, u_est_error};
+valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
+    {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
+figureName = [figurePath, 'attitude_estimation_undersampled_q_default.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
+
+
+%% Oversampled Hack
+exportflag = false;
+
+sensorStruct.measProcess = "default";
+sensorStruct.attitudeSensorSolver = "deterministic";
+sensorStruct.attitudeFileName = "starTrackerSimpleOversampled.mat";
+
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+R_ItoP = simOut.yout{1}.Values.Data;
+u = wrapToPi(squeeze(simOut.alpha.Data));
+R_est = simOut.R_est.Data;
+nsteps = length(t);
+u_est = zeros([3 nsteps]);
+for i=1:nsteps
+    u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
+end
+
+u_est_error = u - u_est;
+values = {u, u_est, u_est_error};
+valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
+    {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
+figureName = [figurePath, 'attitude_estimation_oversampled_det_default.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
+
+sensorStruct.measProcess = "default";
+sensorStruct.attitudeSensorSolver = "qmethod";
+sensorStruct.attitudeFileName = "starTrackerSimpleOversampled.mat";
+
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+R_ItoP = simOut.yout{1}.Values.Data;
+u = wrapToPi(squeeze(simOut.alpha.Data));
+R_est = simOut.R_est.Data;
+nsteps = length(t);
+u_est = zeros([3 nsteps]);
+for i=1:nsteps
+    u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
+end
+
+u_est_error = u - u_est;
+values = {u, u_est, u_est_error};
+valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
+    {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
+figureName = [figurePath, 'attitude_estimation_oversampled_q_default.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
