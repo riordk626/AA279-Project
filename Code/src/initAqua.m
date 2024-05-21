@@ -27,6 +27,6 @@ initAttitudeSensor(sensorStruct.measProcess, sensorStruct.attitudeNoiseFactor,..
                     sensorStruct.attitudeSensorSolver, sensorStruct.starCatalog,...
                     sensorStruct.attitudeFileName)
 
-initKalmanFilter(kalmanFilterStruct.Q, kalmanFilter.R, kalmanFilterStruct.P0, kalmanFilterStruct.dt)
+initKalmanFilter(kalmanFilterStruct.Q, kalmanFilterStruct.R, kalmanFilterStruct.P0, kalmanFilterStruct.dt_KF)
 
 % save_system(masterModel)

@@ -21,9 +21,7 @@ switch disturbace
         distMWS.DataSource = dataSource;
         distMWS.FileName = 'magConstants';
         distMWS.reload
-
         distMWS.save('magConstants.mat')
-
         distMWS.assignin("magnetic", "dipole")
     case "solar"
         distModel = 'solarMoment';
@@ -34,6 +32,36 @@ switch disturbace
         distMWS.assignin('rcm', plantStuct.rcm)
         distMWS.assignin('centroids', plantStuct.centroids)
     case "aero"
+        distModel = 'AerodynamicMoment';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.assignin('normalVectors', plantStuct.normalVectors)
+        distMWS.assignin('areas', plantStuct.areas)
+        distMWS.assignin('rcm', plantStuct.rcm)
+        distMWS.assignin('centroids', plantStuct.centroids)
+    case "all"
+        distModel = 'gravityGradient';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.assignin('I_sim', plantStuct.I_sim)
+
+        distModel = 'magneticField';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.DataSource = dataSource;
+        distMWS.FileName = 'magConstants';
+        distMWS.reload
+        distMWS.save('magConstants.mat')
+        distMWS.assignin("magnetic", "dipole")
+
+        distModel = 'solarMoment';
+        load_system(distModel)
+        distMWS = get_param(distModel, 'ModelWorkspace');
+        distMWS.assignin('normalVectors', plantStuct.normalVectors)
+        distMWS.assignin('areas', plantStuct.areas)
+        distMWS.assignin('rcm', plantStuct.rcm)
+        distMWS.assignin('centroids', plantStuct.centroids)
+
         distModel = 'AerodynamicMoment';
         load_system(distModel)
         distMWS = get_param(distModel, 'ModelWorkspace');

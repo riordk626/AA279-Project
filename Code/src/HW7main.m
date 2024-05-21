@@ -39,6 +39,7 @@ nmeas = 11;
 kalmanFilterStruct.Q = eye(6);
 kalmanFilterStruct.R = eye(3*nmeas + 3);
 kalmanFilterStruct.P0 = eye(6);
+kalmanFilterStruct.dt_KF = 1e-3;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
@@ -62,5 +63,5 @@ distStruct.disturbance = "all";
 
 %% Problem 5 & 6
 
-simIn = initAqua(Tfinal,dt, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct,kalmanFilterStruct);
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct,kalmanFilterStruct);
 simOut = sim(simIn);
