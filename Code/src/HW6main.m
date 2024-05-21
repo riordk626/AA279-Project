@@ -50,14 +50,34 @@ R_RTNtoPdes = A_ptob.' * R_RTNtoBdes;
 R0 = R_RTNtoPdes * R_ECItoRTN;
 % 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
+Tfinal = T * 5;
+
+% plots all torques
+
+distStruct.disturbance = "all";
+
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct);
+simOut = sim(simIn);
+
+t = simOut.t;
+M_all = squeeze(simOut.M_all);
+
+figure()
+hold on
+p = plot(t, M_all, 'LineWidth', 2);
+set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
+xlabel('t [sec]')
+ylabel('M [Nm]')
+ax = gca();
+ax.FontSize = 14;
+legend
+figureName = [figurePath, 'all_torque.png'];
+
+exportgraphics(gcf, figureName)
+sgtitle(gcf, 'Total Torque')
 
 % plot solar torque
 distStruct.disturbance = "solar";
-% distStruct.disturbance = "all":
-
-% Tfinal = 365 * 24 * 3600;
-Tfinal = T * 5;
-
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
@@ -164,7 +184,6 @@ figureName = [figurePath, 'aero_torque.png'];
 exportgraphics(gcf, figureName)
 sgtitle(gcf, 'Aero Torque')
 
-
 %% Problem 2 & 3
 
 ombx = 0;
@@ -234,6 +253,29 @@ fig = figure();
 timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
 
 %% Problem 4, 5, & 6
+
+% plot euler angles from obc for omega measurements and ground truth
+obc = squeeze(simOut.alphaMeasured.Data);
+groundTruth = squeeze(simOut.alpha.Data);
+t = simOut.t;
+
+figure()
+hold on
+p = plot(t, obc, 'LineWidth', 2);
+p2 = plot(t, groundTruth, 'LineWidth', 2);
+set(p, {'DisplayName'}, {'\phi_{obc}'; '\theta_{obc}'; '\psi_{obc}'})
+set(p2, {'DisplayName'}, {'\phi'; '\theta'; '\psi'})
+xlabel('t [sec]')
+ylabel('Euler Angles [rad]')
+ax = gca();
+ax.FontSize = 14;
+legend
+figureName = [figurePath, 'obcVsGroundOmegas.png'];
+
+exportgraphics(gcf, figureName)
+sgtitle(gcf, 'OBC vs Ground Truth for Measured Euler Angles')
+
+
 Tfinal = 5*T;
 
 omx = deg2rad(0.03);
