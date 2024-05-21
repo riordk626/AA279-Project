@@ -55,14 +55,9 @@ ICstruct.om0 = om0; ICstruct.R0 = R0;
 distStruct.disturbance = "solar";
 % distStruct.disturbance = "all":
 
-<<<<<<< HEAD
 % Tfinal = 365 * 24 * 3600;
 Tfinal = T * 5;
 
-
-=======
-Tfinal = 5*T;
->>>>>>> main
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct, sensorStruct);
 
@@ -184,12 +179,8 @@ R0 = R_RTNtoPdes * R_ECItoRTN;
 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 
-<<<<<<< HEAD
 % distStruct.disturbance = "grav";
 distStruct.disturbance = "all";
-=======
-distStruct.disturbance = "none";
->>>>>>> main
 
 Tfinal = 5*T;
 
