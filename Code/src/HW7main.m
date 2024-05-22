@@ -43,9 +43,9 @@ kalmanFilterStruct.dt_KF = 1e-3;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
-omx = 0;
-omy = 0;
-omz = 0;
+omx = n_float;
+omy = n_float;
+omz = n_float;
 % % 
 om0 = [omx omy omz].';
 R_ECItoRTN = eci2rtn(r0, v0);
@@ -55,7 +55,7 @@ R0 = R_RTNtoPdes * R_ECItoRTN;
 % 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 Tfinal = T * 5;
-dt = 1e-3;
+dt = 1e-1;
 
 % plots all torques
 
