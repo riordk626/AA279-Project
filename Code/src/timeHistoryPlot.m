@@ -18,5 +18,5 @@ for i=1:n
 end
 
 if exportflag
-    exportgraphics(gcf, figureName)
+    exportgraphics(gcf, fullfile(figureName))
 end
