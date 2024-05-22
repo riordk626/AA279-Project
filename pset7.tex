@@ -1,0 +1,87 @@
+\section{\Large PROBLEM SET 7}
+
+\subsection{Problem 1 - Introduce representative (from manufacturer or Wertz or first lectures) sensor errors in the form of constant bias and Gaussian noise with given standard deviation.}
+
+Bias and Gaussian noise were first introduced to the startracker measurements through adding them to the unit vector that represented the location of an identified star in the ECI frame. Through analyzing star trackers produced by different manufacturers, the constant bias was set to 5 arcseconds and the mean of the Gaussian noise was set to 1 arcsecond based on the values given by Honeywell for their MST satellite. From there, the position vector of the star was converted to spherical coordinates so that the the noise and bias could be added to the angular components, $\theta$ and $\phi$. The bias was directly added to the unit vector, and the noise was added through multiplying the standard deviation by a a normal distribution with mean of zero and a standard deviation of one. The resultant simulink model and code for this are show below.
+
+
+
+\begin{figure} [H]
+    \centering
+    \begin{lstlisting}
+function rStarUnitPerturbed = perturbMeasurements(rStarUnitSamples, rStarUnitPerturbed)
+
+% rStarUnitPerturbed = zeros(size(rStarUnitSamples));
+
+% Bias and standard dev from known star tracker data (Honeywell MST)
+mu = 5 * (pi / 180 / 3600); % Bias error in radians (converted from 5 arcseconds)
+sigma = 1 * (pi / 180 / 3600); % Standard deviation of noise in radians (converted from 1 arcseconds)
+
+nStars = length(rStarUnitSamples(1,:));
+
+for i = 1:nStars
+
+    % Get one star measurement
+    rStarUnit = rStarUnitSamples(:,i);
+
+    % Convert to spherical coordinates
+    x = rStarUnit(1);
+    y = rStarUnit(2); 
+    z = rStarUnit(3);
+    r = sqrt(x^2 + y^2 + z^2);
+    theta = acos(z / r);
+    phi = atan2(y, x);
+    
+    % Calculate the displacement due to bias error
+    d_bias = mu;
+    
+    % Generate Gaussian noise and calculate displacement
+    noise = sigma .* randn(1); % Angular noise in radians
+    d_noise = noise;
+    
+    % Add the errors to the sperical coords
+    theta_perturbed = theta + d_bias + d_noise;
+    phi_perturbed = phi + d_bias + d_noise;
+    
+    % Convert back to spherical coordinates
+    x_perturbed = r * sin(theta_perturbed) * cos(phi_perturbed);
+    y_perturbed = r * sin(theta_perturbed) * sin(phi_perturbed);
+    z_perturbed = r * cos(theta_perturbed);
+    
+    u_measured = [x_perturbed; y_perturbed; z_perturbed];
+    
+    % Normalize the measured vector to ensure it remains a unit vector
+    u_measured = u_measured ./ norm(u_measured);
+
+    rStarUnitPerturbed(:,i) = u_measured;
+    
+end
+end
+    \end{lstlisting}
+    \caption{Star Tracker Noise}
+    \label{fig:starTrackerNoise}
+\end{figure}
+
+\subsection{Problem 2 - Re-apply the attitude determination algorithms from the previous pset. Plot attitude estimation error. Note that the attitude estimation error represents a rotation matrix (DCM) which quantifies how far the estimated
+attitude is from the true attitude. You can use any parameterization to plot the attitude estimation errors corresponding to this DCM. Is the result consistent with the sensor bias and noise you have introduced?}
+
+
+\subsection{Problem 3 - For small sensor errors, the DCM corresponds to a small rotation. Can you give an interpretation of small angles (e.g., in Euler angles and quaternions) to the obtained error DCM?}
+
+\subsection{Problem 4 - Start modeling actual sensors in dedicated (Simulink or otherwise) subsystems which are part of the spacecraft. These models take inputs from ground-truth simulation and provides output measurements, including systematic and random errors. Take inspiration from overview of sensors discussed in class and
+textbook for typical errors.}
+
+\subsection{Problem 5 - Designing and implement the time update of a KF/EKF to obtain the best estimate of the state from the available measurements and models:}
+
+\subsubsection{Search in literature, define, and code a state transition matrix $\Phi$ which provides your state at step k+1 based on the state at step k. Verify that the output of this propagation step is consistent with the rigorous propagation of the attitude (numerical integration). Plot propagation errors as needed.}
+
+\subsubsection{Search in literature, define, and code a control input matrix B which provides the increment to your state at step k+1 due to a control torque at step k. Hint: optional at this stage since you do not have a controller yet.}
+
+
+\subsubsection{(a) and (b) allow you to propagate the state from k to k+1 including the known control input torques. Hint: Initially you will design the filter by neglecting any control torque from your simulation.}
+
+\subsubsection{Define and code an initial state error covariance matrix P which quantifies the uncertainty of your initial state. This can be picked as diagonal matrix with diagonal elements representing the variance of each state parameter σ2. Initially you can neglect cross-covariance terms assuming that errors of various state components are not correlated.}
+
+\subsubsection{The time update of the EKF needs Φ, B, and P. Hint: You could increment your navigation performance by keeping the filter receptive to new measurements at steady state through the addition of constant process noise Q at each step. Initially you can define Q similar to P but much smaller (e.g., 1/10 or 1/100).}
+
+\subsection{Problem 6 - Produce plots showing true attitude estimation errors (estimate vs truth with statistics), formal or estimated attitude estimation errors (covariance from filter). Discuss the results, do they meet expectations? How well is the true estimation error described by the formal covariance? Note that we are only implementing the time update even if we call them “attitude estimates and estimation errors”.}
