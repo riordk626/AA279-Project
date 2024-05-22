@@ -39,7 +39,7 @@ nmeas = 11;
 kalmanFilterStruct.Q = eye(6);
 kalmanFilterStruct.R = eye(3*nmeas + 3);
 kalmanFilterStruct.P0 = eye(6);
-kalmanFilterStruct.dt_KF = 1e-1;
+kalmanFilterStruct.dt_KF = 1;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
@@ -279,8 +279,8 @@ timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 distStruct.disturbance = "none";
 
-omx = 0;
-omy = 0;
+omx = n_float;
+omy = n_float;
 omz = n_float;
 
 om0 = [omx omy omz].';
