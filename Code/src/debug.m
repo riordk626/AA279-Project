@@ -1,116 +1,55 @@
-%% Initialization
-clc, clear
-close all
+rStarUnitSamples = [5 3;
+2 1;
+0 9];
 
-projectStartup;
-exportflag = false;
-figurePath = '../../Images/PS5/';
+perturbMeasurements(rStarUnitSamples)
 
-[rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
-[areas, centroids, normalVectors] = aquaSurfaceProps();
+function rStarUnitPerturbed = perturbMeasurements(rStarUnitSamples)
 
-load('orbitConstants.mat')
+rStarUnitPerturbed = zeros(size(rStarUnitSamples));
 
-[r0, v0] = keplerian2ECI(a_float, e_float, i_float, Omega_float, omega_float, nu_float, mu_float);
+% Bias and standard dev from known star tracker data (Honeywell MST)
+mu = 5 * (pi / 180 / 3600); % Bias error in radians (converted from 5 arcseconds)
+sigma = 1 * (pi / 180 / 3600); % Standard deviation of noise in radians (converted from 1 arcseconds)
 
-orbitStruct.orbitType = "num";
-orbitStruct.dataSource = 'MAT-File';
-% orbitStruct.dataSource = 'MATLAB File';
-distStruct.dataSource = 'MAT-File';
+nStars = length(rStarUnitSamples(1,:));
 
-plantStruct.I_sim = Itotal_p;
-plantStruct.axesFlag = 0;
-plantStruct.dynamicsType = "default";
-plantStruct.attitudeType = "euler";
-plantStruct.sequence = "313";
+for i = 1:nStars
 
-plantStruct.normalVectors = normalVectors;
-plantStruct.areas = areas;
-plantStruct.rcm = rcm;
-plantStruct.centroids = centroids;
+    % Get one star measurement
+    rStarUnit = rStarUnitSamples(:,i);
 
-ICstruct.r0 = r0; ICstruct.v0 = v0;
-Tfinal = 5*T;
+    % Convert to spherical coordinates
+    x = rStarUnit(1);
+    y = rStarUnit(2); 
+    z = rStarUnit(3);
+    r = sqrt(x^2 + y^2 + z^2);
+    theta = acos(z / r);
+    phi = atan2(y, x);
+    
+    % Calculate the displacement due to bias error
+    d_bias = mu;
+    
+    % Generate Gaussian noise and calculate displacement
+    noise = sigma .* randn(1); % Angular noise in radians
+    d_noise = noise;
+    
+    % Add the errors to the sperical coords
+    theta_perturbed = theta + d_bias + d_noise;
+    phi_perturbed = phi + d_bias + d_noise;
+    
+    % Convert back to spherical coordinates
+    x_perturbed = r * sin(theta_perturbed) * cos(phi_perturbed);
+    y_perturbed = r * sin(theta_perturbed) * sin(phi_perturbed);
+    z_perturbed = r * cos(theta_perturbed);
+    
+    u_measured = [x_perturbed; y_perturbed; z_perturbed];
+    
+    % Normalize the measured vector to ensure it remains a unit vector
+    u_measured = u_measured ./ norm(u_measured);
 
-
-%% Problem 3 - Disturbance Moment Verification
-
-omx = 0;
-omy = 0;
-omz = n_float;
-
-om0 = [omx omy omz].';
-R_ECItoRTN = eci2rtn(r0, v0);
-% R_RTNtoP = [0 0 -1;0 1 0;1 0 0];
-R_RTNtoP = eye(3);
-R0 = R_RTNtoP * R_ECItoRTN;
-
-ICstruct.om0 = om0; ICstruct.R0 = R0;
-
-plantStruct.I_sim = Itotal_p;
-
-% plots solar torque
-
-distStruct.disturbance = "solar";
-
-simIn = initAqua(Tfinal, ICstruct, orbitStruct, plantStruct, distStruct);
-
-simOut = sim(simIn);
-
-t = simOut.t;
-r = squeeze(simOut.r.Data);
-M_mag = squeeze(simOut.M_mag);
-r_mag = vecnorm(r,2,1);
-% mag_data = load('magConstants.mat', 'm_sat', 'Re', 'B0');
-% m_sat = mag_data.m_sat;
-% Re = mag_data.Re;
-% B0 = mag_data.B0;
-% m_sat_mag = norm(m_sat);
-
-% M_mag_bound = 2*m_sat_mag*Re^3*B0./(r_mag.^3);
-
-figure()
-% plot(t, M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_u')
-hold on
-% plot(t, -M_mag_bound, 'b--', 'LineWidth', 2, 'DisplayName', 'M_l')
-p = plot(t, M_mag, 'LineWidth', 2);
-set(p, {'DisplayName'}, {'M_x';'M_y';'M_z'})
-xlabel('t [sec]')
-ylabel('M [Nm]')
-ax = gca();
-ax.FontSize = 14;
-legend
-figureName = [figurePath, 'solar_torque.png'];
-
-exportgraphics(gcf, figureName)
-sgtitle(gcf, 'Solar Torque')
-
-%% test actual function
-
-resultantSolarTorque(0.33, 0.33, 2, areas(1), normalVectors, centroids, rcm, A_ptob, [0; 0; 1])
-
-function M = resultantSolarTorque(dragCoeff, cs, P, A, N, r_cent, rcm, A_ptob, sunUnit)
-M = zeros([3 1]);
-n = size(A, 1);
-
-%Rotate everything to principle frame
-N = transpose(N);
-r_cent = transpose(r_cent);
-rcm = A_ptob.' * transpose(rcm);
-for i=1:n
-    N(:, i) = A_ptob.' * N(:, i);
-    r_cent(:, i) = A_ptob.' * r_cent(:, i);
-end 
-
-for i=1:n
-    if dot(N(:, i), sunUnit) > 0
-        theta = asin(dot(sunUnit, N(:, i)));
-        sun_force = -P*A(i)*cos(theta)*(1-cs).*sunUnit;
-        disp(sun_force)
-        normal_force = -P*A(i)*cos(theta)*2*(cs*cos(theta) + ((1/3)*dragCoeff)).*N(:,i);
-        disp(normal_force)
-        total_force = sun_force + normal_force;
-        M = M + cross(r_cent(:, i) - rcm, total_force);
-    end
+    rStarUnitPerturbed(:,i) = u_measured;
+    
 end
+
 end
