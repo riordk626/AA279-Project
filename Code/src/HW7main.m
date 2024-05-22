@@ -39,7 +39,7 @@ nmeas = 11;
 kalmanFilterStruct.Q = eye(6);
 kalmanFilterStruct.R = eye(3*nmeas + 3);
 kalmanFilterStruct.P0 = eye(6);
-kalmanFilterStruct.dt_KF = 1e-3;
+kalmanFilterStruct.dt_KF = 1e-1;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
@@ -54,8 +54,8 @@ R_RTNtoPdes = A_ptob.' * R_RTNtoBdes;
 R0 = R_RTNtoPdes * R_ECItoRTN;
 % 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
-Tfinal = T * 5;
-dt = 1e-1;
+Tfinal = 3*T;
+dt_sc = 1e-1;
 
 % plots all torques
 
