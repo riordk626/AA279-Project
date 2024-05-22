@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = true;
+exportflag = false;
 figurePath = '../../Images/PS7/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -43,17 +43,6 @@ kalmanFilterStruct.dt_KF = 1e-1;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
-omx = n_float;
-omy = n_float;
-omz = n_float;
-% % 
-om0 = [omx omy omz].';
-R_ECItoRTN = eci2rtn(r0, v0);
-R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
-R_RTNtoPdes = A_ptob.' * R_RTNtoBdes;
-R0 = R_RTNtoPdes * R_ECItoRTN;
-% 
-ICstruct.om0 = om0; ICstruct.R0 = R0;
 Tfinal = 3*T;
 dt_sc = 1e-1;
 
@@ -62,6 +51,18 @@ dt_sc = 1e-1;
 distStruct.disturbance = "all";
 
 %% Problem 2
+
+omx = 0;
+omy = -n_float;
+omz = 0;
+% % 
+om0 = [omx omy omz].';
+R_ECItoRTN = eci2rtn(r0, v0);
+R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
+R_RTNtoPdes = A_ptob.' * R_RTNtoBdes;
+R0 = R_RTNtoPdes * R_ECItoRTN;
+% 
+ICstruct.om0 = om0; ICstruct.R0 = R0;
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct,kalmanFilterStruct);
 
@@ -246,35 +247,84 @@ figureName = [figurePath, 'attitude_estimation_oversampled_det_default.png'];
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
-sensorStruct.measProcess = "default";
-sensorStruct.attitudeSensorSolver = "qmethod";
-sensorStruct.attitudeFileName = "starTrackerSimpleOversampled.mat";
+% sensorStruct.measProcess = "default";
+% sensorStruct.attitudeSensorSolver = "qmethod";
+% sensorStruct.attitudeFileName = "starTrackerSimpleOversampled.mat";
+% 
+% simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct,kalmanFilterStruct);
+% 
+% simOut = sim(simIn);
+% 
+% t = simOut.t;
+% R_ItoP = simOut.yout{1}.Values.Data;
+% u = wrapToPi(squeeze(simOut.alpha.Data));
+% R_est = simOut.R_est.Data;
+% nsteps = length(t);
+% u_est = zeros([3 nsteps]);
+% for i=1:nsteps
+%     u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
+% end
+% 
+% u_est_error = u - u_est;
+% values = {u, u_est, u_est_error};
+% valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+% valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
+%     {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
+% figureName = [figurePath, 'attitude_estimation_oversampled_q_default.png'];
+% 
+% fig = figure();
+% timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
+
+%% Problem 5 & 6
+
+distStruct.disturbance = "none";
+
+omx = 0;
+omy = 0;
+omz = n_float;
+
+om0 = [omx omy omz].';
+R_ECItoRTN = eci2rtn(r0, v0);
+R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
+R_RTNtoPdes = A_ptob.' * R_RTNtoBdes;
+R0 = R_RTNtoPdes * R_ECItoRTN;
+ICstruct.om0 = om0; ICstruct.R0 = R0;
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct,kalmanFilterStruct);
-
 simOut = sim(simIn);
 
 t = simOut.t;
 R_ItoP = simOut.yout{1}.Values.Data;
 u = wrapToPi(squeeze(simOut.alpha.Data));
-R_est = simOut.R_est.Data;
+u = u(:,1:end-1);
+om = squeeze(simOut.om_p.Data);
+om = om(:,1:end-1);
+q_kf = squeeze(simOut.q_kf.Data);
+x_kf = squeeze(simOut.x_kf.Data);
+om_kf = x_kf(4:6, :);
 nsteps = length(t);
-u_est = zeros([3 nsteps]);
-for i=1:nsteps
-    u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
+u_kf = zeros([3 nsteps-1]);
+for i=1:nsteps-1
+    Rint = q2R(q_kf(:,i));
+    u_kf(:,i) = RtoEuler(Rint, plantStruct.sequence);
 end
 
-u_est_error = u - u_est;
-values = {u, u_est, u_est_error};
-valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+u_kf_error = u - u_kf;
+values = {u, u_kf, u_kf_error};
+valueNames = {'u [rad]';'u_{kf} [rad]'; '\Delta u [rad]'};
 valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
     {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
-figureName = [figurePath, 'attitude_estimation_oversampled_q_default.png'];
+figureName = [figurePath, 'kalman_filter_time_update_error_attitude.png'];
 
 fig = figure();
-timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
+timeHistoryPlot(fig, t(1:end-1), values, valueNames, valueLabels, figureName, exportflag)
 
-%% Problem 5 & 6
+om_kf_error = om - om_kf;
+values = {om, om_kf, om_kf_error};
+valueNames = {'\omega [rad/s]';'\omega_{kf} [rad/s]'; '\Delta \omega [rad/s]'};
+valueLabels = {{'\omega_1'; '\omega_2'; '\omega_3'};{'\omega_1'; '\omega_2'; '\omega_3'};...
+    {'\Delta \omega_1'; '\Delta \omega_2'; '\Delta \omega_3'}};
+figureName = [figurePath, 'kalman_filter_time_update_error_velocities.png'];
 
-simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct,kalmanFilterStruct);
-simOut = sim(simIn);
+fig = figure();
+timeHistoryPlot(fig, t(1:end-1), values, valueNames, valueLabels, figureName, exportflag)
