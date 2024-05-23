@@ -177,7 +177,7 @@ For the $\omega$ measurements, Figure \ref{fig:omega_noise} was generated to sho
     \label{fig:omega_noise}
 \end{figure}
 
-Because the angular velocities are being held at zero, the constant bias causes the estimated value of $\omega_x$ to vary greatly from the true value. This is also exacerbated by the angular velocity not being capped at $2\pi$. While the constant bias seems to dominate the error, the small oscillations from the noise can also be seen in $\omega_x$, $\omega_y$, and $\omega_z$.
+Because the angular velocities are being held at zero, the gaussian noise causes the estimated value of $\omega_x$ to vary greatly from the true value. While the gaussian noise seems to dominate the error, the small difference from the constant bias can also be seen in $\omega_x$, $\omega_y$, and $\omega_z$.
 
 \subsection{Problem 3 - For small sensor errors, the DCM corresponds to a small rotation. Can you give an interpretation of small angles (e.g., in Euler angles and quaternions) to the obtained error DCM?}
 
@@ -363,3 +363,25 @@ In Figure \ref{fig:kf_time_update_attitude_statistics} the bounds corresponding 
 \end{figure}
 
 Both currently grow indefinitley, as there is no measurement update to reduce uncertainty in the state estimate.
+
+The Simulink model used to implement the Kalman Filter is shown below in Figure \ref{fig:kf_simulink_model}.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[trim={4cm 13cm 3cm 0cm},clip,width = 15cm]{Images/PS7/kalman_filter_.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[trim={0cm 15cm 10cm 0cm},clip,width = 15cm]{Images/PS6/statisticalAttitude-2.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[trim={0cm 15cm 10cm 0cm},clip,width = 15cm]{Images/PS6/statisticalAttitude-3.png}
+    \caption{Statistical Attitude Determination Model}
+    \label{fig:stat_attitude}
+\end{figure}
