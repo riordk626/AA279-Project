@@ -197,7 +197,17 @@ Where
     s_{\omega} \triangleq \frac{1}{\omega} \sin{\frac{\omega \Delta t}{2}}
 \end{equation*}
 
-The time update for the covariance 
+Therefore the discrete time update step for the state can be seen in Equation \ref{eq:kf_state_time_update}.
+
+\begin{equation} \label{eq:kf_state_time_update}
+    \vec{x}_{t + 1} = \Phi_t \vec{x}_{t + 1}
+\end{equation}
+
+The time update for the covariance follows Equation \ref{eq:kf_cov_time_update}.
+
+\begin{equation} \label{eq:kf_cov_time_update}
+    P_{t + 1} = \Phi_t \Sigma_{t \vert t-1} \Phi_t^T + Q_t
+\end{equation}
 
 \subsubsection{Search in literature, define, and code a control input matrix B which provides the increment to your state at step k+1 due to a control torque at step k. Hint: optional at this stage since you do not have a controller yet.}
 
