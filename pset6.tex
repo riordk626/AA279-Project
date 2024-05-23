@@ -2,11 +2,80 @@
 
 \subsection{Problem 1 - Complete the modeling and verification of perturbation torques as described in the previous pset}
 
-In the previous problem set, the magnetic torque was implemented successfully, but the aerodynamic and solar 
+In the previous problem set, the magnetic torque was implemented successfully, but the aerodynamic and solar radiation torques still needed improvement. For the solar radiation torque, the unit vector pointing towards the sun needed to be implemented. To accomplish this, the orbit propagator used for the satellite was leveraged. The propagator was modified to take in the orbital elements of the desired orbit at the beginning of the simulation such that it could be called separately for the satellite and the sun. The new resultant layout of the simulink file is shown below in Figure \ref{fig:sun_orbit_sim}.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS6/updatedOrbitPropagatorSim.png}
+    \caption{Updated Orbit Propagator to include Sun Orbit Propagation}
+    \label{fig:sun_orbit_sim}
+\end{figure}
+
+In the above simulink model, the orbital elements of Earth's orbit around the sun were used to simulate the 'orbit' of the sun around the Earth in the ECI frame. The semimajor axis and eccentricity were left untouched as they are independent of coordinate frames. It is important to note, however, that the angular values including the inclination were adjusted to be in Earth's equatorial plane that is offset by the ecliptic plane by 23.5$\degree$. The orbital parameters that were used are shown below.
+
+\begin{center}
+    a = 7080.6 km \\
+    e = 0.0000979 \\
+    i = 98.2$\degree$ \\
+    $\Omega$ = 95.2063$\degree$ \\
+    $\omega$ = 120.4799$\degree$ \\
+\end{center}
+
+A plot showing the resultant orbit of the sun 'around' the Earth is shown below in Figure \ref{fig:sun_orbit}.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS6/sunOrbit.png}
+    \caption{Orbit of the Sun Around Earth in ECI Frame}
+    \label{fig:sun_orbit}
+\end{figure}
+
+One it was verified that the unit vector pointing towards the sun was correct, the remaining tasks for the solar radiation torque were finding values for $c_d$ and $c_s$ that aligned with the theory and approximating the center of pressure of the satellite. While the exact materials used for the Aqua satellite are unknown, it is safe to assume that the solar array had a lower $c_d$ value than the encasing of the sensors and electronics in the satellite. This is because the encasing is typically covered in an opaque white paint to protect the electronics from environmental dangers. Therefore, $c_d$ was adjusted to be high for every surface except the two designated to the solar array and $c_1$ followed the opposite relationship to ensure that $c_d + c_s < 1$. Finally, the center of pressure was calculated through the following approximation.
+
+\begin{equation}
+    \frac{\sum^n_{i=1} A_i c_i}{\sum^n_{i=1} A_i}
+\end{equation}
+
+In this equation A represents the area of each surface and c represents the centroid location in the principle frames. Through making these corrections and debugging small issues in the simulink model shown in Figure \ref{fig:simulink_sol}. The resultant torques plotted versus time are shown in Figure \ref{fig:solar_torque}.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS6/solar_torque.png}
+    \caption{Solar Torque}
+    \label{fig:solar_torque}
+\end{figure}
+
+The small oscillations shown in Figure \ref{fig:solar_torque} confirm that the torque is periodic for the Earth pointing satellite as predicted in theory. Furthermore, the torque is well within the bounds. 
+
+For the aerodynamic drag, the theory shown in last weeks problem set was correct, but small issues needed to be debugged with the model. Once these bugs were resolved, the resultant torques were obtained and are shown below in Figure \ref{fig:aero_torque}.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS6/aero_torque.png}
+    \caption{Aerodynamic Torque}
+    \label{fig:aero_torque}
+\end{figure}
+
+
+As predicted in the theory, the drag is constant for the earth pointing satellite, and stays well within the bounds thus validating the simulation. Finally, once all of the disturbances were obtained, they were combined to obtain the total torque from aerodynamic drag, solar radiation, gravity, and magnetic disturbances. The total torque is shown below in Figure \ref{fig:all_torque}.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS6/all_torque.png}
+    \caption{Total Torque}
+    \label{fig:all_torque}
+\end{figure}
+
+The total torque shows that the primary disturbance contributors are gravity and solar radiation for our satellite and its mission. 
 
 \subsection{Problem 2 - Compute the attitude control error even if a controller is not implemented yet. The attitude control error represents the rotation between the desired and actual attitude. Plot the attitude control error and give its interpretation. Note that this step requires the definition and computation of the desired or nominal or target attitude of the spacecraft. In general, this can be expressed in body or principal axes.}
 
-Recall that the mission for the Aqua satellite requires the instruments on the bottom of the craft to be Earth-pointing. With the selected body axes, this means that the desired attitude expressed as a rotation matrix from the RTN frame to the body frame is described as follows.
+Recall that the mission for the Aqua satellite requires the instruments on the bottom of the spacecraft to be Earth-pointing. With the selected body axes, this means that the desired attitude expressed as a rotation matrix from the RTN frame to the body frame is described as follows.
 
 \begin{equation*}
     \boldsymbol{\bar{R}}_{RTN \rightarrow x'y'z'} = \begin{bmatrix}
@@ -149,6 +218,26 @@ The statistical attitude determination method, or the so called q-method, was im
 
 \subsubsection{Implement angular velocity measurements and the reconstruction of the attitude from those (through kinematic equations coded identically to ground truth but replicated in the spacecraft on- board computer)}
 
+The reconstruction of the attitude from angular velocity measurements was obtained through copying the existing block to integrate the Euler equations into the on board computer (OBC). However, the angular velocity measurements were fed into the plant as opposed to a external torque. The resultant simulink diagrams are shown below.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS6/obc_plant_om.png}
+    \caption{OBC Plant for $\omega$ Measurements}
+    \label{fig:obc_plant_omega}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS6/obc_attitudeProp_om.png}
+    \caption{Attitude Propagator for $\omega$ Measurements in OBC}
+    \label{fig:obc_prop_omega}
+\end{figure}
+
+The attitudePropagate block remained unchanged from previous work.
+
 \subsection{Problem 6 - Plot the resulting estimated attitude in the absence of sensor errors. Show that it is identical to the true attitude (except for numerical errors).}
 
 First, the deterministic attitude method was tested using the "undersampled" (2 available measurement) case. This was down with the feed through model. That is, no fictitious measurements were generated before creating a triad. The results of this simulation are seen in Figure \ref{fig:det_attitude_undersampled_default}.
@@ -157,7 +246,7 @@ First, the deterministic attitude method was tested using the "undersampled" (2 
     \centering
     \captionsetup{ justification = centering }
     \includegraphics[width = 12cm]{Images/PS6/attitude_estimation_undersampled_det_default.png}
-    \caption{Ground Truth vs. Estimated Attitude for Underampled Deterministic Method with Feed Through Measurements}
+    \caption{Ground Truth vs. Estimated Attitude for Undersampled Deterministic Method with Feed Through Measurements}
     \label{fig:det_attitude_undersampled_default}
 \end{figure}
 
@@ -167,7 +256,7 @@ The following test was deterministically performing attitude determination using
     \centering
     \captionsetup{ justification = centering }
     \includegraphics[width = 12cm]{Images/PS6/attitude_estimation_undersampled_det_fictitious.png}
-    \caption{Ground Truth vs. Estimated Attitude for Underampled Deterministic Method with Fictitious Measurements}
+    \caption{Ground Truth vs. Estimated Attitude for Undersampled Deterministic Method with Fictitious Measurements}
     \label{fig:det_attitude_undersampled_fictitious}
 \end{figure}
 
@@ -177,7 +266,7 @@ The last undersampled case was on the statistical method with feed through on th
     \centering
     \captionsetup{ justification = centering }
     \includegraphics[width = 12cm]{Images/PS6/attitude_estimation_undersampled_q_default.png}
-    \caption{Ground Truth vs. Estimated Attitude for Underampled Statistical Method with Feed Through Measurements}
+    \caption{Ground Truth vs. Estimated Attitude for Undersampled Statistical Method with Feed Through Measurements}
     \label{fig:stat_attitude_undersampled_default}
 \end{figure}
 
@@ -198,3 +287,14 @@ The next step was to validate that both deterministic and statistical attitude d
 \end{figure}
 
 For all cases it is seen that the error between the true state and the estimated state is nearly zero (i.e. on the order of $10^-4$). There are spikes in the error plot where singularities occur. A future fix for this might be to use quaternions or a different Euler angle sequence. 
+
+To validate that the resultant Euler angles from the OBC $omega$ measurements were the same as the ground truth. They were co-plotted and are shown below in Figure \ref{fig:obcVsGroundOmega}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width = 12cm]{Images/PS6/obcVsGroundOmegas.png}
+    \caption{Ground Truth vs. Estimated Attitude for $\omega$ Measurements}
+    \label{fig:obcVsGroundOmega}
+\end{figure}
+
+The plots for the ground trut perfectly overlayed those from the OBC.
