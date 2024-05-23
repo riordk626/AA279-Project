@@ -36,9 +36,9 @@ sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "starTrackerSimpleUndersampled.mat";
 
 nmeas = 11;
-kalmanFilterStruct.Q = eye(6);
 kalmanFilterStruct.R = eye(3*nmeas + 3);
-kalmanFilterStruct.P0 = eye(6);
+kalmanFilterStruct.P0 = (1e-3).*eye(6);
+kalmanFilterStruct.Q = (1e-2).*kalmanFilterStruct.P0;
 kalmanFilterStruct.dt_KF = 1;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
@@ -234,11 +234,8 @@ timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 distStruct.disturbance = "none";
 
-omx = n_float;
-omy = n_float;
-omz = n_float;
-
-om0 = [omx omy omz].';
+om0 = A_ptob.' * [0;-n_float;0];
+% om0 = [omx omy omz].';
 R_ECItoRTN = eci2rtn(r0, v0);
 R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
 R_RTNtoPdes = A_ptob.' * R_RTNtoBdes;
@@ -251,17 +248,22 @@ simOut = sim(simIn);
 t = simOut.t;
 R_ItoP = simOut.yout{1}.Values.Data;
 u = wrapToPi(squeeze(simOut.alpha.Data));
-u = u(:,1:end-1);
 om = squeeze(simOut.om_p.Data);
-om = om(:,1:end-1);
 q_kf = squeeze(simOut.q_kf.Data);
 x_kf = squeeze(simOut.x_kf.Data);
+P_kf = simOut.P_kf.Data;
 om_kf = x_kf(4:6, :);
 nsteps = length(t);
-u_kf = zeros([3 nsteps-1]);
-for i=1:nsteps-1
+u_kf = zeros([3 nsteps]);
+sigKF = zeros([6 nsteps]);
+sigTrue = zeros([6 nsteps]);
+for i=1:nsteps
     Rint = q2R(q_kf(:,i));
     u_kf(:,i) = RtoEuler(Rint, plantStruct.sequence);
+
+    sigKF(:,i) = sqrt(diag(P_kf(:,:,i)));
+    sigTrue(1:3,i) = std(u(:,i) - u_kf(:,i));
+    sigTrue(4:6,i) = std(om(:,i) - om_kf(:,i));
 end
 
 u_kf_error = u - u_kf;
@@ -272,7 +274,7 @@ valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
 figureName = [figurePath, 'kalman_filter_time_update_error_attitude.png'];
 
 fig = figure();
-timeHistoryPlot(fig, t(1:end-1), values, valueNames, valueLabels, figureName, exportflag)
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 om_kf_error = om - om_kf;
 values = {om, om_kf, om_kf_error};
@@ -282,4 +284,36 @@ valueLabels = {{'\omega_1'; '\omega_2'; '\omega_3'};{'\omega_1'; '\omega_2'; '\o
 figureName = [figurePath, 'kalman_filter_time_update_error_velocities.png'];
 
 fig = figure();
-timeHistoryPlot(fig, t(1:end-1), values, valueNames, valueLabels, figureName, exportflag)
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
+
+% meanValues = {om_kf(1,:), om_kf(2,:), om_kf(3,:)};
+% errorValues = {sigTrue(4,:), sigTrue(5,:), sigTrue(6,:)};
+% valueNames = {'\omega_1 [rad/s]';'\omega_2 [rad/s]';'\omega_3 [rad/s]'};
+% figureName = [figurePath, 'kalman_filter_omega_stat_bounds.png'];
+% 
+% fig = figure();
+% errorPlots(fig, t, meanValues, errorValues, valueNames,figureName,exportflag)
+
+meanValues = {om_kf(1,:), om_kf(2,:), om_kf(3,:)};
+errorValues = {sigKF(4,:), sigKF(5,:), sigKF(6,:)};
+valueNames = {'\omega_1 [rad/s]';'\omega_2 [rad/s]';'\omega_3 [rad/s]'};
+figureName = [figurePath, 'kalman_filter_omega_cov_bounds.png'];
+
+fig = figure();
+errorPlots(fig, t, meanValues, errorValues, valueNames,figureName,exportflag)
+
+% meanValues = {zeros([1 nsteps]), zeros([1 nsteps]), zeros([1 nsteps])};
+% errorValues = {sigTrue(1,:), sigTrue(2,:), sigTrue(3,:)};
+% valueNames = {'\alpha_1 [rad/s]';'\alpha_2 [rad/s]';'\alpha_3 [rad/s]'};
+% figureName = [figurePath, 'kalman_filter_att_stat_bounds.png'];
+% 
+% fig = figure();
+% errorPlots(fig, t, meanValues, errorValues, valueNames,figureName,exportflag)
+
+meanValues = {zeros([1 nsteps]), zeros([1 nsteps]), zeros([1 nsteps])};
+errorValues = {sigKF(1,:), sigKF(2,:), sigKF(3,:)};
+valueNames = {'\alpha_1 [rad/s]';'\alpha_2 [rad/s]';'\alpha_3 [rad/s]'};
+figureName = [figurePath, 'kalman_filter_att_cov_bounds.png'];
+
+fig = figure();
+errorPlots(fig, t, meanValues, errorValues, valueNames,figureName,exportflag)
