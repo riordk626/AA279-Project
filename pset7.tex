@@ -139,7 +139,7 @@ end
 \subsection{Problem 2 - Re-apply the attitude determination algorithms from the previous pset. Plot attitude estimation error. Note that the attitude estimation error represents a rotation matrix (DCM) which quantifies how far the estimated
 attitude is from the true attitude. You can use any parameterization to plot the attitude estimation errors corresponding to this DCM. Is the result consistent with the sensor bias and noise you have introduced?}
 
-The error for the "undersampled" (2 available measurement) case from the previous assignment was once again plotted for the star tracker measurements. In order to see the error that was present in addition to the numerical integration error, the constant bias and Gaussian noise were scaled by a factor of 1e3 to make the distinction clear. 
+The error for the "undersampled" (2 available measurement) case from the previous assignment was once again plotted for the star tracker and magnetometer measurements. In order to see the error that was present in addition to the numerical integration error, the constant bias and Gaussian noise were scaled by a factor of 10 to make the distinction clear. 
 
 \begin{figure}[H]
     \centering
@@ -165,7 +165,7 @@ The error for the "undersampled" (2 available measurement) case from the previou
     \label{fig:stat_attitude_undersampled_default_noise}
 \end{figure}
 
-It can be seen in each of the plots that the added noise causes small oscillations in the measurements that aren't present in the ground truth values. These errors are small due to how accurate the star tracker measurements are but could still lead to issues if not properly accounted for.
+It can be seen in each of the plots that the added noise causes small oscillations in the measurements that aren't present in the ground truth values. These errors are small due to how accurate the star tracker measurements are but could still lead to issues if not properly accounted for. Additionally, there are some singularities where the error spikes due to the measurements of the magnetometer. These spikes could be caused by the magnetometer being weighted too highly for it's given accuracy or for an inaccuracy in the model.
 
 For the $\omega$ measurements, Figure \ref{fig:omega_noise} was generated to show the error between the sensor and ground truth.
 
@@ -324,6 +324,42 @@ The matrix $\boldsymbol{Q}_t$ represents the process noise. This was chosen heur
 
 Figure \ref{fig:kf_quat_prop} shows the ground truth attitude represented as Euler angles, the estimated attitude (converted from the propagated reference quaternion to Euler angles), and the error between the two.
 
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering}
+    \includegraphics[width = 15cm]{Images/PS7/kalman_filter_time_update_error_attitude.png}
+    \caption{Ground Truth vs. Kalman Filter Time Update Estimate for Attitude}
+    \label{fig:kf_quat_prop}
+\end{figure}
+
 Figure \ref{fig:kf_omega_prop} shows the angular velocity portion of the state compared with the ground truth angular velocity. The attitude error states were omitted for this step as their evolution is trivial.
 
-In Figure \ref{fig:kf_time_update_statistics} the 
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering}
+    \includegraphics[width = 15cm]{Images/PS7/kalman_filter_time_update_error_velocities.png}
+    \caption{Ground Truth vs. Kalman Filter Time Update Estimate for Angular Velocities}
+    \label{fig:kf_omega_prop}
+\end{figure}
+
+In both of these figures, a delay can be seen at the beginning of the sim before the first update step is performed to match the ground truth and then linearly propagate the state forward. Beyond this point the errors between the ground truth and the time update estimate are quite small. Singularities still exist that cause spikes in the   error, but this is to be expected.
+
+In Figure \ref{fig:kf_time_update_attitude_statistics} the bounds corresponding to the variance on each attitude error state is shown, while in Figure \ref{fig:kf_time_update_vel_statistics} the variance is shown for each component of angular velocity.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering}
+    \includegraphics[width = 15cm]{Images/PS7/kalman_filter_att_cov_bounds.png}
+    \caption{1-$\sigma$ Bounds on Attitude Error State}
+    \label{fig:kf_time_update_attitude_statistics}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering}
+    \includegraphics[width = 15cm]{Images/PS7/kalman_filter_omega_cov_bounds.png}
+    \caption{1-$\sigma$ Bounds on Angular Velocity State}
+    \label{fig:kf_time_update_vel_statistics}
+\end{figure}
+
+Both currently grow indefinitley, as there is no measurement update to reduce uncertainty in the state estimate.
