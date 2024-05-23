@@ -93,23 +93,33 @@ obc = squeeze(simOut.alphaMeasured.Data);
 groundTruth = squeeze(simOut.alpha.Data);
 t = simOut.t;
 
-figure()
-hold on
-p = plot(t, obc, 'LineWidth', 2);
-p2 = plot(t, groundTruth, 'LineWidth', 2);
-set(p, {'DisplayName'}, {'\phi_{obc}'; '\theta_{obc}'; '\psi_{obc}'})
-set(p2, {'DisplayName'}, {'\phi'; '\theta'; '\psi'})
-xlabel('t [sec]')
-ylabel('Euler Angles [rad]')
-ax = gca();
-ax.FontSize = 14;
-legend
-% figureName = [figurePath, 'obcVsGroundOmegas.png'];
+% figure()
+% hold on
+% p = plot(t, obc, 'LineWidth', 2);
+% p2 = plot(t, groundTruth, 'LineWidth', 2);
+% set(p, {'DisplayName'}, {'\phi_{obc}'; '\theta_{obc}'; '\psi_{obc}'})
+% set(p2, {'DisplayName'}, {'\phi'; '\theta'; '\psi'})
+% xlabel('t [sec]')
+% ylabel('Euler Angles [rad]')
+% ax = gca();
+% ax.FontSize = 14;
+% legend
+% % figureName = [figurePath, 'obcVsGroundOmegas.png'];
+% figureName = fullfile(figurePath, 'obcVsGroundOmegas.png');
+% 
+% exportgraphics(gcf, figureName)
+% saveas(gcf, figureName)
+% sgtitle(gcf, 'OBC vs Ground Truth for Measured Euler Angles')
+
+u_est_error = obc - groundTruth;
+values = {groundTruth, obc, u_est_error};
+valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+valueLabels = {{'\omega_x'; '\omega_y'; '\omega_z'};{'\omega_x'; '\omega_y'; '\omega_z'};...
+    {'\Delta \omega_x'; '\Delta \omega_y'; '\Delta \omega_z'}};
 figureName = fullfile(figurePath, 'obcVsGroundOmegas.png');
 
-exportgraphics(gcf, figureName)
-saveas(gcf, figureName)
-sgtitle(gcf, 'OBC vs Ground Truth for Measured Euler Angles')
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 
 Tfinal = 5*T;
