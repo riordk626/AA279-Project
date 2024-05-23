@@ -1,5 +1,5 @@
 %% Initialization
-clc, clear
+% clc, clear
 close all
 
 projectStartup;
@@ -89,28 +89,10 @@ fig = figure();
 timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
 
 % plot euler angles from obc for omega measurements and ground truth
-obc = squeeze(simOut.alphaMeasured.Data);
-groundTruth = squeeze(simOut.alpha.Data);
-t = simOut.t;
-
-% figure()
-% hold on
-% p = plot(t, obc, 'LineWidth', 2);
-% p2 = plot(t, groundTruth, 'LineWidth', 2);
-% set(p, {'DisplayName'}, {'\phi_{obc}'; '\theta_{obc}'; '\psi_{obc}'})
-% set(p2, {'DisplayName'}, {'\phi'; '\theta'; '\psi'})
-% xlabel('t [sec]')
-% ylabel('Euler Angles [rad]')
-% ax = gca();
-% ax.FontSize = 14;
-% legend
-% % figureName = [figurePath, 'obcVsGroundOmegas.png'];
-% figureName = fullfile(figurePath, 'obcVsGroundOmegas.png');
-% 
-% exportgraphics(gcf, figureName)
-% saveas(gcf, figureName)
-% sgtitle(gcf, 'OBC vs Ground Truth for Measured Euler Angles')
-
+obc = squeeze(simOut.gyro_meas.Data);
+groundTruth = squeeze(simOut.om_p.Data);
+groundTruth = groundTruth(:, 1:length(obc));
+t = simOut.t(1:length(obc));
 u_est_error = obc - groundTruth;
 values = {groundTruth, obc, u_est_error};
 valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
