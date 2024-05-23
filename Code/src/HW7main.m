@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = false;
+exportflag = true;
 figurePath = '../../Images/PS7/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -83,6 +83,7 @@ values = {u_error};
 valueNames = {'u [rad]'};
 valueLabels = {{'\phi'; '\theta'; '\psi'}};
 figureName = [figurePath, 'attitude_error_dist.png'];
+figureName = fullfile(figurePath, 'attitude_error_dist.png');
 
 fig = figure();
 timeHistoryPlot(fig, t,values,valueNames,valueLabels,figureName,exportflag)
@@ -92,21 +93,33 @@ obc = squeeze(simOut.alphaMeasured.Data);
 groundTruth = squeeze(simOut.alpha.Data);
 t = simOut.t;
 
-figure()
-hold on
-p = plot(t, obc, 'LineWidth', 2);
-p2 = plot(t, groundTruth, 'LineWidth', 2);
-set(p, {'DisplayName'}, {'\phi_{obc}'; '\theta_{obc}'; '\psi_{obc}'})
-set(p2, {'DisplayName'}, {'\phi'; '\theta'; '\psi'})
-xlabel('t [sec]')
-ylabel('Euler Angles [rad]')
-ax = gca();
-ax.FontSize = 14;
-legend
-figureName = [figurePath, 'obcVsGroundOmegas.png'];
+% figure()
+% hold on
+% p = plot(t, obc, 'LineWidth', 2);
+% p2 = plot(t, groundTruth, 'LineWidth', 2);
+% set(p, {'DisplayName'}, {'\phi_{obc}'; '\theta_{obc}'; '\psi_{obc}'})
+% set(p2, {'DisplayName'}, {'\phi'; '\theta'; '\psi'})
+% xlabel('t [sec]')
+% ylabel('Euler Angles [rad]')
+% ax = gca();
+% ax.FontSize = 14;
+% legend
+% % figureName = [figurePath, 'obcVsGroundOmegas.png'];
+% figureName = fullfile(figurePath, 'obcVsGroundOmegas.png');
+% 
+% exportgraphics(gcf, figureName)
+% saveas(gcf, figureName)
+% sgtitle(gcf, 'OBC vs Ground Truth for Measured Euler Angles')
 
-exportgraphics(gcf, figureName)
-sgtitle(gcf, 'OBC vs Ground Truth for Measured Euler Angles')
+u_est_error = obc - groundTruth;
+values = {groundTruth, obc, u_est_error};
+valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+valueLabels = {{'\omega_x'; '\omega_y'; '\omega_z'};{'\omega_x'; '\omega_y'; '\omega_z'};...
+    {'\Delta \omega_x'; '\Delta \omega_y'; '\Delta \omega_z'}};
+figureName = fullfile(figurePath, 'obcVsGroundOmegas.png');
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 
 Tfinal = 5*T;
@@ -128,7 +141,7 @@ distStruct.disturbance = "none";
 % distStruct.disturbance = "all":
 
 % Undersampled Hacked
-exportflag = false;
+exportflag = true;
 
 sensorStruct.measProcess = "default";
 sensorStruct.attitudeNoiseFactor = 0;
@@ -160,6 +173,8 @@ figureName = [figurePath, 'attitude_estimation_undersampled_det_default.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
+exportgraphics(gcf, figureName)
+saveas(gcf, figureName)
 
 sensorStruct.measProcess = "fictitious";
 sensorStruct.attitudeSensorSolver = "deterministic";
@@ -214,66 +229,6 @@ figureName = [figurePath, 'attitude_estimation_undersampled_q_default.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
-
-
-% Oversampled Hack
-exportflag = false;
-
-sensorStruct.measProcess = "default";
-sensorStruct.attitudeSensorSolver = "deterministic";
-sensorStruct.attitudeFileName = "starTrackerSimpleOversampled.mat";
-
-simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct,kalmanFilterStruct);
-
-simOut = sim(simIn);
-
-t = simOut.t;
-R_ItoP = simOut.yout{1}.Values.Data;
-u = wrapToPi(squeeze(simOut.alpha.Data));
-R_est = simOut.R_est.Data;
-nsteps = length(t);
-u_est = zeros([3 nsteps]);
-for i=1:nsteps
-    u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
-end
-
-u_est_error = u - u_est;
-values = {u, u_est, u_est_error};
-valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
-valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
-    {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
-figureName = [figurePath, 'attitude_estimation_oversampled_det_default.png'];
-
-fig = figure();
-timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
-
-% sensorStruct.measProcess = "default";
-% sensorStruct.attitudeSensorSolver = "qmethod";
-% sensorStruct.attitudeFileName = "starTrackerSimpleOversampled.mat";
-% 
-% simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct,kalmanFilterStruct);
-% 
-% simOut = sim(simIn);
-% 
-% t = simOut.t;
-% R_ItoP = simOut.yout{1}.Values.Data;
-% u = wrapToPi(squeeze(simOut.alpha.Data));
-% R_est = simOut.R_est.Data;
-% nsteps = length(t);
-% u_est = zeros([3 nsteps]);
-% for i=1:nsteps
-%     u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
-% end
-% 
-% u_est_error = u - u_est;
-% values = {u, u_est, u_est_error};
-% valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
-% valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
-%     {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
-% figureName = [figurePath, 'attitude_estimation_oversampled_q_default.png'];
-% 
-% fig = figure();
-% timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 %% Problem 5 & 6
 
