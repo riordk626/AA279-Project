@@ -158,7 +158,7 @@ For a Multiplicative Extended Kalman Filter (MEKF), the absolute attitude of the
 
 \begin{equation} \label{eq:kf_state_def}
     \vec{x} = \begin{bmatrix}
-        \alpha_1 \\ \alpha_2 \\ \alpha_3 \\ \omega_1 \\ \omega_2 \\ \omega_3
+        \alpha_1 \\ \alpha_2 \\ \alpha_3 \\ \omega_x \\ \omega_y \\ \omega_z
     \end{bmatrix}
 \end{equation}
 
@@ -173,9 +173,31 @@ The discrete state transition matrix for this state in the time update is shown 
 
 Where $\boldsymbol{\Phi}_{\alpha,t}$ and $\boldsymbol{\Phi}_{\omega,t}$ are defined in Equations \ref{eq:alpha_STM} and \ref{eq:omega_STM}.
 
-\begin{equation}
-    \boldsymbol{\Phi}_{\alpha,t} = \boldsymbol{I} = \frac{s_\omega}{\omega} \left[ \vec{\omega} \times \right] + \left( \frac{1 - c_{\omega}}{\omega ^2} \right)
+\begin{equation} \label{eq:alpha_STM}
+    \boldsymbol{\Phi}_{\alpha,t} = \boldsymbol{I} + s_{\omega} \boldsymbol{\left[ \vec{\omega} \times \right]} + \left( \frac{1 - c_{\omega}}{\omega ^2} \right) \boldsymbol{\left[ \vec{\omega} \times \right]} \boldsymbol{\left[ \vec{\omega} \times \right]}
 \end{equation}
+
+\begin{equation} \label{eq:omega_STM}
+    \Phi_{\omega,t} = \boldsymbol{I} + \begin{bmatrix}
+        0 & \frac{I_y - I_z}{I_x} \omega_{z,t} & \frac{I_y - I_z}{I_x} \omega_{y,t} \\
+        \frac{I_z - I_x}{I_y} \omega_{z,t} & 0 & \frac{I_z - I_x}{I_y} \omega_{x,t} \\
+        \frac{I_x - I_y}{I_z} \omega_{y,t} & \frac{I_x - I_y}{I_z} \omega_{x,t} & 0
+    \end{bmatrix} \frac{\Delta t}{2}
+\end{equation}
+
+Where
+
+\begin{equation*}
+    \omega \triangleq \Vert \vec{\omega} \Vert
+\end{equation*}
+\begin{equation*}
+    c_{\omega} \triangleq \cos{\frac{\omega \Delta t}{2}}
+\end{equation*}
+\begin{equation*}
+    s_{\omega} \triangleq \frac{1}{\omega} \sin{\frac{\omega \Delta t}{2}}
+\end{equation*}
+
+
 
 \subsubsection{Search in literature, define, and code a control input matrix B which provides the increment to your state at step k+1 due to a control torque at step k. Hint: optional at this stage since you do not have a controller yet.}
 
