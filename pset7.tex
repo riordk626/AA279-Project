@@ -4,7 +4,13 @@
 
 Bias and Gaussian noise were first introduced to the startracker measurements through adding them to the unit vector that represented the location of an identified star in the ECI frame. Through analyzing star trackers produced by different manufacturers, the constant bias was set to 5 arcseconds and the mean of the Gaussian noise was set to 1 arcsecond based on the values given by Honeywell for their MST satellite. From there, the position vector of the star was converted to spherical coordinates so that the the noise and bias could be added to the angular components, $\theta$ and $\phi$. The bias was directly added to the unit vector, and the noise was added through multiplying the standard deviation by a a normal distribution with mean of zero and a standard deviation of one. The resultant simulink model and code for this are show below.
 
-
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS7/starTrackerErrorSimulink.png}
+    \caption{Star Tracker Error Model in Simulink}
+    \label{fig:starTrackerErrorSimulink}
+\end{figure}
 
 \begin{figure} [H]
     \centering
@@ -62,6 +68,8 @@ end
     \label{fig:starTrackerNoise}
 \end{figure}
 
+For the $\omega$ error, the constant bias and the standard deviation of the Gaussian noise were once again pulled from a gyroscope manufacturer. This time they were pulled from Bosch Sensortec for the BMI160. The bias error was given as three 
+
 \subsection{Problem 2 - Re-apply the attitude determination algorithms from the previous pset. Plot attitude estimation error. Note that the attitude estimation error represents a rotation matrix (DCM) which quantifies how far the estimated
 attitude is from the true attitude. You can use any parameterization to plot the attitude estimation errors corresponding to this DCM. Is the result consistent with the sensor bias and noise you have introduced?}
 
@@ -75,13 +83,15 @@ textbook for typical errors.}
 
 \subsubsection{Search in literature, define, and code a state transition matrix $\Phi$ which provides your state at step k+1 based on the state at step k. Verify that the output of this propagation step is consistent with the rigorous propagation of the attitude (numerical integration). Plot propagation errors as needed.}
 
+For a Multiplicative Extended Kalman Filter (MEKF), the absolute attitude of the spacecraft is represented using a quaternion parameterization. This helps avoid singularities, while introducing the unitary norm constraint. To sidestep this issue, the state that is actually fed through the filter itself consists of a 3-component vector that represents a small deviation between a reference quaternion at the previous timestep and the reference quaternion for the current timestep. The expected value of these values is zero, and this component of the state is only altered during the measurement update. As a result, the time update step of MEKF will not update this value. The full state vector also contains the three angular velocity of the spacecraft about its principal axes. 
+
 \subsubsection{Search in literature, define, and code a control input matrix B which provides the increment to your state at step k+1 due to a control torque at step k. Hint: optional at this stage since you do not have a controller yet.}
 
 
 \subsubsection{(a) and (b) allow you to propagate the state from k to k+1 including the known control input torques. Hint: Initially you will design the filter by neglecting any control torque from your simulation.}
 
-\subsubsection{Define and code an initial state error covariance matrix P which quantifies the uncertainty of your initial state. This can be picked as diagonal matrix with diagonal elements representing the variance of each state parameter σ2. Initially you can neglect cross-covariance terms assuming that errors of various state components are not correlated.}
+\subsubsection{Define and code an initial state error covariance matrix P which quantifies the uncertainty of your initial state. This can be picked as diagonal matrix with diagonal elements representing the variance of each state parameter $\sigma ^2$. Initially you can neglect cross-covariance terms assuming that errors of various state components are not correlated.}
 
-\subsubsection{The time update of the EKF needs Φ, B, and P. Hint: You could increment your navigation performance by keeping the filter receptive to new measurements at steady state through the addition of constant process noise Q at each step. Initially you can define Q similar to P but much smaller (e.g., 1/10 or 1/100).}
+\subsubsection{The time update of the EKF needs $\Phi$, B, and P. Hint: You could increment your navigation performance by keeping the filter receptive to new measurements at steady state through the addition of constant process noise Q at each step. Initially you can define Q similar to P but much smaller (e.g., 1/10 or 1/100).}
 
 \subsection{Problem 6 - Produce plots showing true attitude estimation errors (estimate vs truth with statistics), formal or estimated attitude estimation errors (covariance from filter). Discuss the results, do they meet expectations? How well is the true estimation error described by the formal covariance? Note that we are only implementing the time update even if we call them “attitude estimates and estimation errors”.}
