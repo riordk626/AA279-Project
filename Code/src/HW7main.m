@@ -1,9 +1,9 @@
 %% Initialization
-% clc, clear
+clc, clear
 close all
 
 projectStartup;
-exportflag = true;
+exportflag = false;
 figurePath = '../../Images/PS7/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -33,7 +33,7 @@ sensorStruct.measProcess = "default";
 sensorStruct.attitudeNoiseFactor = 0;
 sensorStruct.attitudeSensorSolver = "deterministic";
 sensorStruct.starCatalog = "simple";
-sensorStruct.attitudeFileName = "starTrackerSimpleUndersampled.mat";
+sensorStruct.attitudeFileName = "attitudeMeasData.mat";
 
 nmeas = 11;
 kalmanFilterStruct.R = eye(3*nmeas + 3);
@@ -129,7 +129,7 @@ sensorStruct.measProcess = "default";
 sensorStruct.attitudeNoiseFactor = 0;
 sensorStruct.attitudeSensorSolver = "deterministic";
 sensorStruct.starCatalog = "simple";
-sensorStruct.attitudeFileName = "starTrackerSimpleUndersampled.mat";
+sensorStruct.attitudeFileName = "attitudeMeasData.mat";
 
 
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct, distStruct,sensorStruct,kalmanFilterStruct);

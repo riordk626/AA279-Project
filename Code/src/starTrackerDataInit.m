@@ -18,6 +18,8 @@ for i=1:size(Vstar,2)
     Vstar(:,i) = Vstar(:,i)./norm(Vstar(:,i));
 end
 
-wstar = rand([10 1]);
+wstar = (1e-2).*rand([10 1]) + 0.9;
 
-save('starTrackerSimpleOversampled.mat', "Vstar", "wstar")
+wmag = 0.3;
+
+save('attitudeMeasData.mat', "Vstar", "wstar", "wmag")
