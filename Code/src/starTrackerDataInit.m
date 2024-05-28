@@ -1,7 +1,6 @@
 clc, clear, close all
 
 rng(10)
-wmag = 0.3;
 
 Vstar = rand([3 2]);
 for i=1:size(Vstar,2)
@@ -10,15 +9,15 @@ end
 
 wstar = rand([2 1]);
 
-save('attitudeEdgeMeasData.mat', "Vstar", "wstar", "wmag")
+save('starTrackerSimpleUndersampled.mat', "Vstar", "wstar")
 
-clear Vstar wstar
+clear Vstar
 
 Vstar = rand([3 10]);
 for i=1:size(Vstar,2)
     Vstar(:,i) = Vstar(:,i)./norm(Vstar(:,i));
 end
 
-wstar = (1e-2).*rand([10 1]) + 0.9;
+wstar = rand([10 1]);
 
-save('attitudeMeasData.mat', "Vstar", "wstar", "wmag")
+save('starTrackerSimpleOversampled.mat', "Vstar", "wstar")

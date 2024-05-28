@@ -186,7 +186,10 @@ Following the measurement update, for a MEKF, the reset step must take place bef
 
 \begin{equation} \label{eq:quat_reset_step}
     \vec{q}_{t+1 \vert t+1} = \begin{bmatrix}
-        
+        1 & -\alpha_1 & -\alpha_2 & -\alpha_3 \\
+        \alpha_1 & 1 & \alpha_3 & -\alpha_2 \\
+        \alpha_2 & -\alpha_3 & 1 & \alpha_1 \\
+        \alpha_3 & \alpha_2 & -\alpha_1 & 1
     \end{bmatrix} \vec{q}_{t+1 \vert t}
 \end{equation}
 
@@ -195,7 +198,7 @@ The model that computes this update step is shown in Figure \ref{fig:quat_reset_
 \begin{figure}[H]
     \centering
     \captionsetup{ justification = centering }
-    \includegraphics{}
+    \includegraphics{Images/PS8/}
     \begin{lstlisting}
 function A = constructA(a)
 
