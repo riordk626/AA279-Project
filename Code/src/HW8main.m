@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = true;
+exportflag = false;
 figurePath = '../../Images/PS8/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -36,7 +36,7 @@ sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "attitudeMeasData.mat";
 
 nmeas = 11;
-kalmanFilterStruct.R = eye(3*nmeas + 3);
+kalmanFilterStruct.R = 0.1.*eye(3*nmeas + 3);
 kalmanFilterStruct.P0 = (1e-3).*eye(6);
 kalmanFilterStruct.Q = (1e-2).*kalmanFilterStruct.P0;
 kalmanFilterStruct.dt_KF = 1;
@@ -83,24 +83,43 @@ simOut = sim(simIn);
 t = simOut.t;
 R_ItoP = simOut.yout{1}.Values.Data;
 u = wrapToPi(squeeze(simOut.alpha.Data));
-R_est = simOut.R_est.Data;
+om = squeeze(simOut.om_p.Data);
+q_kf = squeeze(simOut.q_kf.Data);
+x_kf = squeeze(simOut.x_kf.Data);
+P_kf = simOut.P_kf.Data;
+om_kf = x_kf(4:6, :);
 nsteps = length(t);
-u_est = zeros([3 nsteps]);
+u_kf = zeros([3 nsteps]);
+sigKF = zeros([6 nsteps]);
+sigTrue = zeros([6 nsteps]);
 for i=1:nsteps
-    u_est(:,i) = RtoEuler(R_est(:,:,i), plantStruct.sequence);
+    Rint = q2R(q_kf(:,i));
+    u_kf(:,i) = RtoEuler(Rint, plantStruct.sequence);
+
+    sigKF(:,i) = sqrt(diag(P_kf(:,:,i)));
+    sigTrue(1:3,i) = std(u(:,i) - u_kf(:,i));
+    sigTrue(4:6,i) = std(om(:,i) - om_kf(:,i));
 end
 
-u_est_error = u - u_est;
-values = {u, u_est, u_est_error};
-valueNames = {'u [rad]';'u_{est} [rad]'; '\Delta u [rad]'};
+u_kf_error = u - u_kf;
+values = {u, u_kf, u_kf_error};
+valueNames = {'u [rad]';'u_{kf} [rad]'; '\Delta u [rad]'};
 valueLabels = {{'\phi'; '\theta'; '\psi'};{'\phi'; '\theta'; '\psi'};...
     {'\Delta \phi'; '\Delta \theta'; '\Delta \psi'}};
-figureName = [figurePath, 'attitude_estimation_undersampled_det_default.png'];
+figureName = [figurePath, 'kalman_filter_time_update_error_attitude.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
-exportgraphics(gcf, figureName)
-saveas(gcf, figureName)
+
+om_kf_error = om - om_kf;
+values = {om, om_kf, om_kf_error};
+valueNames = {'\omega [rad/s]';'\omega_{kf} [rad/s]'; '\Delta \omega [rad/s]'};
+valueLabels = {{'\omega_1'; '\omega_2'; '\omega_3'};{'\omega_1'; '\omega_2'; '\omega_3'};...
+    {'\Delta \omega_1'; '\Delta \omega_2'; '\Delta \omega_3'}};
+figureName = [figurePath, 'kalman_filter_time_update_error_velocities.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, exportflag)
 
 % plot covariance from filter
 
