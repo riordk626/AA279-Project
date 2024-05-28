@@ -2,7 +2,7 @@
 
 \subsection{Problem 1 - Introduce representative (from manufacturer or Wertz or first lectures) sensor errors in the form of constant bias and Gaussian noise with given standard deviation.} \label{sec:hw7problem1}
 
-Bias and Gaussian noise were first introduced to the startracker measurements through adding them to the unit vector that represented the location of an identified star in the ECI frame. Through analyzing star trackers produced by different manufacturers, the constant bias was set to 5 arcseconds and the mean of the Gaussian noise was set to 1 arcsecond based on the values given by Honeywell for their MST satellite. From there, the position vector of the star was converted to spherical coordinates so that the the noise and bias could be added to the angular components, $\theta$ and $\phi$. The bias was directly added to the unit vector, and the noise was added through multiplying the standard deviation by a a normal distribution with mean of zero and a standard deviation of one. The resultant simulink model and code for this are show below.Bias and Gaussian noise were first introduced to the startracker measurements through adding them to the unit vector that represented the location of an identified star in the ECI frame. Through analyzing star trackers produced by different manufacturers, the constant bias was set to 5 arcseconds and the mean of the Gaussian noise was set to 1 arcsecond based on the values given by Honeywell for their MST satellite. From there, the position vector of the star was converted to spherical coordinates so that the the noise and bias could be added to the angular components, $\theta$ and $\phi$. The bias was directly added to the unit vector, and the noise was added through multiplying the standard deviation by a a normal distribution with mean of zero and a standard deviation of one. The resultant simulink model and code for this are show below.
+Bias and Gaussian noise were first introduced to the star tracker measurements through adding them to the unit vector that represented the location of an identified star in the ECI frame. Through analyzing star trackers produced by different manufacturers, the constant bias was set to 5 arcseconds and the mean of the Gaussian noise was set to 1 arcsecond based on the values given by Honeywell for their MST satellite. From there, the position vector of the star was converted to spherical coordinates so that the the noise and bias could be added to the angular components, $\theta$ and $\phi$. The bias was directly added to the unit vector, and the noise was added through multiplying the standard deviation by a normal distribution with a mean of zero and a standard deviation of one. The resultant simulink model and code for this are show below. 
 
 \begin{figure}[H]
     \centering
@@ -68,7 +68,7 @@ end
     \label{fig:starTrackerNoise}
 \end{figure}
 
-For the magnetometer error, the unit vector of Earth's magnetic field was calculated and perturbed in the same way the unit vector for the star was in Figure \ref{fig:starTrackerNoise} and \ref{fig:starTrackerErrorSimulink}. The simulink models and code that did this are shown below.
+For the magnetometer error, the unit vector of Earth's magnetic field was calculated and perturbed in the same way the unit vector for the star was in Figure \ref{fig:starTrackerNoise} and \ref{fig:starTrackerErrorSimulink}. The simulink model that built off of the previous model to perturb the star tracker is shown below as is the code used to calculated the unit vector of the magnetic field in the ECI frame.
 
 \begin{figure}[H]
     \centering
@@ -95,7 +95,7 @@ end
     \label{fig:magnetometerNoise}
 \end{figure}
 
-For the $\omega$ error, the constant bias and the standard deviation of the Gaussian noise were once again pulled from a gyroscope manufacturer. This time they were pulled from Bosch Sensortec for the BMI160. The bias error was given as 3 $\degree$/$s$ and the standard deviation was set to  0.014 $\degree$/$\left(s \sqrt{Hz}\right)$. A bandwidth of one was assumed to convert the standard deviation to $\degree$/$s$. The standard deviation was then multiplied by a normal distribution with mean of zero and a standard deviation of one. The resultant simulink model and code are shown below.
+For the $\omega$ error, the constant bias and the standard deviation of the Gaussian noise were once again pulled from a gyroscope manufacturer. This time they were pulled from Bosch Sensortec for the BMI160. The bias error was given as 3 $\degree$/$s$ and the standard deviation was set to  0.014 $\degree$/$\left(s \sqrt{Hz}\right)$. A bandwidth of 1 was assumed to convert the standard deviation to $\degree$/$s$. The standard deviation was then multiplied by a normal distribution with a mean of zero and a standard deviation of one. The resultant simulink model and code are shown below.
 
 \begin{figure}[H]
     \centering
@@ -165,7 +165,7 @@ The error for the "undersampled" (2 available measurement) case from the previou
     \label{fig:stat_attitude_undersampled_default_noise}
 \end{figure}
 
-It can be seen in each of the plots that the added noise causes small oscillations in the measurements that aren't present in the ground truth values. These errors are small due to how accurate the star tracker measurements are but could still lead to issues if not properly accounted for. Additionally, there are some singularities where the error spikes due to the measurements of the magnetometer. These spikes could be caused by the magnetometer being weighted too highly for it's given accuracy or for an inaccuracy in the model.
+It can be seen in each of the plots that the added noise causes small oscillations in the measurements that aren't present in the ground truth values. These errors are small due to how accurate the star tracker measurements are but could still lead to issues if not properly accounted for. Additionally, there are some singularities where the error spikes due to the measurements of the magnetometer. These spikes could be caused by the magnetometer being weighted too heavily for its given accuracy or for an inaccuracy in the model. Future validation will be done to ensure that the spikes aren't caused by a model error.
 
 For the $\omega$ measurements, Figure \ref{fig:omega_noise} was generated to show the error between the sensor and ground truth.
 
@@ -177,11 +177,11 @@ For the $\omega$ measurements, Figure \ref{fig:omega_noise} was generated to sho
     \label{fig:omega_noise}
 \end{figure}
 
-Because the angular velocities are being held at zero, the gaussian noise causes the estimated value of $\omega_x$ to vary greatly from the true value. While the gaussian noise seems to dominate the error, the small difference from the constant bias can also be seen in $\omega_x$, $\omega_y$, and $\omega_z$.
+While the gaussian noise seems to dominate the error, the small difference from the constant bias can also be seen in $\omega_x$, $\omega_y$, and $\omega_z$. Even with the present noise, it can be seen that the values follow the same trends as the true values.
 
 \subsection{Problem 3 - For small sensor errors, the DCM corresponds to a small rotation. Can you give an interpretation of small angles (e.g., in Euler angles and quaternions) to the obtained error DCM?}
 
-As it can be seen in the plots from problem 2, the Gaussian noise results in small angle oscillations. Because of this, the the DCM matrix between the ground truth and measured values should be linearized and look like a small angle approximation matrix. That is, it should resemble the skews symmetric matrix with ones along the diagonal and small angles for the off diagonal values. To prove this, a DCM at one timestep in the simulation is shown below.
+As it can be seen in the plots from problem 2, the Gaussian noise results in small angle oscillations. Because of this, the the DCM matrix between the ground truth and measured values should be linearized and look like a small angle approximation matrix. That is, it should resemble the skews symmetric matrix with ones along the diagonal and small angles for the off diagonal values. To prove this, a DCM at one of the timesteps in the simulation is shown below.
 
 \begin{align*}
 \begin{bmatrix}
@@ -202,7 +202,7 @@ Because Problem 1 already assumes that the sensors provide unit vector measureme
 
 \subsubsection{Search in literature, define, and code a state transition matrix $\Phi$ which provides your state at step k+1 based on the state at step k. Verify that the output of this propagation step is consistent with the rigorous propagation of the attitude (numerical integration). Plot propagation errors as needed.}
 
-For a Multiplicative Extended Kalman Filter (MEKF), the absolute attitude of the spacecraft is represented using a quaternion parameterization. This helps avoid singularities, while introducing the unitary norm constraint. To sidestep this issue, the state that is actually fed through the filter itself consists of a 3-component vector that represents a small deviation between a reference quaternion at the previous timestep and the reference quaternion for the current timestep. The expected value of these values is zero, and this component of the state is only altered during the measurement update. As a result, the time update step of MEKF will not update this value. The full state vector also contains the three angular velocity of the spacecraft about its principal axes. The full state vector can be written as seen in Equation \ref{eq:kf_state_def}.
+For a Multiplicative Extended Kalman Filter (MEKF), the absolute attitude of the spacecraft is represented using a quaternion parameterization. This helps avoid singularities, while introducing the issue of a unitary norm constraint. To sidestep this issue, the state that is actually fed through the filter itself consists of a 3-component vector that represents a small deviation between a reference quaternion at the previous timestep and the reference quaternion for the current timestep. The expected value of these values is zero, and this component of the state is only altered during the measurement update. As a result, the time update step of MEKF will not update this value. The full state vector also contains the three angular velocity of the spacecraft about its principal axes. The full state vector can be written as seen in Equation \ref{eq:kf_state_def}.
 
 \begin{equation} \label{eq:kf_state_def}
     \vec{x} = \begin{bmatrix}
@@ -289,7 +289,7 @@ The vector $\vec{u}_t$ represents the control inputs, which are the moments appl
 For the initial covariance, denoted as $\boldsymbol{\Sigma}_{0 \vert 0}$, a diagonal matrix with 6 elements was generated with an order of magnitude that corresponds with the error seen in the simulation results above that compare the ground truth to the determined attitude.
 
 \begin{equation*}
-    \boldsymbol{\Sigma}_{0 \vert 0} = 10^-3 \begin{bmatrix}
+    \boldsymbol{\Sigma}_{0 \vert 0} = 10^{-3} \begin{bmatrix}
         1 & 0 & 0 & 0 & 0 & 0 \\
         0 & 1 & 0 & 0 & 0 & 0 \\
         0 & 0 & 1 & 0 & 0 & 0 \\
@@ -310,7 +310,7 @@ The time update for the covariance follows Equation \ref{eq:kf_cov_time_update}.
 The matrix $\boldsymbol{Q}_t$ represents the process noise. This was chosen heuristically to be equivalent to the intiial covariance scaled by a factor of $1/100$. 
 
 \begin{equation*}
-    \boldsymbol{Q}_t = \frac{1}{100} \boldsymbol{\Sigma}_{0 \vert 0} = 10^-5 \begin{bmatrix}
+    \boldsymbol{Q}_t = \frac{1}{100} \boldsymbol{\Sigma}_{0 \vert 0} = 10^{-5} \begin{bmatrix}
         1 & 0 & 0 & 0 & 0 & 0 \\
         0 & 1 & 0 & 0 & 0 & 0 \\
         0 & 0 & 1 & 0 & 0 & 0 \\
@@ -369,19 +369,43 @@ The Simulink model used to implement the Kalman Filter is shown below in Figure 
 \begin{figure}[H]
     \centering
     \captionsetup{ justification = centering }
-    \includegraphics[trim={4cm 13cm 3cm 0cm},clip,width = 15cm]{Images/PS7/kalman_filter_.png}
+    \includegraphics[trim={0cm 5cm 0cm 4cm},clip,width = 15cm]{Images/PS7/kalmanFilter-01.png}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \captionsetup{ justification = centering }
-    \includegraphics[trim={0cm 15cm 10cm 0cm},clip,width = 15cm]{Images/PS6/statisticalAttitude-2.png}
+    \includegraphics[trim={0cm 2cm 0cm 3cm},clip,width = 15cm]{Images/PS7/kalmanFilter-04.png}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \captionsetup{ justification = centering }
-    \includegraphics[trim={0cm 15cm 10cm 0cm},clip,width = 15cm]{Images/PS6/statisticalAttitude-3.png}
-    \caption{Statistical Attitude Determination Model}
-    \label{fig:stat_attitude}
+    \includegraphics[trim={0cm 18cm 15cm 0cm},clip,width = 15cm]{Images/PS7/kalmanFilter-05.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[trim={0cm 18cm 15cm 0cm},clip,width = 15cm]{Images/PS7/kalmanFilter-06.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[trim={0cm 18cm 15cm 0cm},clip,width = 15cm]{Images/PS7/kalmanFilter-07.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[trim={0cm 9cm 15cm 0cm},clip,width = 15cm]{Images/PS7/kalmanFilter-08.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[trim={0cm 16cm 15cm 0cm},clip,width = 15cm]{Images/PS7/kalmanFilter-09.png}
+    \caption{Multiplicative Kalman Filter Model}
+    \label{fig:kf_model}
 \end{figure}
