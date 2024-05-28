@@ -48,7 +48,7 @@ dt_sc = 1e-1;
 
 % plots all torques
 
-distStruct.disturbance = "none";
+distStruct.disturbance = "all";
 
 timeUpdateTest = false;
 
