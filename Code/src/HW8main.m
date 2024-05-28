@@ -36,7 +36,7 @@ sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "attitudeMeasData.mat";
 
 nmeas = 11;
-kalmanFilterStruct.R = 0.1.*eye(3*nmeas + 3);
+kalmanFilterStruct.R = 2.*eye(3*nmeas + 3);
 kalmanFilterStruct.P0 = (1e-3).*eye(6);
 kalmanFilterStruct.Q = (1e-2).*kalmanFilterStruct.P0;
 kalmanFilterStruct.dt_KF = 1;
@@ -48,7 +48,9 @@ dt_sc = 1e-1;
 
 % plots all torques
 
-distStruct.disturbance = "all";
+distStruct.disturbance = "none";
+
+timeUpdateTest = false;
 
 %% Problem 7
 
@@ -64,10 +66,6 @@ R_RTNtoPdes = A_ptob.' * R_RTNtoBdes;
 R0 = R_RTNtoPdes * R_ECItoRTN;
 % 
 ICstruct.om0 = om0; ICstruct.R0 = R0;
-
-% plot solar torque
-% distStruct.disturbance = "none";
-distStruct.disturbance = "all";
 
 sensorStruct.measProcess = "default";
 sensorStruct.attitudeNoiseFactor = 0;
