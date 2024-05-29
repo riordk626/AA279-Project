@@ -36,9 +36,12 @@ sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "attitudeMeasData.mat";
 
 nmeas = 11;
-kalmanFilterStruct.R = 2.*eye(3*nmeas + 3);
+Ratt = 0.001*eye(3*nmeas);
+Ratt(1,1) = 0.01;
+Rom = 0.1.*eye(3);
+kalmanFilterStruct.R = [Ratt, zeros([3*nmeas, 3]); zeros([3 3*nmeas]), Rom];
 kalmanFilterStruct.P0 = (1e-3).*eye(6);
-kalmanFilterStruct.Q = (8e-2).*kalmanFilterStruct.P0;
+kalmanFilterStruct.Q = (10e-2).*kalmanFilterStruct.P0;
 kalmanFilterStruct.dt_KF = 1;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
