@@ -243,6 +243,49 @@ For any plots and analysis regarding these residuals, the norm of this residual 
 
 \subsection{Problem 7 - Produce plots showing true attitude estimation errors (estimate vs truth with statistics at steady state), formal or estimated attitude estimation errors (covariance from filter), pre- and post-fit residuals (with statistics at steady state), etc. Discuss the results, do they meet expectations? Is the true estimation error well described by the formal covariance? Are the measurements residuals consistent with the applied measurement errors? Hint: show estimation errors, do not overlap state estimate with reference truth.}
 
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS8/kalman_filter_meas_update_att_cov_bounds.png}
+    \caption{Kalman Filter Covariance From Filter}
+    \label{fig:kalman_att_cov}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS8/kalman_filter_meas_update_error_attitude.png}
+    \caption{Kalman Filter Error for Attitude Measurements from Star Tracker and Magnetometer}
+    \label{fig:kalman_error_attitude}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS8/kalman_filter_meas_update_error_velocities.png}
+    \caption{Kalman Filter Error for Velocity Measurements from Gyroscope}
+    \label{fig:kalman_error_attitude}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS8/kalman_filter_meas_update_omega_cov_bounds.png}
+    \caption{Kalman Filter $\omega$ Covariance From Filter}
+    \label{fig:kalman_omega_cov}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 12cm]{Images/PS8/kalman_filter_meas_update_residual_comparison.png}
+    \caption{Residual Comparison of Kalman Filter Update}
+    \label{fig:kalman_residual}
+\end{figure}
+
+While these plots follow slightly similar trends to what would be expected, there is too much error between the true and predicted values for the filter to be working entirely correctly. This seems to indicate that an unresolved issue exists with our Kalman filter. While we haven't been able to find the source of this error, we currently believe that it likely lies within our star-tracker/magnetometer measurement model in the filter.
+
 \subsection{Problem 8 - Start thinking/planning possible upgrades for the final project deliverable. Upgrades can go in several directions tailored to your project needs. For example, define different modes for attitude estimation using different sensors and algorithms based on your concept of operations. What would it take to implement a UKF instead of an EKF? Can you improve your dynamics and measurement models? Can you use measurements that are more representative of what your sensors are going to actually provide you?}
 
-In the previous homework, the sensors were only modelled to the depth of assuming that they output unit vector measurement of the star location or gravitational field. 
+In the previous homework, the sensors were only modelled to the depth of assuming that they output unit vector measurement of the star location or gravitational field that
+include errors from a constant bias and Gaussian noise. However, it would be much more accurate to assume that they output voltage values that then need to be converted to meaningful measurements. Because of this, a lower level hardware model of the attitude sensors would be beneficial to implement as that would align with the scope of what was needed for the Aqua satellite. Another option for the final project would be to implement a mode of operation where instead of pointing towards the Earth, the satellite would communicate with another satellite in the same orbit. The Aqua satellite was one of several science missions launched by NASA into similar low Earth orbits. These satellites formed a train over the several years that they were all launched in. To the best of our knowledge, the satellites in this train were not able to communicate with each other due to the big gaps in technology between their launches. However, if they were, they could use those connections to help with down linking data and other tasks. Because of this, it would be interesting to define another mode of operation where the satellite would point to another artifical satellite in its orbit.
