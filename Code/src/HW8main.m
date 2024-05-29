@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = false;
+exportflag = true;
 figurePath = '../../Images/PS8/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -36,9 +36,10 @@ sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "attitudeMeasData.mat";
 
 nmeas = 11;
-Ratt = 0.001*eye(3*nmeas);
-Ratt(1,1) = 0.01;
-Rom = 0.1.*eye(3);
+Rmag = 4e-10*eye(3);
+Rstar = 2.35e-11*eye(3*(nmeas-1));
+Ratt = [Rmag, zeros([3, 3*(nmeas-1)]); zeros([3*(nmeas-1), 3]), Rstar];
+Rom = 5.97e-8*eye(3);
 kalmanFilterStruct.R = [Ratt, zeros([3*nmeas, 3]); zeros([3 3*nmeas]), Rom];
 kalmanFilterStruct.P0 = (1e-3).*eye(6);
 kalmanFilterStruct.Q = (10e-2).*kalmanFilterStruct.P0;
