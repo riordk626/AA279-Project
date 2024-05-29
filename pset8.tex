@@ -98,15 +98,32 @@ end
 
 \subsection{Problem 2 - Define and code your constant measurement error covariance matrix R which quantifies the uncertainty of your measurements. This can be picked as diagonal matrix with diagonal elements representing the variance of each parameter $\sigma^2_m$. Hint: If your instrument is well characterized you can use $\sigma_m$ applied in your simulation to generate the measurements from your ground-truth.}
 
-A value for the noise covariance that was obtained via tuning and testing for better convergence is shown below.
+For the error covariance matrix R, the manufacturer data for the standard deviation of the noise for each of the sensors was used. As stated in the previous homework, the standard deviations for each of the sensors are as follows.
+
+\begin{align*}
+    \sigma_{StarTracker} &= 0.000277778 \degree\\
+    \sigma_{Magnetometer} &= 0.0011459 \degree\\
+    \sigma_{Gyro} &= 0.014 \degree / s\\
+\end{align*}
+
+The standard deviation for the noise introduced by each of the sensors was converted to be in radians as opposed to degrees and squared before going into $\boldsymbol{R}$.
 
 \begin{equation*}
-    \boldsymbol{R} = 2 \begin{bmatrix}
-        1 & 0 & \dots & 0 \\
-        0 & 1 &  & \vdots \\
-        \vdots &  &  \ddots & \\
-        0 & \dots & & 1
-    \end{bmatrix} = 2 \boldsymbol{I}
+    \boldsymbol{R} = \begin{bmatrix} 
+        4e-10 & 0 & 0 & 0 & \dots & 0 & 0 & 0 & 0\\
+        0 & 4e-10 & 0 & 0 &  & \vdots & \vdots & \vdots & \vdots \\
+        0 & 0 & 4e-10 & 0 &  & \vdots & \vdots & \vdots & \vdots \\
+        0 & 0 & 0 & 2.35e-11 &  & \vdots & \vdots & \vdots & \vdots \\
+        \vdots & \vdots & \vdots & &  \ddots &\vdots &\vdots&\vdots & \vdots\\
+        0 & 0 & 0 & 0 &  & 2.35e-11 & 0 & 0 & 0 \\
+        \vdots & \vdots & \vdots & \vdots & & 0 & 5.97e-8 & 0 & 0 \\
+        \vdots & \vdots & \vdots & \vdots & & 0 & 0 & 5.97e-8 & 0  \\
+        \vdots & \vdots & \vdots & \vdots &  & 0 & 0 & 0 & 5.97e-8\\
+    \end{bmatrix} 
+\end{equation*}
+\begin{equation*}
+    \boldsymbol{R} 
+    = 2 \boldsymbol{I}
 \end{equation*}
 
 \subsection{Problem 3 - Compute your modelled measurement vector at step k+1 from your state at step k+1. This transformation can be rigorous (non-linear, EKF) or approximate (linear, KF).}
@@ -145,7 +162,7 @@ The residual $\vec{z}$ is computed using Equation \ref{eq:meas_residual}.
     \vec{z} = \vec{y} - \vec{h}
 \end{equation}
 
-\subsection{Probelm 5 - The measurement update of the EKF needs H, P, R, and z to compute the Kalman gain K, the new estimated state and its associated covariance matrix.}
+\subsection{Problem 5 - The measurement update of the EKF needs H, P, R, and z to compute the Kalman gain K, the new estimated state and its associated covariance matrix.}
 
 The Kalman gain is computed using Equation \ref{eq:kalman_gain}.
 
@@ -186,10 +203,10 @@ Following the measurement update, for a MEKF, the reset step must take place bef
 
 \begin{equation} \label{eq:quat_reset_step}
     \vec{q}_{t+1 \vert t+1} = \begin{bmatrix}
-        1 & -\alpha_1 & -\alpha_2 & -\alpha_3 \\
-        \alpha_1 & 1 & \alpha_3 & -\alpha_2 \\
-        \alpha_2 & -\alpha_3 & 1 & \alpha_1 \\
-        \alpha_3 & \alpha_2 & -\alpha_1 & 1
+        1 & -\alpha_1/2 & -\alpha_2/2 & -\alpha_3/2 \\
+        \alpha_1/2 & 1 & \alpha_3/2 & -\alpha_2/2 \\
+        \alpha_2/2 & -\alpha_3/2 & 1 & \alpha_1/2 \\
+        \alpha_3/2 & \alpha_2/2 & -\alpha_1/2 & 1
     \end{bmatrix} \vec{q}_{t+1 \vert t}
 \end{equation}
 
@@ -197,8 +214,13 @@ The model that computes this update step is shown in Figure \ref{fig:quat_reset_
 
 \begin{figure}[H]
     \centering
+    \includegraphics[width = 10cm]{Images/PS8/quat_update_2.png}
+    \includegraphics[width = 8cm]{Images/PS8/quat_update_1.png}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
     \captionsetup{ justification = centering }
-    \includegraphics{Images/PS8/}
     \begin{lstlisting}
 function A = constructA(a)
 
@@ -221,4 +243,6 @@ For any plots and analysis regarding these residuals, the norm of this residual 
 
 \subsection{Problem 7 - Produce plots showing true attitude estimation errors (estimate vs truth with statistics at steady state), formal or estimated attitude estimation errors (covariance from filter), pre- and post-fit residuals (with statistics at steady state), etc. Discuss the results, do they meet expectations? Is the true estimation error well described by the formal covariance? Are the measurements residuals consistent with the applied measurement errors? Hint: show estimation errors, do not overlap state estimate with reference truth.}
 
-\subsection{Problem 8 - Start thinking/planning possible upgrades for the final project deliverable. Upgrades can go in several directions tailored to your project needs. For example, define different modes for attitude estimation using different sensors and algorithms based on your concept of operations. What would it take to implement a UKF instead of an EKF? Can you improve your dynamics and measurement models? Can you use measurements that are more representative of what your sensors are going to actually provide you? }
+\subsection{Problem 8 - Start thinking/planning possible upgrades for the final project deliverable. Upgrades can go in several directions tailored to your project needs. For example, define different modes for attitude estimation using different sensors and algorithms based on your concept of operations. What would it take to implement a UKF instead of an EKF? Can you improve your dynamics and measurement models? Can you use measurements that are more representative of what your sensors are going to actually provide you?}
+
+In the previous homework, the sensors were only modelled to the depth of assuming that they output unit vector measurement of the star location or gravitational field. 
