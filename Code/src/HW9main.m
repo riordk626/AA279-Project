@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = true;
+exportflag = false;
 figurePath = '../../Images/PS9/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -61,23 +61,24 @@ distStruct.disturbance = "all";
 
 timeUpdateTest = false;
 
-%% Problem 2
-
-omx = -n_float;
-omy = 0;
-omz = 0;
+omx_des = -n_float;
+omy_des = 0;
+omz_des = 0;
 % % 
-om_des = [omx omy omz].';
+om_des = [omx_des omy_des omz_des].';
 om0 = om_des;
 R_ECItoRTN = eci2rtn(r0, v0);
 % R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
 R_RTNtoPdes = [0, 0, -1;0, 1, 0;1, 0, 0];
-R_des = R_RTNtoPdes * R_ECItoRTN;
-R0 = R_des;
+R_des = R_RTNtoPdes;
+R0 = R_RTNtoPdes * R_ECItoRTN;
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 
 R_om_des.R_des = R_des;
 R_om_des.om_des = om_des;
+
+%% Problem 2
+
 
 % initialize for reaction wheel test
 Lw0 = 12;
@@ -139,3 +140,48 @@ ylim([-.1 .1])
 if exportflag
     exportgraphics(fig, figureName)
 end
+
+%% Problem 3
+
+% error testing
+distStruct.disturbance = "none";
+
+clear actuatorModelStruct
+actuatorModelStruct.controlMoment = "ideal";
+actuatorModelStruct.actuatorParams = struct([]);
+
+clear controlLawStruct
+controlLawStruct.controlType = "PD";
+controlLawStruct.errorType = "small";
+kp = diag([0, 0, 0]);
+kd = diag([0, 0, 0]);
+controlLawStruct.controllerParams.kp = kp;
+controlLawStruct.controllerParams.kd = kd;
+controlLawStruct.dt_cont = 1e-1;
+
+om0 = om_des + [0.01 0 0].';
+ICstruct.om0 = om0;
+
+simIn = initAqua(Tfinal, R_om_des, ICstruct, orbitStruct, plantStruct,...
+    distStruct,sensorStruct,kalmanFilterStruct,controlLawStruct, actuatorModelStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+n = length(t);
+
+% R_error = squeeze(simOut.R_error.Data);
+% a_error = zeros([3 n]);
+% for i=1:n
+%     a_error(:,i) = wrapToPi(RtoEuler(R_error(:,:,i), "312"));
+% end
+% valueLabels = {{'3';'1';'2'}};
+
+a_error = squeeze(simOut.a_error.Data);
+valueLabels = {{'$\alpha_x$';'$\alpha_y$';'$\alpha_z$'}};
+values = {a_error};
+valueNames = {'$\alpha$'};
+figureName = [];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, false)
