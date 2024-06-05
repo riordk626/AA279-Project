@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = false;
+exportflag = true;
 figurePath = '../../Images/PS9/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -63,17 +63,21 @@ timeUpdateTest = false;
 
 %% Problem 2
 
-omx = 0;
-omy = -n_float;
+omx = -n_float;
+omy = 0;
 omz = 0;
 % % 
-om0 = [omx omy omz].';
+om_des = [omx omy omz].';
+om0 = om_des;
 R_ECItoRTN = eci2rtn(r0, v0);
 % R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
 R_RTNtoPdes = [0, 0, -1;0, 1, 0;1, 0, 0];
-R0 = R_RTNtoPdes * R_ECItoRTN;
-% 
+R_des = R_RTNtoPdes * R_ECItoRTN;
+R0 = R_des;
 ICstruct.om0 = om0; ICstruct.R0 = R0;
+
+R_om_des.R_des = R_des;
+R_om_des.om_des = om_des;
 
 % initialize for reaction wheel test
 Lw0 = 12;
@@ -84,7 +88,7 @@ actuatorModelStruct.controlMoment = "reactionWheel";
 actuatorModelStruct.actuatorParams.Lw0 = Lw0.*ones([4 1]);
 actuatorModelStruct.actuatorParams.A = A;
 
-simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct,...
+simIn = initAqua(Tfinal, R_om_des, ICstruct, orbitStruct, plantStruct,...
     distStruct,sensorStruct,kalmanFilterStruct,controlLawStruct, actuatorModelStruct);
 
 simOut = sim(simIn);
@@ -106,7 +110,7 @@ timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, expor
 % initialize for magnetorquer test
 actuatorModelStruct.controlMoment = "magnetorquer";
 
-simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct,...
+simIn = initAqua(Tfinal, R_om_des, ICstruct, orbitStruct, plantStruct,...
     distStruct,sensorStruct,kalmanFilterStruct,controlLawStruct, actuatorModelStruct);
 
 simOut = sim(simIn);
@@ -117,15 +121,21 @@ Mc = squeeze(simOut.Mc.Data);
 Mout = squeeze(simOut.Mout.Data);
 m = squeeze(simOut.m.Data);
 Ldot = simOut.Ldot.Data;
-values = {Mc;Mout;m(1:2,:)};
-valueNames = {'$M_c$ [Nm]';'$M_{out}$ [Nm]';'$m$'};
+values = {Mc;Mout;m(1:2,:);Ldot};
+valueNames = {'$M_c$ [Nm]';'$M_{out}$ [Nm]';'$m$';'$\dot{L}_w$'};
 valueLabels = {{'$M_x$';'$M_y$';'$M_z$'}, {'$M_x$';'$M_y$';'$M_z$'}, {'$m_x$'...
-    ;'$m_y$'}};
-figureName = [figurePath, 'simple_magnetorquer_model_output.png'];
+    ;'$m_y$'},{'$\dot{L}_z$'}};
+figureName = [figurePath, 'simple_magnetorquer_plus_wheel_model_output.png'];
 
 fig = figure();
-timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, false)
 
 fig;
-subplot(3,1,3)
-ylim([-0.5 0.5])
+subplot(4,1,3)
+ylim([-.1 .1])
+subplot(4,1,4)
+ylim([-.1 .1])
+
+if exportflag
+    exportgraphics(fig, figureName)
+end

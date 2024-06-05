@@ -9,9 +9,9 @@ for i=1:n
     p = plot(t, values{i}, 'LineWidth', 2);
     if legendflag
         set(p, {'DisplayName'}, valueLabels{i})
-        legend
+        legend('Interpreter','latex')
     end
-    ylabel(valueNames{i})
+    ylabel(valueNames{i}, 'Interpreter', 'latex')
     if i==n
         xlabel('t [sec]')
     end

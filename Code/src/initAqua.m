@@ -1,4 +1,4 @@
-function simIn = initAqua(Tfinal, targetAttitude, ICstruct, orbitStruct,...
+function simIn = initAqua(Tfinal, R_om_des, ICstruct, orbitStruct,...
     plantStruct, distStruct, sensorStruct, kalmanFilterStruct, controlLawStruct,...
     actuatorModelStruct)
 
@@ -12,10 +12,12 @@ masterWS.assignin('R0', ICstruct.R0)
 masterWS.assignin('Tfinal', Tfinal)
 
 simIn = Simulink.SimulationInput(masterModel);
-targetAttitude_data = targetAttitude;
-targetAttitude_data(:,:,2) = targetAttitude;
-R_RTNtoPdes = timeseries(targetAttitude_data, [0 Tfinal]);
-simIn.ExternalInput = R_RTNtoPdes;
+% targetAttitude_data = targetAttitude;
+% targetAttitude_data(:,:,2) = targetAttitude;
+% R_RTNtoPdes = timeseries(targetAttitude_data, [0 Tfinal]);
+% simIn.ExternalInput = targetAttitude;
+masterWS.assignin('R_des', R_om_des.R_des)
+masterWS.assignin('om_des', R_om_des.om_des)
 
 initOrbital(orbitStruct.orbitType, orbitStruct.dataSource)
 
