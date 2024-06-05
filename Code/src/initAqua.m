@@ -30,7 +30,8 @@ initAttitudeSensor(sensorStruct.measProcess, sensorStruct.attitudeNoiseFactor,..
 
 initKalmanFilter(kalmanFilterStruct.Q, kalmanFilterStruct.R, kalmanFilterStruct.P0, kalmanFilterStruct.dt_KF)
 
-initControlLaw(controlLawStruct.controlLaw, controlLawStruct.errorType, controlLawStruct.controllerParams)
+initControlLaw(controlLawStruct.controlType, controlLawStruct.errorType,...
+    controlLawStruct.dt_cont, controlLawStruct.controllerParams)
 
 initActuatorModel(actuatorModelStruct.controlMoment, actuatorModelStruct.actuatorParams)
 

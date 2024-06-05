@@ -45,9 +45,10 @@ kalmanFilterStruct.P0 = (1e-3).*eye(6);
 kalmanFilterStruct.Q = (10e-2).*kalmanFilterStruct.P0;
 kalmanFilterStruct.dt_KF = 1;
 
-controlLawStruct.controlLaw = "dummy";
+controlLawStruct.controlType = "dummy";
 controlLawStruct.errorType = "small";
 controlLawStruct.controllerParams = struct([]);
+controlLawStruct.dt_cont = 1e-1;
 
 Lw0 = 10;
 A = (1/sqrt(3)).*[-1, 1, 1, -1;
@@ -86,4 +87,5 @@ ICstruct.om0 = om0; ICstruct.R0 = R0;
 simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct,...
     distStruct,sensorStruct,kalmanFilterStruct,controlLawStruct, actuatorModelStruct);
 
-% simOut = sim(simIn);
+simOut = sim(simIn);
+
