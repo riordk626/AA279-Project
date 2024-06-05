@@ -76,7 +76,7 @@ R0 = R_RTNtoPdes * R_ECItoRTN;
 ICstruct.om0 = om0; ICstruct.R0 = R0;
 
 % initialize for reaction wheel test
-Lw0 = 10;
+Lw0 = 12;
 A = (1/sqrt(3)).*[-1, 1, 1, -1;
                   -1, -1, 1, 1;
                   1, 1, 1, 1];
