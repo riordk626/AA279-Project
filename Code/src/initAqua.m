@@ -1,5 +1,6 @@
 function simIn = initAqua(Tfinal, targetAttitude, ICstruct, orbitStruct,...
-    plantStruct, distStruct, sensorStruct, kalmanFilterStruct)
+    plantStruct, distStruct, sensorStruct, kalmanFilterStruct, controlLawStruct,...
+    actuatorModelStruct)
 
 masterModel = 'aquaMasterModel';
 load_system(masterModel)
@@ -28,5 +29,9 @@ initAttitudeSensor(sensorStruct.measProcess, sensorStruct.attitudeNoiseFactor,..
                     sensorStruct.attitudeFileName)
 
 initKalmanFilter(kalmanFilterStruct.Q, kalmanFilterStruct.R, kalmanFilterStruct.P0, kalmanFilterStruct.dt_KF)
+
+initControlLaw(controlLawStruct.controlLaw, controlLawStruct.errorType, controlLawStruct.controllerParams)
+
+initActuatorModel(actuatorModelStruct.controlMoment, actuatorModelStruct.actuatorParams)
 
 % save_system(masterModel)

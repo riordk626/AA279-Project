@@ -3,7 +3,7 @@ model = 'actuatorModel';
 
 load_system(model)
 mws = get_param(model, 'modelworkspace');
-mws.assignin(controlMoment)
+mws.assignin('controlMoment', controlMoment)
 
 switch controlMoment
     case "reactionWheel"

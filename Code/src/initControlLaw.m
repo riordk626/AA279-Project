@@ -4,6 +4,7 @@ model = 'controlLaw';
 load_system(model)
 mws = get_param(model, 'modelworkspace');
 
+mws.assignin('controlLaw', controlLaw)
 mws.assignin('errorType', errorType)
 switch controlLaw
     case "PD"

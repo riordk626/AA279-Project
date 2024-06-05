@@ -45,7 +45,17 @@ kalmanFilterStruct.P0 = (1e-3).*eye(6);
 kalmanFilterStruct.Q = (10e-2).*kalmanFilterStruct.P0;
 kalmanFilterStruct.dt_KF = 1;
 
+controlLawStruct.controlLaw = "dummy";
+controlLawStruct.errorType = "small";
+controlLawStruct.controllerParams = struct([]);
 
+Lw0 = 10;
+A = (1/sqrt(3)).*[-1, 1, 1, -1;
+                  -1, -1, 1, 1;
+                  1, 1, 1, 1];
+actuatorModelStruct.controlMoment = "reactionWheel";
+actuatorModelStruct.actuatorParams.Lw0 = Lw0.*ones([4 1]);
+actuatorModelStruct.actuatorParams.A = A;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
@@ -57,3 +67,23 @@ dt_sc = 1e-1;
 distStruct.disturbance = "all";
 
 timeUpdateTest = false;
+
+%% Problem 2
+
+omx = 0;
+omy = -n_float;
+omz = 0;
+% % 
+om0 = [omx omy omz].';
+R_ECItoRTN = eci2rtn(r0, v0);
+% R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
+R_RTNtoPdes = [0, 0, -1;0, 1, 0;1, 0, 0];
+R0 = R_RTNtoPdes * R_ECItoRTN;
+% 
+ICstruct.om0 = om0; ICstruct.R0 = R0;
+
+
+simIn = initAqua(Tfinal, R_RTNtoPdes, ICstruct, orbitStruct, plantStruct,...
+    distStruct,sensorStruct,kalmanFilterStruct,controlLawStruct, actuatorModelStruct);
+
+% simOut = sim(simIn);
