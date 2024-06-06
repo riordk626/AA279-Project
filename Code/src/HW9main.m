@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = false;
+exportflag = true;
 figurePath = '../../Images/PS9/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -182,8 +182,8 @@ timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, false
 clear controlLawStruct
 controlLawStruct.controlType = "PD";
 controlLawStruct.errorType = "small";
-wn = [30*n_float, 30*n_float, 30*n_float].';
-zeta = [0.5, 0.5, 0.5].';
+wn = 0.5.*[50*n_float, 50*n_float, 50*n_float].';
+zeta = [sqrt(2)/2, sqrt(2)/2, sqrt(2)/2].';
 Ixyz = diag(Itotal_p);
 kp = Ixyz.*(wn.^2);
 kd = 2.*zeta.*sqrt(Ixyz.*kp);
