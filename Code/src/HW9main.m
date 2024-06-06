@@ -143,8 +143,8 @@ end
 
 %% Problem 3
 
-% error testing
-distStruct.disturbance = "none";
+% error testing - not a part of the pset; just for validation
+distStruct.disturbance = "all";
 
 clear actuatorModelStruct
 actuatorModelStruct.controlMoment = "ideal";
@@ -159,7 +159,7 @@ controlLawStruct.controllerParams.kp = kp;
 controlLawStruct.controllerParams.kd = kd;
 controlLawStruct.dt_cont = 1e-1;
 
-om0 = om_des + [0.01 0 0].';
+om0 = om_des + [0.001 -0.0005 0.0002].';
 ICstruct.om0 = om0;
 
 simIn = initAqua(Tfinal, R_om_des, ICstruct, orbitStruct, plantStruct,...
@@ -169,14 +169,6 @@ simOut = sim(simIn);
 
 t = simOut.t;
 n = length(t);
-
-% R_error = squeeze(simOut.R_error.Data);
-% a_error = zeros([3 n]);
-% for i=1:n
-%     a_error(:,i) = wrapToPi(RtoEuler(R_error(:,:,i), "312"));
-% end
-% valueLabels = {{'3';'1';'2'}};
-
 a_error = squeeze(simOut.a_error.Data);
 valueLabels = {{'$\alpha_x$';'$\alpha_y$';'$\alpha_z$'}};
 values = {a_error};
@@ -185,3 +177,32 @@ figureName = [];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, false)
+
+% gain design and tuning + testing
+clear controlLawStruct
+controlLawStruct.controlType = "PD";
+controlLawStruct.errorType = "small";
+wn = [30*n_float, 30*n_float, 30*n_float].';
+zeta = [0.5, 0.5, 0.5].';
+Ixyz = diag(Itotal_p);
+kp = Ixyz.*(wn.^2);
+kd = 2.*zeta.*sqrt(Ixyz.*kp);
+controlLawStruct.controllerParams.kp = diag(kp);
+controlLawStruct.controllerParams.kd = diag(kd);
+controlLawStruct.dt_cont = 1e-1;
+
+simIn = initAqua(Tfinal, R_om_des, ICstruct, orbitStruct, plantStruct,...
+    distStruct,sensorStruct,kalmanFilterStruct,controlLawStruct, actuatorModelStruct);
+
+simOut = sim(simIn);
+
+t = simOut.t;
+n = length(t);
+a_error = squeeze(simOut.a_error.Data);
+valueLabels = {{'$\alpha_x$';'$\alpha_y$';'$\alpha_z$'}};
+values = {a_error};
+valueNames = {'$\alpha$'};
+figureName = [figurePath, 'alpha_history_PD_control.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
