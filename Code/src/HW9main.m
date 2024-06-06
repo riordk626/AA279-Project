@@ -206,3 +206,29 @@ figureName = [figurePath, 'alpha_history_PD_control.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
+
+Mc = squeeze(simOut.Mc.Data);
+Mout = squeeze(simOut.Mout.Data);
+values = {Mc;Mout};
+valueNames = {'$M_{c,PD}$ [Nm]';'$M_{c,true}$ [Nm]'};
+valueLabels = {{'$M_x$';'$M_y$';'$M_z$'}, {'$M_x$';'$M_y$';'$M_z$'}};
+figureName = [figurePath, 'control_moment_history.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
+
+% plot of attitude determination error in both euler angles and also using
+% small angle approximation
+R_est2true = squeeze(simOut.R_est2true.Data);
+a_est2true = squeeze(simOut.a_est2true.Data);
+u_est2true = zeros([3 n]);
+for i=1:n
+    u_est2true(:,i) = RtoEuler(R_est2true(:,:,i), "312");
+end
+values = {u_est2true;a_est2true};
+valueNames = {'$u$ [rad]';'$\alpha$'};
+valueLabels = {{'$\phi$';'$\theta$';'$\psi$'}, {'$\alpha_x$';'$\alpha_y$';'$\alpha_z$'}};
+figureName = [figurePath, 'attitude_estimate_error.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
