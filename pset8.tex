@@ -108,7 +108,18 @@ For the error covariance matrix R, the manufacturer data for the standard deviat
 
 The standard deviation for the noise introduced by each of the sensors was converted to be in radians as opposed to degrees and squared before going into $\boldsymbol{R}$.
 
-\begin{equation*}
+\begin{equation} \label{eq:full_sens_matrix}
+    \boldsymbol{R} = \begin{bmatrix}
+        \boldsymbol{\sigma}_{M}^2 & \boldsymbol{0} & \boldsymbol{0} \\
+        \boldsymbol{0} & \boldsymbol{\sigma}_{ST}^2 & \boldsymbol{0} \\
+        \boldsymbol{0} & \boldsymbol{0} & \boldsymbol{\sigma}_{G}^2 \\
+    \end{bmatrix}
+\end{equation}
+
+The first three diagonal elements represent the uncertainty of the magnetometer and the last three represent the gyroscope. The middle elements represent the uncertainty for the star tracker. Due to there being multiple measurements for the star tracker depending on how many stars are in view, the size of $R$ would need to be scaled appropriately. 
+
+\small
+\begin{equation*} 
     \boldsymbol{R} = \begin{bmatrix} 
         4e-10 & 0 & 0 & 0 & \dots & 0 & 0 & 0 & 0\\
         0 & 4e-10 & 0 & 0 &  & \vdots & \vdots & \vdots & \vdots \\
@@ -121,10 +132,7 @@ The standard deviation for the noise introduced by each of the sensors was conve
         \vdots & \vdots & \vdots & \vdots &  & 0 & 0 & 0 & 5.97e-8\\
     \end{bmatrix} 
 \end{equation*}
-\begin{equation*}
-    \boldsymbol{R} 
-    = 2 \boldsymbol{I}
-\end{equation*}
+\normalsize
 
 \subsection{Problem 3 - Compute your modelled measurement vector at step k+1 from your state at step k+1. This transformation can be rigorous (non-linear, EKF) or approximate (linear, KF).}
 
@@ -147,7 +155,7 @@ The full concatenated measurement model is computed using both Equations \ref{eq
 \begin{figure}[H]
     \centering
     \captionsetup{ justification = centering }
-    \includegraphics[width = 12cm]{}
+    \includegraphics[width = 12cm]{Images/PS8/meas_model.png}
     \caption{Simulink Model for Measurement Model Computation}
     \label{fig:simulink_meas_model}
 \end{figure}
@@ -182,7 +190,7 @@ The measurement update for the state mean and covariance are computed using Equa
 
 The following MATLAB function, shown in Figure \ref{fig:meas_update_matlab_func}, uses the current sensitivity matrix, state covariance, measurement noise covariance, and the residual to compute an updated state mean and covariance estimate.
 
-\begin{figure}
+\begin{figure}[H]
     \centering
     \captionsetup{ justification = centering}
     \begin{lstlisting}
@@ -287,5 +295,6 @@ While these plots follow slightly similar trends to what would be expected, ther
 
 \subsection{Problem 8 - Start thinking/planning possible upgrades for the final project deliverable. Upgrades can go in several directions tailored to your project needs. For example, define different modes for attitude estimation using different sensors and algorithms based on your concept of operations. What would it take to implement a UKF instead of an EKF? Can you improve your dynamics and measurement models? Can you use measurements that are more representative of what your sensors are going to actually provide you?}
 
-In the previous homework, the sensors were only modelled to the depth of assuming that they output unit vector measurement of the star location or gravitational field that
-include errors from a constant bias and Gaussian noise. However, it would be much more accurate to assume that they output voltage values that then need to be converted to meaningful measurements. Because of this, a lower level hardware model of the attitude sensors would be beneficial to implement as that would align with the scope of what was needed for the Aqua satellite. Another option for the final project would be to implement a mode of operation where instead of pointing towards the Earth, the satellite would communicate with another satellite in the same orbit. The Aqua satellite was one of several science missions launched by NASA into similar low Earth orbits. These satellites formed a train over the several years that they were all launched in. To the best of our knowledge, the satellites in this train were not able to communicate with each other due to the big gaps in technology between their launches. However, if they were, they could use those connections to help with down linking data and other tasks. Because of this, it would be interesting to define another mode of operation where the satellite would point to another artifical satellite in its orbit.
+In the previous homework, the sensors were only modelled to the depth of assuming that they output unit vector measurements of star locations or Earth's gravitational field. These measurements were directly perturbed to incorporate errors from a constant bias and Gaussian noise. However, it would be much more accurate to assume that the sensors output voltage measurements that are then converted to meaningful measurements such as the unit vectors mentioned above. Because of this, a lower level hardware model of the attitude sensors would be beneficial to implement as that would align with the scope of what was needed for the Aqua satellite. 
+
+Another option for the final project would be to implement a mode of operation where instead of pointing towards the Earth, the satellite would communicate with another satellite in the same orbit. The Aqua satellite was one of several science missions launched by NASA into similar low Earth orbits. These satellites formed a train over the several years that they were all launched in. To the best of our knowledge, the satellites in this train were not able to communicate with each other due to the big gaps in technology between their launches. However, if they were, they could use those connections to help with downlinking data and other tasks. Because of this, it would be interesting to define another mode of operation where the satellite would point to another artificial satellite at a different true anomaly angle in its orbit.

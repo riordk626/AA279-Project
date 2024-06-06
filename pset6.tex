@@ -1,6 +1,6 @@
 \section{\Large PROBLEM SET 6}
 
-\subsection{Problem 1 - Complete the modeling and verification of perturbation torques as described in the previous pset}
+\subsection{Problem 1 - Complete the modeling and verification of perturbation torques as described in the previous pset} \label{sec:pertTorques}
 
 In the previous problem set, the magnetic torque was implemented successfully, but the aerodynamic and solar radiation torques still needed improvement. For the solar radiation torque, the unit vector pointing towards the sun needed to be implemented. To accomplish this, the orbit propagator used for the satellite was leveraged. The propagator was modified to take in the orbital elements of the desired orbit at the beginning of the simulation such that it could be called separately for the satellite and the sun. The new resultant layout of the simulink file is shown below in Figure \ref{fig:sun_orbit_sim}.
 
