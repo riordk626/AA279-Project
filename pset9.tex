@@ -77,8 +77,15 @@ From substituting in moment of inertias and angular velocities and linearizing, 
 \end{align*}
 
 
-The simulink model that was used to implement this is shown below in Figures \ref{} and \ref{fig:rwCode}.
+The simulink model that was used to implement this is shown below in Figures \ref{fig:simulink_mw} and \ref{fig:rwCode}.
 
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS9/momentumWheelModel.png}
+    \caption{Simulink Model for Momentum Wheel}
+    \label{fig:simulink_mw}
+\end{figure}
 
 \begin{figure}[H]
     \centering
@@ -92,7 +99,111 @@ Lwdot = pinv(A) * (- Mc - cross(omega, A * Lw));
     \label{fig:rwCode}
 \end{figure}
 
+For the magnetorquer, the following Euler equation was used to get output torque where $A$ = [0 0 1]$^T$.
+
+\begin{equation}
+    \Vec{M}_c = \Vec{m} \times \Vec{B} + \Vec{A} \Vec{\dot L}_w
+\end{equation}
+
+The same simulink model used to obtain the magnetic field for both the magnetic disturbances and magnetometer was used, and the new overall simulink model is shown below.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS9/magnetorquerModel.png}
+    \caption{Simulink Model for Magnetorquer}
+    \label{fig:simulink_magnetorquer}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering}
+    \begin{lstlisting}
+function Mout = fcn(m, Ldot, B)
+
+Mout = cross(m,B) + [0;0;1] * Ldot;
+    \end{lstlisting}
+    \caption{Magnetorquer Function}
+    \label{fig:mtCode}
+\end{figure}
+
+The input and output of both of these actuators are shown below in Figures \ref{} and \ref{}.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS9/reaction_wheel_model_output.png}
+    \caption{Output for Reaction Wheel}
+    \label{fig:rwOutput}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS9/simple_magnetorquer_plus_wheel_model_output.png}
+    \caption{Output for Reaction Wheel and Magnetorquer}
+    \label{fig:mtOutput}
+\end{figure}
 
 \subsection{Problem 3 - Start designing and implementing a linear control law which provides the desired behavior of the dynamic system (damping and frequency) by a feedback done on the control tracking errors. Try using both a small angle approximation and a non-linear approach in defining the control tracking errors used in the control law. Hint: this task requires that you linearize the Euler equations and that you show how the gains of the linear control law are derived, also start applying the control law by assuming that the actuators are doing their job ideally (no actuation equations, no saturation or other limits). Selection of gains can be done through standard PD, pole placement or LQR approaches.}
 
+A PD controller was used for this task. The nonlinear approach was done by taking the error produced from the sensor measurements, $R$, and producing the inverse skew matrix through the function shown in Figure \ref{fig:smallThetaCode}.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering}
+    \begin{lstlisting}
+function alpha = inv_skw(R)
+
+alpha = zeros([3 1]);
+
+alpha(1) = (R(2,3) + (-R(3,2)))/2;
+alpha(2) = (R(3,1) + (-R(3,1)))/2;
+alpha(3) = (R(1,2) + (-R(2,1)))/2;
+    \end{lstlisting}
+    \caption{Small Angle Approximation Function}
+    \label{fig:smallThetaCode}
+\end{figure}
+
+The small angle approximation was also attempted, but since the nonlinear approximation was functioning and the two approaches behaved the same in the relevant regime, it wasn't explored further. From here, $\alpha$ and the angular velocity errors from the gyroscope were fed into the following equation for the PD control law as $e_\theta$ and $e_\omega$.
+
+\begin{equation}
+    \Vec{I} \Vec{\dot \omega} = \Vec{\tau} - \Vec{\omega} \times (\Vec{I} \Vec{\omega})
+\end{equation}
+
+\begin{equation}
+    - \dot \omega_{desired} = -K_p e_\theta - K_d e_\omega
+\end{equation}
+
+The simulink implementation of this is shown below.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS9/controllerModel.png}
+    \caption{Simulink Model for Controller}
+    \label{fig:controllerSimulink}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS9/PDController.png}
+    \caption{Simulink Model for PD Gains}
+    \label{fig:PDsimulink}
+\end{figure}
+
+The design the $k_p$ and $k_d$ gains, the euler equations were linearized to follow the form shown below.
+
+\begin{equation}
+    I \Vec{\Ddot{\alpha}} + k_d  \Vec{\dot \alpha} + k_p \alpha = 0
+\end{equation}
+
+Additionally, the desired characteristic equation for the closed-loop transfer function is $s^2 + 2\zeta\omega_n s +\omega_n^2$ where $\zeta$ is the damping ratio and $\omega_n$ is the natural frequency. Because of this, $K_p = \omega_n^2 I_{axis}$ and $K_d = 2\zeta\omega_n I_{axis}$. From this, a damping ratio of $\sqrt{2}/2$ and a frequency of 50n were chosen to obtain $k_p$ and $k_d$.
+
+It is also important to note that since there are currently bugs in our Kalman filter, the controller is currently getting fed ground truth to aboid residual errors.
+
+
 \subsection{Problem 4 - Start plotting all the relevant quantities of your simulation, including attitude determination errors, attitude control errors, control actions (along all axes), etc. Hint: stress difference between what the ADCS believes, and what the spacecraft is actually doing. This affects estimation, control errors, and control actions.}
+
+Due to bugs in our Kalman filter, the current attitutude determination error is getting plotted using the q-method as opposed to the MEKF.
