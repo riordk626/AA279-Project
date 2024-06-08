@@ -38,12 +38,13 @@ sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "attitudeMeasData.mat";
 
 nmeas = 11;
-Rmag = 4e-10*eye(3);
-% Rmag = 500.*eye(3);
-Rstar = 2.35e-11*eye(3*(nmeas-1));
-% Rstar = 500.*eye(3*(nmeas - 1));
+% Rmag = 4e-10*eye(3);
+Rmag = 1e-1.*eye(3);
+% Rstar = 2.35e-11*eye(3*(nmeas-1));
+Rstar = 5e-3.*eye(3*(nmeas - 1));
 Ratt = [Rmag, zeros([3, 3*(nmeas-1)]); zeros([3*(nmeas-1), 3]), Rstar];
-Rom = 5.97e-8*eye(3);
+% Rom = 5.97e-8*eye(3);
+Rom = 1e-4.*eye(3);
 kalmanFilterStruct.R = [Ratt, zeros([3*nmeas, 3]); zeros([3 3*nmeas]), Rom];
 kalmanFilterStruct.P0 = (1e-3).*eye(6);
 kalmanFilterStruct.Q = (10e-2).*kalmanFilterStruct.P0;
@@ -59,6 +60,8 @@ kp = Ixyz.*(wn.^2);
 kd = 2.*zeta.*sqrt(Ixyz.*kp);
 controlLawStruct.controllerParams.kp = diag(kp);
 controlLawStruct.controllerParams.kd = diag(kd);
+% controlLawStruct.controllerParams.kp = zeros(3);
+% controlLawStruct.controllerParams.kd = zeros(3);
 controlLawStruct.dt_cont = 1e-1;
 
 % initialize for reaction wheel test
@@ -74,7 +77,8 @@ actuatorModelStruct.actuatorParams.Lw_max = inf;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
-Tfinal = 3*T;
+% Tfinal = 3*T;
+Tfinal = 30;
 dt_sc = 1e-1;
 
 omx_des = -n_float;
@@ -83,6 +87,7 @@ omz_des = 0;
 % % 
 om_des = [omx_des omy_des omz_des].';
 om0 = om_des;
+% om0 = 0.05.*randn([3 1]);
 R_ECItoRTN = eci2rtn(r0, v0);
 % R_RTNtoBdes = [0 1 0;0 0 1;1 0 0];
 R_RTNtoPdes = [0, 0, -1;0, 1, 0;1, 0, 0];
@@ -166,6 +171,31 @@ figureName = [figurePath, 'alpha_history_PD_control.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
+
+% plot covariance from filter
+meanValues = {om_kf(1,:), om_kf(2,:), om_kf(3,:)};
+trueValues = {om(1,:), om(2,:), om(3,:)};
+errorValues = {sigKF(4,:), sigKF(5,:), sigKF(6,:)};
+valueNames = {'$\omega_1$ [rad/s]';'$\omega_2$ [rad/s]';'$\omega_3$ [rad/s]'};
+figureName = [figurePath, 'kalman_filter_meas_update_omega_cov_bounds.png'];
+
+fig = figure();
+errorPlots(fig, t, meanValues,trueValues, errorValues, valueNames,figureName,exportflag)
+
+atrue = zeros([3 nsteps]);
+for i=1:nsteps
+    Rest = q2R(q_kf(:,i));
+    atrue(:,i) = RtoEuler(Rest * R_ItoP(:,:,i).', "312");
+end
+meanValues = {zeros([1 nsteps]), zeros([1 nsteps]), zeros([1 nsteps])};
+errorValues = {sigKF(1,:), sigKF(2,:), sigKF(3,:)};
+trueValues = {atrue(2,:), atrue(3,:), atrue(1,:)};
+valueNames = {'$\alpha_1$ [rad/s]';'$\alpha_2$ [rad/s]';'$\alpha_3$ [rad/s]'};
+figureName = [figurePath, 'kalman_filter_meas_update_att_cov_bounds.png'];
+
+fig = figure();
+errorPlots(fig, t, meanValues, trueValues, errorValues, valueNames,figureName,exportflag)
+
 
 z_prefit = vecnorm(squeeze(simOut.z_prefit.Data), 2, 1);
 z_postfit = vecnorm(squeeze(simOut.z_postfit.Data), 2, 1);
