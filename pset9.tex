@@ -12,7 +12,7 @@ As shown in Section \ref{sec:pertTorques}, the total torque from aerodynamic dra
     \label{fig:all_torque_hw9}
 \end{figure}
 
-In this plot it can be seen that the maximum torque is about 0.035 Nm. Due to the criticality of the actuators to the mission, a safety factor of 2.5 was selected to ensure that the selected actuators would be well equipped to handle perturbations well outside of the expected range. Multiplying the safety factor by the maximum perturbation torque resulted in a required maximum torque of 0.0875 Nm. Due to the nature of the mission, it isn't required for the satellite to complete fast slew maneuvers to switch between different modes of operation. Because the satellite is in a sun-synchronous orbit, and the sensors will always be earth pointing, there isn't a need to quickly slew between the science mode of operation where the data collection is prioritized to the charging mode of operation where the solar arrays must be pointed towards the sun. Because of this, it is sufficient to size the actuators to handle the manuevers that are needed to correct for perturbations torques and not for fast slew maneuvers.
+In this plot it can be seen that the maximum torque is about 0.035 Nm. Due to the criticality of the actuators to the mission, a safety factor of 2.5 was selected to ensure that the selected actuators would be well equipped to handle perturbations well outside of the expected range. Multiplying the safety factor by the maximum perturbation torque resulted in a required maximum torque of 0.0875 Nm. Due to the nature of the mission, it isn't necessary for the satellite to complete fast slew maneuvers to switch between different modes of operation. Because the satellite is in a sun-synchronous orbit, and the sensors will always be earth pointing, there isn't a need to quickly slew between the science mode of operation where data collection is prioritized to the charging mode of operation where the solar arrays must be pointed towards the sun. Because of this, it is sufficient to size the actuators to handle the manuevers that are needed to correct for perturbations torques and not for fast slew maneuvers.
 
 In order to ensure that the chosen actuators were able to produce the required maximum torque, available data sheets for momentum/reaction wheels and magnetorquers were analyzed. For reaction wheels, the Rocket Lab 12.0 Nms RW4 [Rad-Hard] and RW5 [Standard] were analyzed as well as the Bradford Aerospace High Torque Reaction Wheel for Satellites. Their maximum angular momentum and torque outputs are tabulated in Table \ref{table:rw}.
 
@@ -28,7 +28,7 @@ In order to ensure that the chosen actuators were able to produce the required m
 \label{table:rw}
 \end{table}
 
-It can also be noted that for the Bradford reaction wheel the torque rise/fall time was listed as 80 ms. Because of this short rise time, the initial angular momentum of the reaction wheel can be approximated as being anything between zero and the maximum value. For the magnetorquer, the maximum and nominal dipole moments were collected for the AAC Clyde Space MTQ800 magnetorquer and are tabulated in Table \ref{table:magnetorquer}.
+It can also be noted that for the Bradford reaction wheel the torque rise/fall time was listed as 80 ms. Because of this short rise time, the initial angular momentum of the reaction wheel can be approximated as being anything between zero and the maximum value. For the magnetorquer, the maximum and nominal dipole moments were collected for the AAC Clyde Space MTQ800 magnetorquer and are tabulated in Table \ref{table:magnetorquer}. While the exact torque output wasn't given in the specifications for the magnetorquer, it can be assumed that it is between 5e-4 and 5e-1 Nm for the given specifications. 
 
 \begin{table}
 \begin{tabular}{c|c|c}
@@ -40,13 +40,11 @@ It can also be noted that for the Bradford reaction wheel the torque rise/fall t
 \label{table:magnetorquer}
 \end{table}
 
-While the exact torque output wasn't given in the specifications for the magnetorquer, it can be assumed that it is between 5e-4 and 5e-1 Nm for the given specifications. 
-
 Due to the reaction wheels being large enough to handle the perturbation torques and the magnetorquers being better suited for fine tuning, we decided to use a combination of a set of reaction wheels and magnetorquers for the satellite.
 
 \subsection{Problem 2 - Start modeling actuators in dedicated (Simulink) subsystems which are part of the spacecraft. These models take inputs from ground-truth simulation and provides output control torques to be directly fed into the Euler equations, including systematic and random errors. Plot output vs input of actuator model. Hint: for the rest of this problem set you should remove all sensing and actuation errors for verification purposes.}
 
-For our actuators, we modelled a reaction wheel, momentum wheel, and a magnetorquer. For the reaction wheel and momentum wheel, we started with the Euler equation shown below.
+For our actuators, we modelled a reaction wheel and a magnetorquer. For the reaction wheel, we started with the Euler equation shown below.
 
 \begin{equation}
     \Vec{\dot L}_t + \Vec{\omega} \times \Vec{L}_t = \Vec{M}
@@ -127,7 +125,7 @@ Mout = cross(m,B) + [0;0;1] * Ldot;
     \label{fig:mtCode}
 \end{figure}
 
-The input and output of both of these actuators are shown below in Figures \ref{} and \ref{}.
+The input and output of both of these actuators are shown below in Figures \ref{fig:rwOutput} and \ref{fig:mtOutput}.
 
 \begin{figure}[H]
     \centering
@@ -206,4 +204,28 @@ It is also important to note that since there are currently bugs in our Kalman f
 
 \subsection{Problem 4 - Start plotting all the relevant quantities of your simulation, including attitude determination errors, attitude control errors, control actions (along all axes), etc. Hint: stress difference between what the ADCS believes, and what the spacecraft is actually doing. This affects estimation, control errors, and control actions.}
 
-Due to bugs in our Kalman filter, the current attitutude determination error is getting plotted using the q-method as opposed to the MEKF.
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS9/attitude_estimate_error.png}
+    \caption{Attitude Estimation Error}
+    \label{fig:attitudeEstimationError}
+\end{figure}
+
+Due to bugs in our Kalman filter, the current attitude determination error is getting plotted using the q-method as opposed to the MEKF.
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS9/control_moment_history.png}
+    \caption{Control Moment History}
+    \label{fig:ControlMomentHistory}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \captionsetup{ justification = centering }
+    \includegraphics[width = 15cm]{Images/PS9/alpha_history_PD_control.png}
+    \caption{$\alpha$ History for PD Control}
+    \label{fig:PDAlpha}
+\end{figure}
