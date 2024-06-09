@@ -56,11 +56,27 @@ Substituting in $\Vec{L}_t = \Vec{I} \Vec{\omega} + \Vec{A} \Vec{L}_w$ where $\V
     \Vec{I} \Vec{\dot \omega} + \Vec{\dot I} \Vec{\omega} + \Vec{A} \Vec{\dot L}_w + \Vec{\dot A} \Vec{L}_w + \Vec{\omega} \times \Vec{I} \Vec{\omega} + \Vec{\omega} \times \Vec{A} \Vec{L}_w = \Vec{M}
 \end{equation}
 
-For one reaction wheel and one momentum wheel, the equation can be simplified to the form shown below.
+For a set of reaction wheels or momentum wheels, the equation can be simplified to the form shown below.
 
 \begin{equation}
-    \Vec{\dot L}_w = \Vec{A}^* \left( - \Vec{M}_c - \Vec{\omega} \times \Vec{A} \Vec{L}_w \right)
+    \Vec{\dot L}_w = \Vec{A}^\dagger \left( - \Vec{M}_c - \Vec{\omega} \times \Vec{A} \Vec{L}_w \right)
 \end{equation}
+
+Where $\vec{A}^\dagger$ is the pseudoinverse of $\vec{A}$. For 4 reaction wheels in a square-pyramid configuration $\vec{A}$ and its pseudoinverse are defined below.
+
+\begin{align*}
+    \vec{A} = \frac{1}{\sqrt{3}} \begin{bmatrix}
+        -1 & 1 & 1 & -1 \\
+        -1 & -1 & 1 & 1 \\
+        1 & 1 & 1 & 1
+    \end{bmatrix} \\
+    \vec{A}^\dagger = \frac{3}{4\sqrt{3}} \begin{bmatrix}
+        -1 & -1 & 1 \\
+        1 & -1 & 1 \\
+        1 & 1 & 1 \\
+        -1 & 1 & 1
+    \end{bmatrix}
+\end{align*}
 
 From substituting in moment of inertias and angular velocities and linearizing, we obtain the following set of equations.
 
@@ -75,13 +91,13 @@ From substituting in moment of inertias and angular velocities and linearizing, 
 \end{align*}
 
 
-The simulink model that was used to implement this is shown below in Figures \ref{fig:simulink_mw} and \ref{fig:rwCode}.
+The Simulink model that was used to implement this is shown below in Figures \ref{fig:simulink_mw} and \ref{fig:rwCode}.
 
 \begin{figure}[H]
     \centering
     \captionsetup{ justification = centering }
     \includegraphics[width = 15cm]{Images/PS9/momentumWheelModel.png}
-    \caption{Simulink Model for Momentum Wheel}
+    \caption{Simulink Model for Reaction Wheel}
     \label{fig:simulink_mw}
 \end{figure}
 
