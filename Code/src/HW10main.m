@@ -3,7 +3,7 @@ clc, clear
 close all
 
 projectStartup;
-exportflag = false;
+exportflag = true;
 figurePath = '../../Images/PS10/';
 
 [rcm, Itotal_b, Itotal_p, A_ptob] = aquaMassProps();
@@ -43,8 +43,8 @@ Rmag = 4e-10*eye(3);
 Rstar = 2.35e-11*eye(3*(nmeas-1));
 % Rstar = 5e-3.*eye(3*(nmeas - 1));
 Ratt = [Rmag, zeros([3, 3*(nmeas-1)]); zeros([3*(nmeas-1), 3]), Rstar];
-Rom = 5.97e-8*eye(3);
-% Rom = 1e-1.*eye(3);
+% Rom = 5.97e-8*eye(3);
+Rom = 5e-3.*eye(3);
 kalmanFilterStruct.R = [Ratt, zeros([3*nmeas, 3]); zeros([3 3*nmeas]), Rom];
 kalmanFilterStruct.P0 = (1e-3).*eye(6);
 kalmanFilterStruct.Q = (10e-2).*kalmanFilterStruct.P0;
@@ -92,6 +92,8 @@ for i=1:nact
 end
 sys = tf(tf_num, tf_den);
 actuatorModelStruct.actuatorParams.sys = sys;
+% actuatorModelStruct.actuatorParams.num = [a];
+% actuatorModelStruct.actuatorParams.den = [1 a];
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
@@ -161,7 +163,7 @@ values = {u, u_kf, u_kf_error};
 valueNames = {'$u$ [rad]';'$u_{kf}$ [rad]'; '$\Delta u$ [rad]'};
 valueLabels = {{'$\phi$'; '$\theta$'; '$\psi$'};{'$\phi$'; '$\theta$'; '$\psi$'};...
     {'$\Delta \phi$'; '$\Delta \theta$'; '$\Delta \psi$'}};
-figureName = [figurePath, 'kalman_filter_meas_update_error_attitude.png'];
+figureName = [figurePath, 'mult_ext_kalman_filter_attitude.png'];
 
 % values = {q, q_kf};
 % valueNames = {'$q$';'$q_{kf}$'};
@@ -176,7 +178,7 @@ values = {om, om_kf, om_kf_error};
 valueNames = {'$\omega$ [rad/s]';'$\omega_{kf}$ [rad/s]'; '$\Delta \omega$ [rad/s]'};
 valueLabels = {{'$\omega_1$'; '$\omega_2$'; '$\omega_3$'};{'$\omega_1$'; '$\omega_2$'; '$\omega_3$'};...
     {'$\Delta \omega_1$'; '$\Delta \omega_2$'; '$\Delta \omega_3$'}};
-figureName = [figurePath, 'kalman_filter_meas_update_error_velocities.png'];
+figureName = [figurePath, 'mult_ext_kalman_filter_velocities.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
@@ -190,12 +192,16 @@ figureName = [figurePath, 'alpha_history_PD_control.png'];
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
 
+t = simOut.t;
+R_ItoP = simOut.yout{1}.Values.Data;
 Mc = squeeze(simOut.Mc.Data);
 Mout = squeeze(simOut.Mout.Data);
-values = {Mc;Mout};
-valueNames = {'$M_{c,PD}$ [Nm]';'$M_{c,true}$ [Nm]'};
-valueLabels = {{'$M_x$';'$M_y$';'$M_z$'}, {'$M_x$';'$M_y$';'$M_z$'}};
-figureName = [figurePath, 'control_moment_history.png'];
+Lwdot = squeeze(simOut.Lwdot.Data);
+values = {Mc;Mout;Lwdot};
+valueNames = {'$M_c$ [Nm]';'$M_{out}$ [Nm]';'$\dot{L}_w$ [Nm]'};
+valueLabels = {{'$M_x$';'$M_y$';'$M_z$'}, {'$M_x$';'$M_y$';'$M_z$'}, {'$\dot{L}_1$'...
+    ;'$\dot{L}_2$';'$\dot{L}_3$';'$\dot{L}_4$'}};
+figureName = [figurePath, 'reaction_wheel_model_output.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
@@ -205,7 +211,7 @@ meanValues = {om_kf(1,:), om_kf(2,:), om_kf(3,:)};
 trueValues = {om(1,:), om(2,:), om(3,:)};
 errorValues = {sigKF(4,:), sigKF(5,:), sigKF(6,:)};
 valueNames = {'$\omega_1$ [rad/s]';'$\omega_2$ [rad/s]';'$\omega_3$ [rad/s]'};
-figureName = [figurePath, 'kalman_filter_meas_update_omega_cov_bounds.png'];
+figureName = [figurePath, 'mult_ext_kalman_filter_omega_cov_bounds.png'];
 
 fig = figure();
 errorPlots(fig, t, meanValues,trueValues, errorValues, valueNames,figureName,exportflag)
@@ -219,7 +225,7 @@ meanValues = {zeros([1 nsteps]), zeros([1 nsteps]), zeros([1 nsteps])};
 errorValues = {sigKF(1,:), sigKF(2,:), sigKF(3,:)};
 trueValues = {atrue(2,:), atrue(3,:), atrue(1,:)};
 valueNames = {'$\alpha_1$ [rad/s]';'$\alpha_2$ [rad/s]';'$\alpha_3$ [rad/s]'};
-figureName = [figurePath, 'kalman_filter_meas_update_att_cov_bounds.png'];
+figureName = [figurePath, 'mult_ext_kalman_filter_att_cov_bounds.png'];
 
 fig = figure();
 errorPlots(fig, t, meanValues, trueValues, errorValues, valueNames,figureName,exportflag)
@@ -231,7 +237,7 @@ z_error = z_prefit - z_postfit;
 
 values = {z_prefit, z_postfit, z_error};
 valueNames = {'$z_{pre}$';'$z_{post}$'; '$\Delta z$'};
-figureName = [figurePath, 'kalman_filter_meas_update_residual_comparison.png'];
+figureName = [figurePath, 'mult_ext_kalman_filter_residual_comparison.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, {}, figureName, false, exportflag)

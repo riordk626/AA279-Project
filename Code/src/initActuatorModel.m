@@ -12,6 +12,8 @@ switch controlMoment
         mws.assignin('Lwdot_max', actuatorParams.Lwdot_max)
         mws.assignin('Lw_max', actuatorParams.Lw_max)
         mws.assignin('sysWheel', actuatorParams.sys)
+        % mws.assignin('num', actuatorParams.num)
+        % mws.assignin('den', actuatorParams.den)
     case "magnetorquer"
         load("magConstants.mat", "mhat_ecef", "B0", "Re")
         mws.assignin('mhat_ecef', mhat_ecef)
