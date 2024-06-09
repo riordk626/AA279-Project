@@ -38,13 +38,13 @@ sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "attitudeMeasData.mat";
 
 nmeas = 11;
-% Rmag = 4e-10*eye(3);
-Rmag = 1e-1.*eye(3);
-% Rstar = 2.35e-11*eye(3*(nmeas-1));
-Rstar = 5e-3.*eye(3*(nmeas - 1));
+Rmag = 4e-10*eye(3);
+% Rmag = 1e-1.*eye(3);
+Rstar = 2.35e-11*eye(3*(nmeas-1));
+% Rstar = 5e-3.*eye(3*(nmeas - 1));
 Ratt = [Rmag, zeros([3, 3*(nmeas-1)]); zeros([3*(nmeas-1), 3]), Rstar];
-% Rom = 5.97e-8*eye(3);
-Rom = 1e-4.*eye(3);
+Rom = sqrt(5.97e-8)*eye(3);
+% Rom = 1e-4.*eye(3);
 kalmanFilterStruct.R = [Ratt, zeros([3*nmeas, 3]); zeros([3 3*nmeas]), Rom];
 kalmanFilterStruct.P0 = (1e-3).*eye(6);
 kalmanFilterStruct.Q = (10e-2).*kalmanFilterStruct.P0;
@@ -77,8 +77,8 @@ actuatorModelStruct.actuatorParams.Lw_max = inf;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
-% Tfinal = 3*T;
-Tfinal = 30;
+Tfinal = 3*T;
+% Tfinal = 30;
 dt_sc = 1e-1;
 
 omx_des = -n_float;
