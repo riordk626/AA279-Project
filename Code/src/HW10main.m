@@ -38,13 +38,13 @@ sensorStruct.starCatalog = "simple";
 sensorStruct.attitudeFileName = "attitudeMeasData.mat";
 
 nmeas = 11;
-% Rmag = 4e-10*eye(3);
-Rmag = 1e-1.*eye(3);
-% Rstar = 2.35e-11*eye(3*(nmeas-1));
-Rstar = 5e-3.*eye(3*(nmeas - 1));
+Rmag = 4e-10*eye(3);
+% Rmag = 1e-1.*eye(3);
+Rstar = 2.35e-11*eye(3*(nmeas-1));
+% Rstar = 5e-3.*eye(3*(nmeas - 1));
 Ratt = [Rmag, zeros([3, 3*(nmeas-1)]); zeros([3*(nmeas-1), 3]), Rstar];
-% Rom = 5.97e-8*eye(3);
-Rom = 1e-4.*eye(3);
+Rom = 5.97e-8*eye(3);
+% Rom = 1e-1.*eye(3);
 kalmanFilterStruct.R = [Ratt, zeros([3*nmeas, 3]); zeros([3 3*nmeas]), Rom];
 kalmanFilterStruct.P0 = (1e-3).*eye(6);
 kalmanFilterStruct.Q = (10e-2).*kalmanFilterStruct.P0;
@@ -69,16 +69,34 @@ Lw0 = 12;
 A = (1/sqrt(3)).*[-1, 1, 1, -1;
                   -1, -1, 1, 1;
                   1, 1, 1, 1];
+nact = size(A,2);
 actuatorModelStruct.controlMoment = "reactionWheel";
-actuatorModelStruct.actuatorParams.Lw0 = Lw0.*ones([4 1]);
+actuatorModelStruct.actuatorParams.Lw0 = Lw0.*ones([nact 1]);
 actuatorModelStruct.actuatorParams.A = A;
-actuatorModelStruct.actuatorParams.Lwdot_max = inf;
-actuatorModelStruct.actuatorParams.Lw_max = inf;
+actuatorModelStruct.actuatorParams.Lwdot_max = 0.265;
+actuatorModelStruct.actuatorParams.Lw_max = 45;
+tr = 80e-3;
+a = 2.2/tr;
+tf_num = cell(nact);
+tf_den = cell(nact);
+for i=1:nact
+    for j=1:nact
+        if i==j
+            tf_num{i,j} = [a];
+            tf_den{i,j} = [1 a];
+        else
+            tf_num{i,j} = [0];
+            tf_den{i,j} = [1];
+        end
+    end
+end
+sys = tf(tf_num, tf_den);
+actuatorModelStruct.actuatorParams.sys = sys;
 
 ICstruct.r0 = r0; ICstruct.v0 = v0;
 
-% Tfinal = 3*T;
-Tfinal = 30;
+Tfinal = 3*T;
+% Tfinal = 30;
 dt_sc = 1e-1;
 
 omx_des = -n_float;
@@ -168,6 +186,16 @@ valueLabels = {{'$\alpha_x$';'$\alpha_y$';'$\alpha_z$'}};
 values = {a_error};
 valueNames = {'$\alpha$'};
 figureName = [figurePath, 'alpha_history_PD_control.png'];
+
+fig = figure();
+timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
+
+Mc = squeeze(simOut.Mc.Data);
+Mout = squeeze(simOut.Mout.Data);
+values = {Mc;Mout};
+valueNames = {'$M_{c,PD}$ [Nm]';'$M_{c,true}$ [Nm]'};
+valueLabels = {{'$M_x$';'$M_y$';'$M_z$'}, {'$M_x$';'$M_y$';'$M_z$'}};
+figureName = [figurePath, 'control_moment_history.png'];
 
 fig = figure();
 timeHistoryPlot(fig, t, values, valueNames, valueLabels, figureName, true, exportflag)
